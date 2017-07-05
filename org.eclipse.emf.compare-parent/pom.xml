@@ -409,6 +409,11 @@
         <module>../plugins/org.eclipse.emf.compare.diagram.sirius</module>
         <module>../plugins/org.eclipse.emf.compare.diagram.ide.ui.sirius</module>
         <module>../packaging/org.eclipse.emf.compare.diagram.sirius-feature</module>
+        
+        <module>../plugins/org.eclipse.emf.compare.facade</module>
+        <module>../plugins/org.eclipse.emf.compare.uml2.facade</module>
+        <module>../plugins/org.eclipse.emf.compare.uml2.facade.tests</module>
+        <module>../packaging/org.eclipse.emf.compare.facade-feature</module>
       </modules>
     </profile>
     <profile>
