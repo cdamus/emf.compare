@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmi:XMI xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:j2eeprofile="http://www.eclipse.org/emf-compare/2017/profile/test/j2ee" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML">
-  <uml:Package xmi:id="_a1OOwGD9EeeRI4ZiQltveg" name="a1">
+  <uml:Package xmi:id="_a1OOwGD9EeeRI4ZiQltveg" name="a2">
     <packagedElement xmi:type="uml:Class" xmi:id="_EbFukGD-Eee5h7jApwhmyQ" name="Thing"/>
+    <packagedElement xmi:type="uml:Interface" xmi:id="_WBFAcGJUEeeUlPd6FZB75g" name="ThingHome"/>
+    <packagedElement xmi:type="uml:Usage" xmi:id="_epTagGJUEeeUlPd6FZB75g" client="_WBFAcGJUEeeUlPd6FZB75g" supplier="_EbFukGD-Eee5h7jApwhmyQ"/>
     <profileApplication xmi:id="_Bs0KcGD-Eee5h7jApwhmyQ">
       <eAnnotations xmi:id="_Bs4b4GD-Eee5h7jApwhmyQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
         <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/emf-compare/2017/profile/test/j2ee#/"/>
@@ -10,4 +12,5 @@
     </profileApplication>
   </uml:Package>
   <j2eeprofile:Bean xmi:id="_Tb5egGECEeeTa-lmeT-VMg" base_Class="_EbFukGD-Eee5h7jApwhmyQ"/>
+  <j2eeprofile:HomeInterface xmi:id="_n9HZIGJdEeeUlPd6FZB75g" base_Interface="_WBFAcGJUEeeUlPd6FZB75g"/>
 </xmi:XMI>

@@ -1,0 +1,188 @@
+/*
+ * Copyright (c) 2017 Christian W. Damus and others.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Christian W. Damus - initial API and implementation
+ *
+ */
+package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.eclipse.emf.common.notify.Notifier;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
+import org.eclipse.emf.compare.utils.Optionals;
+import org.eclipse.uml2.uml.Interface;
+import org.eclipse.uml2.uml.NamedElement;
+import org.eclipse.uml2.uml.Usage;
+import org.eclipse.uml2.uml.util.UMLUtil;
+
+/**
+ * Façade adapter for home-interfaces in a J2EE model.
+ *
+ * @author Christian W. Damus
+ */
+public class HomeInterfaceAdapter extends NamedElementAdapter {
+
+	/**
+	 * Initializes me with a stereotype application.
+	 * 
+	 * @param facade
+	 *            the bean façade
+	 * @param homeInterface
+	 *            the UML model element
+	 * @param stereotype
+	 *            the J2EE HomeInterface stereotype application
+	 */
+	HomeInterfaceAdapter(HomeInterface facade, Interface homeInterface,
+			org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface stereotype) {
+
+		super(facade, homeInterface, stereotype);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isAdapterForType(Object type) {
+		return (type == Bean.class) || (type == HomeInterfaceAdapter.class) //
+				|| super.isAdapterForType(type);
+	}
+
+	@Override
+	public HomeInterface getFacade() {
+		return (HomeInterface)super.getFacade();
+	}
+
+	@Override
+	public Interface getUnderlyingElement() {
+		return (Interface)super.getUnderlyingElement();
+	}
+
+	@Override
+	public org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface getStereotype() {
+		return (org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface)super.getStereotype();
+	}
+
+	/**
+	 * Ensures that the façade and its UML element are connected by an adapter.
+	 * 
+	 * @param facade
+	 *            a home-interface façade
+	 * @param homeInterface
+	 *            the UML model element
+	 * @return the existing or new adapter
+	 */
+	static HomeInterfaceAdapter connect(HomeInterface facade, Interface homeInterface) {
+		HomeInterfaceAdapter result = null;
+
+		org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface stereotype = UMLUtil
+				.getStereotypeApplication(homeInterface,
+						org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface.class);
+
+		if (stereotype != null) {
+			result = connect(facade, homeInterface, HomeInterfaceAdapter.class,
+					(f, m) -> new HomeInterfaceAdapter(f, m, stereotype));
+		}
+
+		return result;
+	}
+
+	/**
+	 * Obtains the adapter instance for some notifier.
+	 * 
+	 * @param notifier
+	 *            a façade or UML model element
+	 * @return the adapter, or {@code null}
+	 */
+	static HomeInterfaceAdapter get(Notifier notifier) {
+		return get(notifier, HomeInterfaceAdapter.class);
+	}
+
+	/**
+	 * Queries whether some {@code object} is a UML interface that is stereotyped as a home-interface.
+	 * 
+	 * @param object
+	 *            an object
+	 * @return whether it is a home interfacein the UML model
+	 */
+	static boolean isHomeInterface(Object object) {
+		return (object instanceof Interface) && (UMLUtil.getStereotypeApplication((Interface)object,
+				org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface.class) != null);
+
+	}
+
+	/**
+	 * Synchronize the bean from the façade to the UML model.
+	 * 
+	 * @param facade
+	 *            the façade
+	 * @param model
+	 *            the UML element
+	 */
+	public void syncBeanToModel(HomeInterface facade, Interface model) {
+		org.eclipse.uml2.uml.Class oldBeanClass = getBean(model);
+		Bean bean = facade.getBean();
+		org.eclipse.uml2.uml.Class newBeanClass = (org.eclipse.uml2.uml.Class)bean.getUnderlyingElement();
+
+		if (newBeanClass != oldBeanClass) {
+			setBean(model, newBeanClass);
+		}
+	}
+
+	protected Optional<Usage> getBeanRelationship(Interface homeInterface) {
+		return homeInterface.getClientDependencies().stream() //
+				.filter(Usage.class::isInstance).map(Usage.class::cast) //
+				.filter(u -> u.getSuppliers().stream().anyMatch(BeanAdapter::isBeanClass))//
+				.findAny();
+
+	}
+
+	protected org.eclipse.uml2.uml.Class getBean(Interface homeInterface) {
+		return getBeanRelationship(homeInterface)//
+				.flatMap(r -> r.getTargets().stream().filter(BeanAdapter::isBeanClass)
+						.map(org.eclipse.uml2.uml.Class.class::cast).findAny())
+				.orElse(null);
+	}
+
+	protected void setBean(Interface homeInterface, org.eclipse.uml2.uml.Class beanClass) {
+		Optional<Usage> usage = getBeanRelationship(homeInterface);
+		Optionals.ifPresentElse(usage, u -> {
+			List<NamedElement> suppliers = u.getSuppliers();
+			if (suppliers.size() == 1) {
+				suppliers.set(0, beanClass);
+			} else {
+				suppliers.clear();
+				suppliers.add(beanClass);
+			}
+		}, () -> homeInterface.createUsage(beanClass));
+	}
+
+	/**
+	 * Synchronize the bean from the UML model to the façade.
+	 * 
+	 * @param model
+	 *            the UML element
+	 * @param facade
+	 *            the façade
+	 */
+	public void syncBeanToFacade(Interface model, HomeInterface facade) {
+		Bean oldBean = facade.getBean();
+		org.eclipse.uml2.uml.Class newBeanClass = getBean(model);
+		Bean newBean = null;
+		if (newBeanClass != null) {
+			newBean = J2EEFacadeFactory.create(newBeanClass);
+		}
+
+		if (newBean != oldBean) {
+			facade.setBean(newBean);
+		}
+	}
+}

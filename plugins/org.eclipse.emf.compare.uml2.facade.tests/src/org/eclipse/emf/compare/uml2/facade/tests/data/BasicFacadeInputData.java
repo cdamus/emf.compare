@@ -36,4 +36,12 @@ public class BasicFacadeInputData extends AbstractFacadeInputData {
 		return loadFacadeFromClassLoader("a1/right.uml"); //$NON-NLS-1$
 	}
 
+	public Resource getA2Left() {
+		return loadFacadeFromClassLoader("a2/left.uml"); //$NON-NLS-1$
+	}
+
+	public Resource getA2Right() {
+		return loadFacadeFromClassLoader("a2/right.uml"); //$NON-NLS-1$
+	}
+
 }

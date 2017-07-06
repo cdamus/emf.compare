@@ -21,6 +21,7 @@ import java.util.Optional;
 import org.eclipse.emf.compare.uml2.facade.tests.data.BasicFacadeInputData;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.BeanKind;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLTest;
@@ -101,6 +102,16 @@ public class BasicFacadeTest extends AbstractUMLTest {
 		assertThat(newBean.getUnderlyingElement(), is(class_));
 	}
 
+	@Test
+	public void simpleHomeInterface() {
+		Package package_ = requirePackage(input.getA2Left(), "a2");
+		HomeInterface thingHome = requireHomeInterface(package_, "ThingHome");
+
+		Bean thing = thingHome.getBean();
+		assertThat("Home interface has no bean", thing, notNullValue());
+		assertThat("Wrong bean", thing.getName(), is("Thing"));
+	}
+
 	//
 	// Test framework
 	//
@@ -126,6 +137,14 @@ public class BasicFacadeTest extends AbstractUMLTest {
 		Bean result = package_.getBean(name);
 
 		assertThat(String.format("No bean '%s'", name), result, notNullValue());
+
+		return result;
+	}
+
+	HomeInterface requireHomeInterface(Package package_, String name) {
+		HomeInterface result = package_.getHomeInterface(name);
+
+		assertThat(String.format("No home-interface '%s'", name), result, notNullValue());
 
 		return result;
 	}

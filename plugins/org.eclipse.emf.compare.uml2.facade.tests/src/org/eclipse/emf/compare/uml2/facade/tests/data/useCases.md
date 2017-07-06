@@ -9,4 +9,10 @@ of the **J2EE Façade Model**, using the **J2EE Profile** on classes and interfa
 
 Two-way comparison of models where the left model
 
-* changes a bean name
+* changes a bean kind
+
+### Use case a2
+
+Two-way comparison of models where the left model
+
+* adds a home-interface for the bean

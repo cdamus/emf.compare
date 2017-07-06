@@ -13,6 +13,7 @@
 package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters;
 
 import static org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters.BeanAdapter.isBeanClass;
+import static org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters.HomeInterfaceAdapter.isHomeInterface;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -24,9 +25,12 @@ import java.util.Set;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.compare.facade.SyncDirectionKind;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement;
 import org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.J2EEProfilePackage;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.uml2.uml.Element;
+import org.eclipse.uml2.uml.Interface;
 import org.eclipse.uml2.uml.PackageableElement;
 import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.UMLPackage;
@@ -128,6 +132,34 @@ public class PackageAdapter extends NamedElementAdapter {
 	}
 
 	/**
+	 * Synchronize the owned home-interfaces from the façade to the UML model.
+	 * 
+	 * @param facade
+	 *            the façade
+	 * @param model
+	 *            the UML element
+	 */
+	public void syncHomeInterfaceToModel(org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package facade,
+			org.eclipse.uml2.uml.Package model) {
+
+		// Add missing interfaces in the model
+		Set<Interface> legitHomeInterfaces = Sets.newHashSet();
+		for (HomeInterface home : facade.getHomeInterfaces()) {
+			Interface homeInterface = getHomeInterface(home);
+			if (homeInterface != null) {
+				legitHomeInterfaces.add(homeInterface);
+				HomeInterfaceAdapter.connect(home, homeInterface).initialSync(SyncDirectionKind.TO_MODEL);
+			}
+		}
+
+		// Destroy extraneous interfaces in the model
+		List<Type> homeInterfacesToDestroy = Lists
+				.newArrayList(Iterables.filter(model.getOwnedTypes(), HomeInterfaceAdapter::isHomeInterface));
+		homeInterfacesToDestroy.removeAll(legitHomeInterfaces);
+		homeInterfacesToDestroy.forEach(Element::destroy);
+	}
+
+	/**
 	 * Finds the UML bean class corresponding to a bean façade, creating it if necessary.
 	 * 
 	 * @param bean
@@ -160,6 +192,38 @@ public class PackageAdapter extends NamedElementAdapter {
 	}
 
 	/**
+	 * Finds the UML interface corresponding to a home-interface façade, creating it if necessary.
+	 * 
+	 * @param homeInterface
+	 *            a home-interface façade
+	 * @return its UML representation
+	 */
+	Interface getHomeInterface(HomeInterface homeInterface) {
+		Interface result = null;
+
+		// Look for existing adapter
+		HomeInterfaceAdapter adapter = HomeInterfaceAdapter.get(homeInterface);
+		if (adapter != null) {
+			result = adapter.getUnderlyingElement();
+		} else if (homeInterface.getPackage() != null) {
+			// It's not deleted, so ensure the underlying model
+			org.eclipse.uml2.uml.Package umlPackage = getUnderlyingElement();
+			if (homeInterface.getName() != null) {
+				result = (Interface)umlPackage.getOwnedType(homeInterface.getName(), false,
+						UMLPackage.Literals.INTERFACE, true);
+			} else {
+				result = umlPackage.createOwnedInterface(null);
+				StereotypeApplicationHelper.getInstance(result).applyStereotype(result,
+						J2EEProfilePackage.Literals.HOME_INTERFACE);
+			}
+
+			HomeInterfaceAdapter.connect(homeInterface, result);
+		}
+
+		return result;
+	}
+
+	/**
 	 * Synchronize the owned beans from the UML model to the façade.
 	 * 
 	 * @param model
@@ -171,22 +235,30 @@ public class PackageAdapter extends NamedElementAdapter {
 			org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package facade) {
 
 		// Add missing beans in the façade
-		Set<Bean> legitBeans = Sets.newHashSet();
+		Set<NamedElement> legitElements = Sets.newHashSet();
 		for (PackageableElement element : model.getPackagedElements()) {
 			if (isBeanClass(element)) {
 				org.eclipse.uml2.uml.Class beanClass = (org.eclipse.uml2.uml.Class)element;
 				Bean bean = getBean(beanClass);
 				if (bean != null) {
-					legitBeans.add(bean);
+					legitElements.add(bean);
 					BeanAdapter.connect(bean, beanClass).initialSync(SyncDirectionKind.TO_FACADE);
+				}
+			} else if (isHomeInterface(element)) {
+				Interface homeInterface = (Interface)element;
+				HomeInterface home = getHomeInterface(homeInterface);
+				if (home != null) {
+					legitElements.add(home);
+					HomeInterfaceAdapter.connect(home, homeInterface)
+							.initialSync(SyncDirectionKind.TO_FACADE);
 				}
 			}
 		}
 
-		// Destroy extraneous beans in the façade
-		List<Bean> beansToDestroy = Lists.newArrayList(facade.getBeans());
-		beansToDestroy.removeAll(legitBeans);
-		beansToDestroy.forEach(EcoreUtil::remove);
+		// Destroy extraneous elements in the façade
+		List<NamedElement> elementsToDestroy = Lists.newArrayList(facade.getMembers());
+		elementsToDestroy.removeAll(legitElements);
+		elementsToDestroy.forEach(EcoreUtil::remove);
 	}
 
 	/**
@@ -213,6 +285,35 @@ public class PackageAdapter extends NamedElementAdapter {
 			}
 
 			BeanAdapter.connect(result, beanClass);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Finds the home-interface façade corresponding to a UML interface, creating it if necessary.
+	 * 
+	 * @param homeInterface
+	 *            a possible UML home interface
+	 * @return its façade, or {@code null} if the class is not a valid home-interface
+	 */
+	HomeInterface getHomeInterface(Interface homeInterface) {
+		HomeInterface result = null;
+
+		// Look for existing adapter
+		HomeInterfaceAdapter adapter = HomeInterfaceAdapter.get(homeInterface);
+		if (adapter != null) {
+			result = adapter.getFacade();
+		} else if (homeInterface.getPackage() != null) {
+			// It's not deleted, so ensure the underlying model
+			org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package package_ = getFacade();
+			if (homeInterface.getName() != null) {
+				result = package_.getHomeInterface(homeInterface.getName(), false, true);
+			} else {
+				result = package_.createHomeInterface(null);
+			}
+
+			HomeInterfaceAdapter.connect(result, homeInterface);
 		}
 
 		return result;
