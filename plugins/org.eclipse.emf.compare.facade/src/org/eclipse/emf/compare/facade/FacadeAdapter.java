@@ -166,17 +166,36 @@ public class FacadeAdapter implements Adapter.Internal {
 	 * 
 	 * @param notification
 	 *            description of a change in either the façade or the underlying element
+	 * @see #handleNotification(Notification)
 	 */
 	public void notifyChanged(Notification notification) {
 		if (notification.isTouch()) {
 			return;
 		}
 
+		handleNotification(notification);
+	}
+
+	/**
+	 * Implements the handling of a notification to perform synchronization.
+	 * 
+	 * @param notification
+	 *            description of a change in either the façade or the underlying element. It will not be a
+	 *            {@link Notification#isTouch() touch} event
+	 * @return whether the notification was completely processed an no further synchronization is required
+	 */
+	protected boolean handleNotification(Notification notification) {
+		boolean result = false;
+
 		if (notification.getNotifier() == model) {
 			syncModelToFacade(notification);
+			result = true;
 		} else if (notification.getNotifier() == facade) {
 			syncFacadeToModel(notification);
+			result = true;
 		}
+
+		return result;
 	}
 
 	/**

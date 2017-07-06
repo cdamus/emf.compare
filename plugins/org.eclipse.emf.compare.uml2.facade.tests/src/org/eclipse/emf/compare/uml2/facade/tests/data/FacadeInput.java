@@ -12,19 +12,19 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests.data;
 
+import static java.lang.annotation.ElementType.TYPE;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
- * This is the {@code BasicFacadeInputData} type. Enjoy.
+ * This is the {@code FacadeInput} type. Enjoy.
  *
  * @author Christian W. Damus
  */
-@FacadeInput({"a1", "a2" }) // Generate resource accessors
-public class BasicFacadeInputData extends BasicFacadeInputDataGen {
-
-	/**
-	 * Initializes me.
-	 */
-	public BasicFacadeInputData() {
-		super();
-	}
-
+@Retention(RetentionPolicy.SOURCE)
+@Target(TYPE)
+public @interface FacadeInput {
+	String[] value();
 }

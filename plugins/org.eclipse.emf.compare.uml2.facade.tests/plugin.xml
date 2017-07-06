@@ -57,7 +57,7 @@ Contributors:
          point="org.eclipse.uml2.uml.generated_package">
       <profile
             uri="http://www.eclipse.org/emf-compare/2017/profile/test/j2ee"
-            location="platform:/plugin/org.eclipse.emf.compare.uml2.facade.tests/model/j2ee.profile.uml#_0">
+            location="pathmap://UML2_FACADE_TESTS/j2ee.profile.uml#_0">
       </profile>
    </extension>
    

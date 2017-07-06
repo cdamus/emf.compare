@@ -12,11 +12,15 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assume.assumeThat;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.emf.compare.uml2.facade.tests.data.BasicFacadeInputData;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
@@ -30,6 +34,8 @@ import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.uml2.uml.Element;
+import org.eclipse.uml2.uml.Interface;
+import org.eclipse.uml2.uml.Usage;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
@@ -41,7 +47,7 @@ import org.junit.Test;
  *
  * @author Christian W. Damus
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "boxing" })
 public class BasicFacadeTest extends AbstractUMLTest {
 
 	private BasicFacadeInputData input = new BasicFacadeInputData();
@@ -110,6 +116,63 @@ public class BasicFacadeTest extends AbstractUMLTest {
 		Bean thing = thingHome.getBean();
 		assertThat("Home interface has no bean", thing, notNullValue());
 		assertThat("Wrong bean", thing.getName(), is("Thing"));
+	}
+
+	@Test
+	public void changeHomeInterfaceBeanFromFacade() {
+		Package package_ = requirePackage(input.getA2Left(), "a2");
+		HomeInterface thingHome = requireHomeInterface(package_, "ThingHome");
+
+		Bean whatsit = requireBean(package_, "Whatsit");
+		thingHome.setBean(whatsit);
+
+		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)whatsit.getUnderlyingElement();
+		Interface thingHomeInterface = (Interface)thingHome.getUnderlyingElement();
+
+		List<Usage> usages = thingHomeInterface.getClientDependencies().stream() //
+				.filter(Usage.class::isInstance).map(Usage.class::cast).collect(Collectors.toList());
+		assertThat("Extra usage created or usage deleted", usages.size(), is(1));
+		assertThat("Wrong usage relationship", usages.get(0).getSuppliers(), is(singletonList(whatsitClass)));
+	}
+
+	@Test
+	public void changeHomeInterfaceBeanFromUML1() {
+		Package package_ = requirePackage(input.getA2Left(), "a2");
+		HomeInterface thingHome = requireHomeInterface(package_, "ThingHome");
+
+		Bean whatsit = requireBean(package_, "Whatsit");
+		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)whatsit.getUnderlyingElement();
+		Interface thingHomeInterface = (Interface)thingHome.getUnderlyingElement();
+
+		List<Usage> usages = thingHomeInterface.getClientDependencies().stream() //
+				.filter(Usage.class::isInstance).map(Usage.class::cast).collect(Collectors.toList());
+		assertThat("Should have an unique usage", usages.size(), is(1));
+
+		// The optimal way to do it
+		assumeThat("Invalid usage", usages.get(0).getSuppliers().size(), is(1));
+		usages.get(0).getSuppliers().set(0, whatsitClass);
+
+		assertThat("Bean not updated", thingHome.getBean(), is(whatsit));
+	}
+
+	@Test
+	public void changeHomeInterfaceBeanFromUML2() {
+		Package package_ = requirePackage(input.getA2Left(), "a2");
+		HomeInterface thingHome = requireHomeInterface(package_, "ThingHome");
+
+		Bean whatsit = requireBean(package_, "Whatsit");
+		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)whatsit.getUnderlyingElement();
+		Interface thingHomeInterface = (Interface)thingHome.getUnderlyingElement();
+
+		List<Usage> usages = thingHomeInterface.getClientDependencies().stream() //
+				.filter(Usage.class::isInstance).map(Usage.class::cast).collect(Collectors.toList());
+		assertThat("Should have an unique usage", usages.size(), is(1));
+
+		// A different way to do it
+		usages.get(0).getSuppliers().clear();
+		usages.get(0).getSuppliers().add(whatsitClass);
+
+		assertThat("Bean not updated", thingHome.getBean(), is(whatsit));
 	}
 
 	//

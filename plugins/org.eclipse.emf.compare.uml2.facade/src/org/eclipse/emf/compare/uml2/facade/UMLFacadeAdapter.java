@@ -98,22 +98,20 @@ public class UMLFacadeAdapter extends FacadeAdapter {
 	}
 
 	/**
-	 * Reacts to changes in the façade or underlying element to synchronize with the other.
-	 * 
-	 * @param notification
-	 *            description of a change in either the façade or the underlying element
+	 * {@inheritDoc}
 	 */
 	@Override
-	public void notifyChanged(Notification notification) {
-		if (notification.isTouch()) {
-			return;
+	public boolean handleNotification(Notification notification) {
+		boolean result = super.handleNotification(notification);
+
+		if (!result) {
+			if ((stereotype != null) && (notification.getNotifier() == stereotype)) {
+				syncStereotypeToFacade(notification);
+				result = true;
+			}
 		}
 
-		if ((stereotype != null) && (notification.getNotifier() == stereotype)) {
-			syncStereotypeToFacade(notification);
-		} else {
-			super.notifyChanged(notification);
-		}
+		return result;
 	}
 
 	/**

@@ -7,13 +7,17 @@ Bundle-ClassPath: .
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Export-Package: org.eclipse.emf.compare.uml2.facade.tests.j2ee,
+Export-Package: org.eclipse.emf.compare.uml2.facade.tests,
+ org.eclipse.emf.compare.uml2.facade.tests.data,
+ org.eclipse.emf.compare.uml2.facade.tests.j2ee,
+ org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters;x-internal:=true,
  org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.impl;x-internal:=true,
  org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.operations;x-internal:=true,
  org.eclipse.emf.compare.uml2.facade.tests.j2ee.util,
  org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile,
  org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.internal.impl;x-internal:=true,
- org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.util
+ org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.util,
+ org.eclipse.emf.compare.uml2.facade.tests.suite
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore;visibility:=reexport,
  org.eclipse.emf.ecore.xmi;visibility:=reexport,

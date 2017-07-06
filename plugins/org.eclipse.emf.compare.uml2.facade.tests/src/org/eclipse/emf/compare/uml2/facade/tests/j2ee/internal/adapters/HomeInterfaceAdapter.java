@@ -15,6 +15,7 @@ package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters;
 import java.util.List;
 import java.util.Optional;
 
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
@@ -31,6 +32,8 @@ import org.eclipse.uml2.uml.util.UMLUtil;
  */
 public class HomeInterfaceAdapter extends NamedElementAdapter {
 
+	private Usage usage;
+
 	/**
 	 * Initializes me with a stereotype application.
 	 * 
@@ -45,6 +48,18 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 			org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface stereotype) {
 
 		super(facade, homeInterface, stereotype);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void dispose() {
+		super.dispose();
+
+		if (usage != null) {
+			removeAdapter(usage);
+		}
 	}
 
 	/**
@@ -69,6 +84,22 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	@Override
 	public org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface getStereotype() {
 		return (org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface)super.getStereotype();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean handleNotification(Notification notification) {
+		boolean result = super.handleNotification(notification);
+
+		if (!result) {
+			if ((usage != null) && (notification.getNotifier() == usage)) {
+				synchronize(usage, getFacade(), false, notification);
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -140,7 +171,8 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	protected Optional<Usage> getBeanRelationship(Interface homeInterface) {
 		return homeInterface.getClientDependencies().stream() //
 				.filter(Usage.class::isInstance).map(Usage.class::cast) //
-				.filter(u -> u.getSuppliers().stream().anyMatch(BeanAdapter::isBeanClass))//
+				.filter(u -> u.getSuppliers().stream().anyMatch(BeanAdapter::isBeanClass)) //
+				.peek(this::setUsage) // We need to track changes to this
 				.findAny();
 
 	}
@@ -153,8 +185,7 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	}
 
 	protected void setBean(Interface homeInterface, org.eclipse.uml2.uml.Class beanClass) {
-		Optional<Usage> usage = getBeanRelationship(homeInterface);
-		Optionals.ifPresentElse(usage, u -> {
+		Optionals.ifPresentElse(getBeanRelationship(homeInterface), u -> {
 			List<NamedElement> suppliers = u.getSuppliers();
 			if (suppliers.size() == 1) {
 				suppliers.set(0, beanClass);
@@ -162,7 +193,21 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 				suppliers.clear();
 				suppliers.add(beanClass);
 			}
-		}, () -> homeInterface.createUsage(beanClass));
+		}, () -> setUsage(homeInterface.createUsage(beanClass)));
+	}
+
+	protected void setUsage(Usage newUsage) {
+		if (newUsage == this.usage) {
+			return;
+		}
+
+		if (this.usage != null) {
+			removeAdapter(this.usage);
+		}
+		this.usage = newUsage;
+		if (newUsage != null) {
+			addAdapter(newUsage);
+		}
 	}
 
 	/**
@@ -184,5 +229,18 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 		if (newBean != oldBean) {
 			facade.setBean(newBean);
 		}
+	}
+
+	/**
+	 * Synchronize the bean from the UML model to the façade by its usage relationship.
+	 * 
+	 * @param model
+	 *            the UML usage element
+	 * @param facade
+	 *            the façade
+	 */
+	public void syncSupplierToFacade(Usage model, HomeInterface facade) {
+		// Just delegate
+		syncBeanToFacade(getUnderlyingElement(), facade);
 	}
 }
