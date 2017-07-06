@@ -15,6 +15,7 @@ location "http://download.eclipse.org/releases/oxygen" {
 	org.eclipse.gmf.runtime.notation.sdk.feature.group lazy
 	org.eclipse.emf.ecoretools.sdk.feature.group lazy
 	org.eclipse.team.svn.feature.group lazy
+	org.eclipse.jdt.apt.core lazy
 }
 
 location "http://download.eclipse.org/acceleo/updates/nightly/latest" {

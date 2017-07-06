@@ -19,6 +19,30 @@
  
   <build>
     <plugins>
+		<plugin>
+		  <groupId>org.bsc.maven</groupId>
+		  <artifactId>maven-processor-plugin</artifactId>
+		  <version>3.3.1</version>
+		  <executions>
+			<execution>
+			  <id>process</id>
+			  <goals>
+				<goal>process</goal>
+			  </goals>
+			  <phase>generate-sources</phase>
+			  <configuration>
+			    <outputDirectory>.apt_generated</outputDirectory>
+			  </configuration>
+			</execution>
+		  </executions>
+		  <dependencies>
+			<dependency>
+				<groupId>org.eclipse.emf.compare</groupId>
+				<artifactId>org.eclipse.emf.compare.uml2.facade.tests.annotations</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+			</dependency>
+		  </dependencies>
+		</plugin>
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-surefire-plugin</artifactId>
