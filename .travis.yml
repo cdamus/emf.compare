@@ -9,4 +9,4 @@ before_script:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
-script: mvn -f org.eclipse.emf.compare-parent/pom.xml -P oxygen -q verify
+script: "mvn -f org.eclipse.emf.compare-parent/pom.xml -q -Dsurefire.printSummary=false -P oxygen verify | grep -E -v -e 'Time elapsed: [0-9.]+ sec\s*$'"
