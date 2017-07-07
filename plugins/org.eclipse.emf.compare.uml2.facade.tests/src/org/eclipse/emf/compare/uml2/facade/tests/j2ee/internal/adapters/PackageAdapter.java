@@ -13,6 +13,7 @@
 package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters;
 
 import static org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters.BeanAdapter.isBeanClass;
+import static org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters.FinderAdapter.isFinder;
 import static org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters.HomeInterfaceAdapter.isHomeInterface;
 
 import com.google.common.collect.Iterables;
@@ -25,6 +26,7 @@ import java.util.Set;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.compare.facade.SyncDirectionKind;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Finder;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement;
 import org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.J2EEProfilePackage;
@@ -34,7 +36,6 @@ import org.eclipse.uml2.uml.Interface;
 import org.eclipse.uml2.uml.PackageableElement;
 import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.UMLPackage;
-import org.eclipse.uml2.uml.util.UMLUtil.StereotypeApplicationHelper;
 
 /**
  * Façade adapter for packages in a J2EE model.
@@ -160,6 +161,34 @@ public class PackageAdapter extends NamedElementAdapter {
 	}
 
 	/**
+	 * Synchronize the owned finders from the façade to the UML model.
+	 * 
+	 * @param facade
+	 *            the façade
+	 * @param model
+	 *            the UML element
+	 */
+	public void syncFinderToModel(org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package facade,
+			org.eclipse.uml2.uml.Package model) {
+
+		// Add missing interfaces in the model
+		Set<Interface> legitFinders = Sets.newHashSet();
+		for (Finder finder : facade.getFinders()) {
+			Interface finderInterface = getFinderInterface(finder);
+			if (finderInterface != null) {
+				legitFinders.add(finderInterface);
+				FinderAdapter.connect(finder, finderInterface).initialSync(SyncDirectionKind.TO_MODEL);
+			}
+		}
+
+		// Destroy extraneous interfaces in the model
+		List<Type> findersToDestroy = Lists
+				.newArrayList(Iterables.filter(model.getOwnedTypes(), FinderAdapter::isFinder));
+		findersToDestroy.removeAll(legitFinders);
+		findersToDestroy.forEach(Element::destroy);
+	}
+
+	/**
 	 * Finds the UML bean class corresponding to a bean façade, creating it if necessary.
 	 * 
 	 * @param bean
@@ -180,8 +209,7 @@ public class PackageAdapter extends NamedElementAdapter {
 				result = (org.eclipse.uml2.uml.Class)umlPackage.getOwnedType(bean.getName(), false,
 						UMLPackage.Literals.CLASS, true);
 			} else {
-				result = umlPackage.createOwnedClass(null, false);
-				StereotypeApplicationHelper.getInstance(result).applyStereotype(result,
+				result = applyStereotype(umlPackage.createOwnedClass(null, false),
 						J2EEProfilePackage.Literals.BEAN);
 			}
 
@@ -212,12 +240,42 @@ public class PackageAdapter extends NamedElementAdapter {
 				result = (Interface)umlPackage.getOwnedType(homeInterface.getName(), false,
 						UMLPackage.Literals.INTERFACE, true);
 			} else {
-				result = umlPackage.createOwnedInterface(null);
-				StereotypeApplicationHelper.getInstance(result).applyStereotype(result,
+				result = applyStereotype(umlPackage.createOwnedInterface(null),
 						J2EEProfilePackage.Literals.HOME_INTERFACE);
 			}
 
 			HomeInterfaceAdapter.connect(homeInterface, result);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Finds the UML interface corresponding to a finder façade, creating it if necessary.
+	 * 
+	 * @param finder
+	 *            a finder façade
+	 * @return its UML representation
+	 */
+	Interface getFinderInterface(Finder finder) {
+		Interface result = null;
+
+		// Look for existing adapter
+		FinderAdapter adapter = FinderAdapter.get(finder);
+		if (adapter != null) {
+			result = adapter.getUnderlyingElement();
+		} else if (finder.getPackage() != null) {
+			// It's not deleted, so ensure the underlying model
+			org.eclipse.uml2.uml.Package umlPackage = getUnderlyingElement();
+			if (finder.getName() != null) {
+				result = (Interface)umlPackage.getOwnedType(finder.getName(), false,
+						UMLPackage.Literals.INTERFACE, true);
+			} else {
+				result = applyStereotype(umlPackage.createOwnedInterface(null),
+						J2EEProfilePackage.Literals.HOME_INTERFACE);
+			}
+
+			FinderAdapter.connect(finder, result);
 		}
 
 		return result;
@@ -252,6 +310,13 @@ public class PackageAdapter extends NamedElementAdapter {
 					HomeInterfaceAdapter.connect(home, homeInterface)
 							.initialSync(SyncDirectionKind.TO_FACADE);
 				}
+			} else if (isFinder(element)) {
+				Interface finderInterface = (Interface)element;
+				Finder finder = getFinder(finderInterface);
+				if (finder != null) {
+					legitElements.add(finder);
+					FinderAdapter.connect(finder, finderInterface).initialSync(SyncDirectionKind.TO_FACADE);
+				}
 			}
 		}
 
@@ -281,7 +346,7 @@ public class PackageAdapter extends NamedElementAdapter {
 			if (beanClass.getName() != null) {
 				result = package_.getBean(beanClass.getName(), false, true);
 			} else {
-				result = package_.createBean(null);
+				result = package_.createBean(beanClass.getName());
 			}
 
 			BeanAdapter.connect(result, beanClass);
@@ -295,7 +360,7 @@ public class PackageAdapter extends NamedElementAdapter {
 	 * 
 	 * @param homeInterface
 	 *            a possible UML home interface
-	 * @return its façade, or {@code null} if the class is not a valid home-interface
+	 * @return its façade, or {@code null} if the interface is not a valid home-interface
 	 */
 	HomeInterface getHomeInterface(Interface homeInterface) {
 		HomeInterface result = null;
@@ -310,10 +375,39 @@ public class PackageAdapter extends NamedElementAdapter {
 			if (homeInterface.getName() != null) {
 				result = package_.getHomeInterface(homeInterface.getName(), false, true);
 			} else {
-				result = package_.createHomeInterface(null);
+				result = package_.createHomeInterface(homeInterface.getName());
 			}
 
 			HomeInterfaceAdapter.connect(result, homeInterface);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Finds the finder façade corresponding to a UML interface, creating it if necessary.
+	 * 
+	 * @param finderInterface
+	 *            a possible UML finder interface
+	 * @return its façade, or {@code null} if the interface is not a valid finder-interface
+	 */
+	Finder getFinder(Interface finderInterface) {
+		Finder result = null;
+
+		// Look for existing adapter
+		FinderAdapter adapter = FinderAdapter.get(finderInterface);
+		if (adapter != null) {
+			result = adapter.getFacade();
+		} else if (finderInterface.getPackage() != null) {
+			// It's not deleted, so ensure the underlying model
+			org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package package_ = getFacade();
+			if (finderInterface.getName() != null) {
+				result = package_.getFinder(finderInterface.getName(), false, true);
+			} else {
+				result = package_.createFinder(finderInterface.getName());
+			}
+
+			FinderAdapter.connect(result, finderInterface);
 		}
 
 		return result;

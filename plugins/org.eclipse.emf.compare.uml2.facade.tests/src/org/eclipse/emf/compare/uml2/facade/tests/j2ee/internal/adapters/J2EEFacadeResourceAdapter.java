@@ -14,7 +14,10 @@ package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters;
 
 import org.eclipse.emf.compare.uml2.facade.UMLFacadeResourceAdapter;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Finder;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.uml2.uml.Interface;
 
 /**
  * Stereotype applications adapter on UML resources for the J2EE façade.
@@ -59,5 +62,35 @@ public class J2EEFacadeResourceAdapter extends UMLFacadeResourceAdapter {
 			org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.Bean bean) {
 
 		return J2EEFacadeFactory.create(class_);
+	}
+
+	/**
+	 * Creates the home-interface façade, if any, for an interface.
+	 * 
+	 * @param interface_
+	 *            an UML interface
+	 * @param homeInterface
+	 *            a home-interface stereotype application attached to it
+	 * @return the home-interface façade
+	 */
+	public HomeInterface createFacade(Interface interface_,
+			org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface homeInterface) {
+
+		return (HomeInterface)J2EEFacadeFactory.create(interface_);
+	}
+
+	/**
+	 * Creates the finder façade, if any, for an interface.
+	 * 
+	 * @param interface_
+	 *            an UML interface
+	 * @param finder
+	 *            a finder stereotype application attached to it
+	 * @return the finder façade
+	 */
+	public Finder createFacade(Interface interface_,
+			org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.Finder finder) {
+
+		return (Finder)J2EEFacadeFactory.create(interface_);
 	}
 }

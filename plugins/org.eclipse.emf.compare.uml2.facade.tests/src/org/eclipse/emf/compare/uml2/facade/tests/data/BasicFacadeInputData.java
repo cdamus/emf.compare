@@ -17,7 +17,7 @@ package org.eclipse.emf.compare.uml2.facade.tests.data;
  *
  * @author Christian W. Damus
  */
-@FacadeInput({"a1", "a2" }) // Generate resource accessors
+@FacadeInput({"a1", "a2", "a3" }) // Generate resource accessors
 public class BasicFacadeInputData extends BasicFacadeInputDataGen {
 
 	/**

@@ -13,10 +13,13 @@
 package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters;
 
 import org.eclipse.emf.compare.facade.SyncDirectionKind;
+import org.eclipse.emf.compare.uml2.facade.UMLFacadeAdapter;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEFactory;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.uml2.uml.Class;
+import org.eclipse.uml2.uml.Interface;
 import org.eclipse.uml2.uml.Package;
 import org.eclipse.uml2.uml.UMLPackage;
 import org.eclipse.uml2.uml.util.UMLSwitch;
@@ -89,6 +92,44 @@ public class J2EEFacadeFactory extends UMLSwitch<EObject> {
 	}
 
 	/**
+	 * Obtains the J2EE home or finder interface façade for an interface in the UML model.
+	 * 
+	 * @param interface_
+	 *            an interface in the UML model that purports to be a home-interface or a finder
+	 * @return its façade, or {@code null} if the {@code interface_} does not represent a J2EE home or finder
+	 *         interface
+	 */
+	public static NamedElement create(Interface interface_) {
+		NamedElement result = null;
+
+		UMLFacadeAdapter adapter = HomeInterfaceAdapter.get(interface_);
+		if (adapter == null) {
+			adapter = FinderAdapter.get(interface_);
+		}
+
+		if (adapter == null) {
+			// Ensure the contextual package
+			org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package package_ = create(interface_.getPackage());
+			if (package_ != null) {
+				PackageAdapter.get(package_).initialSync(SyncDirectionKind.TO_FACADE,
+						UMLPackage.Literals.PACKAGE__PACKAGED_ELEMENT);
+
+				// Now there will be an adapter if it's a real J2EE interface
+				adapter = HomeInterfaceAdapter.get(interface_);
+				if (adapter == null) {
+					adapter = FinderAdapter.get(interface_);
+				}
+			}
+		}
+
+		if (adapter != null) {
+			result = (NamedElement)adapter.getFacade();
+		}
+
+		return result;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -101,6 +142,14 @@ public class J2EEFacadeFactory extends UMLSwitch<EObject> {
 	 */
 	@Override
 	public EObject caseClass(Class object) {
+		return create(object);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public EObject caseInterface(Interface object) {
 		return create(object);
 	}
 }

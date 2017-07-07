@@ -18,36 +18,38 @@ import java.util.Optional;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
-import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Finder;
 import org.eclipse.emf.compare.utils.Optionals;
 import org.eclipse.uml2.uml.Interface;
 import org.eclipse.uml2.uml.NamedElement;
 import org.eclipse.uml2.uml.Usage;
+import org.eclipse.uml2.uml.profile.standard.Create;
+import org.eclipse.uml2.uml.profile.standard.StandardPackage;
 import org.eclipse.uml2.uml.util.UMLUtil;
 
 /**
- * Façade adapter for home-interfaces in a J2EE model.
+ * Façade adapter for finder interfaces in a J2EE model.
  *
  * @author Christian W. Damus
  */
-public class HomeInterfaceAdapter extends NamedElementAdapter {
+public class FinderAdapter extends NamedElementAdapter {
 
-	private Usage usage;
+	private Usage create;
 
 	/**
 	 * Initializes me with a stereotype application.
 	 * 
 	 * @param facade
-	 *            the home-interface façade
-	 * @param homeInterface
+	 *            the finder façade
+	 * @param finder
 	 *            the UML model element
 	 * @param stereotype
-	 *            the J2EE HomeInterface stereotype application
+	 *            the J2EE Finder stereotype application
 	 */
-	HomeInterfaceAdapter(HomeInterface facade, Interface homeInterface,
-			org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface stereotype) {
+	FinderAdapter(Finder facade, Interface finder,
+			org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.Finder stereotype) {
 
-		super(facade, homeInterface, stereotype);
+		super(facade, finder, stereotype);
 	}
 
 	/**
@@ -57,8 +59,8 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	public void dispose() {
 		super.dispose();
 
-		if (usage != null) {
-			removeAdapter(usage);
+		if (create != null) {
+			removeAdapter(create);
 		}
 	}
 
@@ -67,13 +69,13 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	 */
 	@Override
 	public boolean isAdapterForType(Object type) {
-		return (type == Bean.class) || (type == HomeInterfaceAdapter.class) //
+		return (type == Bean.class) || (type == FinderAdapter.class) //
 				|| super.isAdapterForType(type);
 	}
 
 	@Override
-	public HomeInterface getFacade() {
-		return (HomeInterface)super.getFacade();
+	public Finder getFacade() {
+		return (Finder)super.getFacade();
 	}
 
 	@Override
@@ -82,8 +84,8 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	}
 
 	@Override
-	public org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface getStereotype() {
-		return (org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface)super.getStereotype();
+	public org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.Finder getStereotype() {
+		return (org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.Finder)super.getStereotype();
 	}
 
 	/**
@@ -94,8 +96,8 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 		boolean result = super.handleNotification(notification);
 
 		if (!result) {
-			if ((usage != null) && (notification.getNotifier() == usage)) {
-				synchronize(usage, getFacade(), false, notification);
+			if ((create != null) && (notification.getNotifier() == create)) {
+				synchronize(create, getFacade(), false, notification);
 			}
 		}
 
@@ -106,21 +108,21 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	 * Ensures that the façade and its UML element are connected by an adapter.
 	 * 
 	 * @param facade
-	 *            a home-interface façade
-	 * @param homeInterface
+	 *            a finder façade
+	 * @param finder
 	 *            the UML model element
 	 * @return the existing or new adapter
 	 */
-	static HomeInterfaceAdapter connect(HomeInterface facade, Interface homeInterface) {
-		HomeInterfaceAdapter result = null;
+	static FinderAdapter connect(Finder facade, Interface finder) {
+		FinderAdapter result = null;
 
-		org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface stereotype = UMLUtil
-				.getStereotypeApplication(homeInterface,
-						org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface.class);
+		org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.Finder stereotype = UMLUtil
+				.getStereotypeApplication(finder,
+						org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.Finder.class);
 
 		if (stereotype != null) {
-			result = connect(facade, homeInterface, HomeInterfaceAdapter.class,
-					(f, m) -> new HomeInterfaceAdapter(f, m, stereotype));
+			result = connect(facade, finder, FinderAdapter.class,
+					(f, m) -> new FinderAdapter(f, m, stereotype));
 		}
 
 		return result;
@@ -133,20 +135,20 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	 *            a façade or UML model element
 	 * @return the adapter, or {@code null}
 	 */
-	static HomeInterfaceAdapter get(Notifier notifier) {
-		return get(notifier, HomeInterfaceAdapter.class);
+	static FinderAdapter get(Notifier notifier) {
+		return get(notifier, FinderAdapter.class);
 	}
 
 	/**
-	 * Queries whether some {@code object} is a UML interface that is stereotyped as a home-interface.
+	 * Queries whether some {@code object} is a UML interface that is stereotyped as a finder.
 	 * 
 	 * @param object
 	 *            an object
-	 * @return whether it is a home interface in the UML model
+	 * @return whether it is a finder in the UML model
 	 */
-	static boolean isHomeInterface(Object object) {
+	static boolean isFinder(Object object) {
 		return (object instanceof Interface) && (UMLUtil.getStereotypeApplication((Interface)object,
-				org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.HomeInterface.class) != null);
+				org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.Finder.class) != null);
 
 	}
 
@@ -158,7 +160,7 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	 * @param model
 	 *            the UML element
 	 */
-	public void syncBeanToModel(HomeInterface facade, Interface model) {
+	public void syncBeanToModel(Finder facade, Interface model) {
 		org.eclipse.uml2.uml.Class oldBeanClass = getBean(model);
 		Bean bean = facade.getBean();
 		org.eclipse.uml2.uml.Class newBeanClass = (org.eclipse.uml2.uml.Class)bean.getUnderlyingElement();
@@ -168,24 +170,25 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 		}
 	}
 
-	protected Optional<Usage> getBeanRelationship(Interface homeInterface) {
-		return homeInterface.getClientDependencies().stream() //
+	protected Optional<Usage> getBeanRelationship(Interface finder) {
+		return finder.getClientDependencies().stream() //
 				.filter(Usage.class::isInstance).map(Usage.class::cast) //
-				.filter(u -> u.getSuppliers().stream().anyMatch(BeanAdapter::isBeanClass)) //
-				.peek(this::setUsage) // We need to track changes to this
+				.filter(d -> UMLUtil.getStereotypeApplication(d, Create.class) != null) //
+				.filter(d -> d.getSuppliers().stream().anyMatch(BeanAdapter::isBeanClass)) //
+				.peek(this::setCreate) // We need to track changes to this
 				.findAny();
 
 	}
 
-	protected org.eclipse.uml2.uml.Class getBean(Interface homeInterface) {
-		return getBeanRelationship(homeInterface)//
+	protected org.eclipse.uml2.uml.Class getBean(Interface finder) {
+		return getBeanRelationship(finder)//
 				.flatMap(r -> r.getTargets().stream().filter(BeanAdapter::isBeanClass)
 						.map(org.eclipse.uml2.uml.Class.class::cast).findAny())
 				.orElse(null);
 	}
 
-	protected void setBean(Interface homeInterface, org.eclipse.uml2.uml.Class beanClass) {
-		Optionals.ifPresentElse(getBeanRelationship(homeInterface), u -> {
+	protected void setBean(Interface finder, org.eclipse.uml2.uml.Class beanClass) {
+		Optionals.ifPresentElse(getBeanRelationship(finder), u -> {
 			List<NamedElement> suppliers = u.getSuppliers();
 			if (suppliers.size() == 1) {
 				suppliers.set(0, beanClass);
@@ -193,20 +196,20 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 				suppliers.clear();
 				suppliers.add(beanClass);
 			}
-		}, () -> setUsage(homeInterface.createUsage(beanClass)));
+		}, () -> setCreate(applyStereotype(finder.createUsage(beanClass), StandardPackage.Literals.CREATE)));
 	}
 
-	protected void setUsage(Usage newUsage) {
-		if (newUsage == this.usage) {
+	protected void setCreate(Usage newCreate) {
+		if (newCreate == this.create) {
 			return;
 		}
 
-		if (this.usage != null) {
-			removeAdapter(this.usage);
+		if (this.create != null) {
+			removeAdapter(this.create);
 		}
-		this.usage = newUsage;
-		if (newUsage != null) {
-			addAdapter(newUsage);
+		this.create = newCreate;
+		if (newCreate != null) {
+			addAdapter(newCreate);
 		}
 	}
 
@@ -218,7 +221,7 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	 * @param facade
 	 *            the façade
 	 */
-	public void syncBeanToFacade(Interface model, HomeInterface facade) {
+	public void syncBeanToFacade(Interface model, Finder facade) {
 		Bean oldBean = facade.getBean();
 		org.eclipse.uml2.uml.Class newBeanClass = getBean(model);
 		Bean newBean = null;
@@ -239,7 +242,7 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	 * @param facade
 	 *            the façade
 	 */
-	public void syncSupplierToFacade(Usage model, HomeInterface facade) {
+	public void syncSupplierToFacade(Usage model, Finder facade) {
 		// Just delegate
 		syncBeanToFacade(getUnderlyingElement(), facade);
 	}

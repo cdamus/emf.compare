@@ -13,6 +13,8 @@
 package org.eclipse.emf.compare.uml2.facade.tests;
 
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 import org.eclipse.emf.compare.uml2.facade.tests.data.BasicFacadeInputData;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.BeanKind;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Finder;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
@@ -175,6 +178,74 @@ public class BasicFacadeTest extends AbstractUMLTest {
 		assertThat("Bean not updated", thingHome.getBean(), is(whatsit));
 	}
 
+	@Test
+	public void simpleFinders() {
+		Package package_ = requirePackage(input.getA3Left(), "a3");
+		Finder thingByID = requireFinder(package_, "ThingByID");
+		Finder thingByName = requireFinder(package_, "ThingByName");
+
+		Bean thing = requireBean(package_, "Thing");
+
+		assertThat("Missing finder(s)", thing.getFinders(), hasItems(thingByID, thingByName));
+	}
+
+	@Test
+	public void changeFinderBeanFromFacade() {
+		Package package_ = requirePackage(input.getA3Left(), "a3");
+		Finder thingByName = requireFinder(package_, "ThingByName");
+
+		Bean whatsit = requireBean(package_, "Whatsit");
+		whatsit.getFinders().add(thingByName); // Tricky! Work from the opposite end
+
+		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)whatsit.getUnderlyingElement();
+		Interface thingByNameInterface = (Interface)thingByName.getUnderlyingElement();
+
+		List<Usage> usages = thingByNameInterface.getClientDependencies().stream() //
+				.filter(Usage.class::isInstance).map(Usage.class::cast).collect(Collectors.toList());
+		assertThat("Extra usage created or usage deleted", usages.size(), is(1));
+		assertThat("Wrong usage relationship", usages.get(0).getSuppliers(), is(singletonList(whatsitClass)));
+	}
+
+	@Test
+	public void changeFinderBeanFromUML1() {
+		Package package_ = requirePackage(input.getA3Left(), "a3");
+		Finder thingByName = requireFinder(package_, "ThingByName");
+
+		Bean whatsit = requireBean(package_, "Whatsit");
+		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)whatsit.getUnderlyingElement();
+		Interface thingByNameInterface = (Interface)thingByName.getUnderlyingElement();
+
+		List<Usage> usages = thingByNameInterface.getClientDependencies().stream() //
+				.filter(Usage.class::isInstance).map(Usage.class::cast).collect(Collectors.toList());
+		assertThat("Should have an unique usage", usages.size(), is(1));
+
+		// The optimal way to do it
+		assumeThat("Invalid usage", usages.get(0).getSuppliers().size(), is(1));
+		usages.get(0).getSuppliers().set(0, whatsitClass);
+
+		assertThat("Bean not updated", whatsit.getFinders(), hasItem(thingByName));
+	}
+
+	@Test
+	public void changeFinderfaceBeanFromUML2() {
+		Package package_ = requirePackage(input.getA3Left(), "a3");
+		Finder thingByName = requireFinder(package_, "ThingByName");
+
+		Bean whatsit = requireBean(package_, "Whatsit");
+		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)whatsit.getUnderlyingElement();
+		Interface thingByNameInterface = (Interface)thingByName.getUnderlyingElement();
+
+		List<Usage> usages = thingByNameInterface.getClientDependencies().stream() //
+				.filter(Usage.class::isInstance).map(Usage.class::cast).collect(Collectors.toList());
+		assertThat("Should have an unique usage", usages.size(), is(1));
+
+		// A different way to do it
+		usages.get(0).getSuppliers().clear();
+		usages.get(0).getSuppliers().add(whatsitClass);
+
+		assertThat("Bean not updated", whatsit.getFinders(), hasItem(thingByName));
+	}
+
 	//
 	// Test framework
 	//
@@ -208,6 +279,14 @@ public class BasicFacadeTest extends AbstractUMLTest {
 		HomeInterface result = package_.getHomeInterface(name);
 
 		assertThat(String.format("No home-interface '%s'", name), result, notNullValue());
+
+		return result;
+	}
+
+	Finder requireFinder(Package package_, String name) {
+		Finder result = package_.getFinder(name);
+
+		assertThat(String.format("No finder '%s'", name), result, notNullValue());
 
 		return result;
 	}
@@ -253,7 +332,6 @@ public class BasicFacadeTest extends AbstractUMLTest {
 			/**
 			 * {@inheritDoc}
 			 */
-			@SuppressWarnings("boxing")
 			@Override
 			protected boolean matchesSafely(EObject item, Description mismatchDescription) {
 				EObject target = resolveBeanKindTarget(item);
@@ -301,7 +379,6 @@ public class BasicFacadeTest extends AbstractUMLTest {
 		};
 	}
 
-	@SuppressWarnings("boxing")
 	void applyStereotype(Element element, String name) {
 		Optional<EObject> application = element.getApplicableStereotypes().stream() //
 				.filter(s -> name.equals(s.getName())).findAny().map(s -> element.applyStereotype(s));

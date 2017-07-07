@@ -17,9 +17,13 @@ import java.util.function.BiFunction;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.compare.facade.FacadeAdapter;
 import org.eclipse.emf.compare.facade.SyncDirectionKind;
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.uml2.uml.Element;
+import org.eclipse.uml2.uml.NamedElement;
+import org.eclipse.uml2.uml.Stereotype;
+import org.eclipse.uml2.uml.util.UMLUtil;
 
 /**
  * A specialized façade adapter for UML that includes support for stereotype applications representing DSML
@@ -203,5 +207,54 @@ public class UMLFacadeAdapter extends FacadeAdapter {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Applies a stereotype to an element, if possible, and returns it.
+	 * 
+	 * @param element
+	 *            an element to stereotype
+	 * @param stereotypeEClass
+	 *            the Ecore definition of the stereotype to apply
+	 * @return the stereotyped {@code element}
+	 * @param <E>
+	 *            the type of element
+	 */
+	protected <E extends Element> E applyStereotype(E element, EClass stereotypeEClass) {
+		Stereotype stereotypeToApply = PrivateUtil.getStereotype(stereotypeEClass, element);
+		if (stereotypeToApply != null) {
+			UMLUtil.safeApplyStereotype(element, stereotypeToApply);
+		}
+
+		return element;
+	}
+
+	//
+	// Nested types
+	//
+
+	/**
+	 * Private local access to protected UML utility APIs.
+	 *
+	 * @author Christian W. Damus
+	 */
+	private static final class PrivateUtil extends UMLUtil {
+		/**
+		 * Queries the UML representation of an Ecore stereotype.
+		 * 
+		 * @param stereotypeEClass
+		 *            the Ecore definition of a stereotype
+		 * @param context
+		 *            an element in the context of the relevant profile application
+		 * @return the stereotype definition, or {@code null} if not resolvable
+		 */
+		static Stereotype getStereotype(EClass stereotypeEClass, Element context) {
+			NamedElement result = getNamedElement(stereotypeEClass, context);
+			if (result instanceof Stereotype) {
+				return (Stereotype)result;
+			} else {
+				return null;
+			}
+		}
 	}
 }
