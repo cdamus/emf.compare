@@ -16,3 +16,10 @@ Two-way comparison of models where the left model
 Two-way comparison of models where the left model
 
 * adds a home-interface for the bean
+
+### Use case a3
+
+Two-way comparison of models where the right model already has a finder
+interface for the bean and the left model
+
+* adds another finder for the bean

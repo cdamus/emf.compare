@@ -23,8 +23,10 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -33,6 +35,7 @@ import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -570,6 +573,146 @@ public class FacadeAdapter implements Adapter.Internal {
 		} else {
 			return String.format("sync%sToFacade", toInitialUpperCase(featureName))::equals; //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * Handles any possible addition/removal of dependencies that need to be tracked.
+	 * 
+	 * @param notification
+	 *            a notification indicating possibly addition/removal of dependencies
+	 * @param isDependency
+	 *            a predicate matching an object should be or already is a dependency
+	 * @return whether the {@code notification} did actually turn out to be about dependencies, which perhaps
+	 *         means it needn't be processed for anything else
+	 */
+	protected boolean handleDependencies(Notification notification,
+			BiPredicate<? super EReference, ? super EObject> isDependency) {
+
+		if (!(notification.getFeature() instanceof EReference)) {
+			// Obviously not adding/removing dependencies
+			return false;
+		}
+
+		boolean result = false;
+
+		// Only EObjects can notify on EReferences
+		EObject notifier = (EObject)notification.getNotifier();
+		EReference reference = (EReference)notification.getFeature();
+
+		EObject newDependency;
+		EObject oldDependency;
+		switch (notification.getEventType()) {
+			case Notification.ADD:
+				newDependency = (EObject)notification.getNewValue();
+				if (isDependency.test(reference, newDependency)) {
+					handleDependencyAdded(notifier, reference, newDependency);
+					result = true;
+				}
+				break;
+			case Notification.ADD_MANY:
+				result = ((Collection<?>)notification.getNewValue()).stream() //
+						.map(EObject.class::cast).filter(applyFirst(reference, isDependency)) //
+						.map(d -> {
+							handleDependencyAdded(notifier, reference, d);
+							return Boolean.TRUE;
+						}).reduce(Boolean::logicalOr).orElse(Boolean.FALSE).booleanValue();
+				break;
+			case Notification.REMOVE:
+				oldDependency = (EObject)notification.getOldValue();
+				if (isDependency.test(reference, oldDependency)) {
+					handleDependencyRemoved(notifier, reference, oldDependency);
+					result = true;
+				}
+				break;
+			case Notification.REMOVE_MANY:
+				result = ((Collection<?>)notification.getOldValue()).stream() //
+						.map(EObject.class::cast).filter(applyFirst(reference, isDependency)) //
+						.map(d -> {
+							handleDependencyAdded(notifier, reference, d);
+							return Boolean.TRUE;
+						}).reduce(Boolean::logicalOr).orElse(Boolean.FALSE).booleanValue();
+				break;
+			case Notification.SET:
+			case Notification.UNSET:
+			case Notification.RESOLVE:
+				oldDependency = (EObject)notification.getOldValue();
+				if ((oldDependency != null) && isDependency.test(reference, oldDependency)) {
+					handleDependencyRemoved(notifier, reference, oldDependency);
+					result = true;
+				}
+				newDependency = (EObject)notification.getNewValue();
+				if ((newDependency != null) && isDependency.test(reference, newDependency)) {
+					handleDependencyAdded(notifier, reference, newDependency);
+					result = true;
+				}
+				break;
+			default:
+				// Pass
+				break;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Partially applies a bi-predicate on the {@code first} argument.
+	 * 
+	 * @param first
+	 *            the first argument
+	 * @param predicate
+	 *            a bi-predicate to partially apply
+	 * @return the partial application of the {@code predicate}
+	 * @param <T>
+	 *            the first argument type
+	 * @param <U>
+	 *            the second argument type
+	 */
+	private static <T, U> Predicate<U> applyFirst(T first, BiPredicate<T, U> predicate) {
+		return u -> predicate.test(first, u);
+	}
+
+	/**
+	 * Handles the addition of a new dependency that needs to be tracked. The default implementation
+	 * reflectively dispatches to a method of the form <blockquote>
+	 * <tt><i>reference</i>Added(<i>ownerType</i>, <i>dependencyType</i>)</tt> </blockquote> where
+	 * <ul>
+	 * <li><i>reference</i> is the name of the {@code reference}</li>
+	 * <li><i>ownerType</i> is the type of the {@code owner}</li>
+	 * <li><i>dependencyType</i> is the name of the {@code newDependency}</li>
+	 * </ul>
+	 * 
+	 * @param owner
+	 *            the owner of the dependency
+	 * @param reference
+	 *            the reference implementing the dependency relationship
+	 * @param newDependency
+	 *            the new dependency in that {@code reference}
+	 */
+	protected void handleDependencyAdded(EObject owner, EReference reference, EObject newDependency) {
+		String methodName = String.format("%sAdded", reference.getName()); //$NON-NLS-1$
+		ReflectiveDispatch.safeInvoke(this, methodName, owner, newDependency);
+	}
+
+	/**
+	 * Handles the addition of an old dependency that no longer needs to be tracked. The default
+	 * implementation reflectively dispatches to a method of the form <blockquote>
+	 * <tt><i>reference</i>Removed(<i>ownerType</i>, <i>dependencyType</i>)</tt> </blockquote> where
+	 * <ul>
+	 * <li><i>reference</i> is the name of the {@code reference}</li>
+	 * <li><i>ownerType</i> is the type of the {@code owner}</li>
+	 * <li><i>dependencyType</i> is the name of the {@code newDependency}</li>
+	 * </ul>
+	 * 
+	 * @param owner
+	 *            the owner of the dependency
+	 * @param reference
+	 *            the reference implementing the dependency relationship
+	 * @param oldDependency
+	 *            the old dependency in that {@code reference}
+	 */
+	protected void handleDependencyRemoved(EObject owner, EReference reference, EObject oldDependency) {
+		String methodName = String.format("%sRemoved", reference.getName()); //$NON-NLS-1$
+		ReflectiveDispatch.safeInvoke(this, methodName, owner, oldDependency);
 	}
 
 	/**

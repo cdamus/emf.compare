@@ -13,6 +13,7 @@
 package org.eclipse.emf.compare.uml2.facade.tests;
 
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -36,8 +37,10 @@ import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.uml2.uml.Dependency;
 import org.eclipse.uml2.uml.Element;
 import org.eclipse.uml2.uml.Interface;
+import org.eclipse.uml2.uml.NamedElement;
 import org.eclipse.uml2.uml.Usage;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -246,6 +249,76 @@ public class BasicFacadeTest extends AbstractUMLTest {
 		assertThat("Bean not updated", whatsit.getFinders(), hasItem(thingByName));
 	}
 
+	@Test
+	public void addHomeInterfaceInFacade() {
+		Package package_ = requirePackage(input.getA2Left(), "a2");
+		Bean whatsit = requireBean(package_, "Whatsit");
+
+		HomeInterface newHome = package_.createHomeInterface("WhatsitHome");
+		newHome.setBean(whatsit);
+
+		Interface interface_ = (Interface)newHome.getUnderlyingElement();
+		assertThat("No UML interface", interface_, notNullValue());
+		assertThat("Wrong interface name", interface_.getName(), is("WhatsitHome"));
+		assertThat("Interface not stereotyped as «HomeInterface»", interface_,
+				hasStereotype("HomeInterface"));
+
+		assertThat("Home interface should have exactly one dependency",
+				interface_.getClientDependencies().size(), is(1));
+		assertThat(interface_.getClientDependencies(),
+				everyItem(suppliedBy(is(whatsit.getUnderlyingElement()))));
+	}
+
+	@Test
+	public void addHomeInterfaceInUML() {
+		Package package_ = requirePackage(input.getA2Left(), "a2");
+
+		org.eclipse.uml2.uml.Package uml = (org.eclipse.uml2.uml.Package)package_.getUnderlyingElement();
+		Interface interface_ = uml.createOwnedInterface("WhatsitHome");
+		applyStereotype(interface_, "HomeInterface");
+
+		interface_.createUsage(uml.getOwnedMember("Whatsit"));
+		HomeInterface newHome = requireHomeInterface(package_, "WhatsitHome");
+		assertThat(newHome.getUnderlyingElement(), is(interface_));
+		assertThat(newHome.getBean(), is(requireBean(package_, "Whatsit")));
+	}
+
+	@Test
+	public void addFinderInFacade() {
+		Package package_ = requirePackage(input.getA3Left(), "a3");
+		Bean thing = requireBean(package_, "Thing");
+
+		Finder newFinder = package_.createFinder("ThingByRandom");
+		newFinder.setBean(thing);
+
+		Interface interface_ = (Interface)newFinder.getUnderlyingElement();
+		assertThat("No UML interface", interface_, notNullValue());
+		assertThat("Wrong interface name", interface_.getName(), is("ThingByRandom"));
+		assertThat("Interface not stereotyped as «Finder»", interface_, hasStereotype("Finder"));
+
+		assertThat("Finder interface should have exactly one dependency",
+				interface_.getClientDependencies().size(), is(1));
+		assertThat(interface_.getClientDependencies(), everyItem(hasStereotype("Create")));
+		assertThat(interface_.getClientDependencies(),
+				everyItem(suppliedBy(is(thing.getUnderlyingElement()))));
+	}
+
+	@Test
+	public void addFinderInUML() {
+		Package package_ = requirePackage(input.getA3Left(), "a3");
+
+		org.eclipse.uml2.uml.Package uml = (org.eclipse.uml2.uml.Package)package_.getUnderlyingElement();
+		Interface interface_ = uml.createOwnedInterface("WhatsitByID");
+		applyStereotype(interface_, "Finder");
+
+		Usage usage = interface_.createUsage(uml.getOwnedMember("Whatsit"));
+		applyStereotype(usage, "Create");
+
+		Finder newFinder = requireFinder(package_, "WhatsitByID");
+		assertThat(newFinder.getUnderlyingElement(), is(interface_));
+		assertThat(requireBean(package_, "Whatsit").getFinders(), hasItem(newFinder));
+	}
+
 	//
 	// Test framework
 	//
@@ -320,8 +393,8 @@ public class BasicFacadeTest extends AbstractUMLTest {
 		return result;
 	}
 
-	Matcher<EObject> hasKind(BeanKind kind) {
-		return new TypeSafeDiagnosingMatcher<EObject>() {
+	<E extends EObject> Matcher<E> hasKind(BeanKind kind) {
+		return new TypeSafeDiagnosingMatcher<E>() {
 			/**
 			 * {@inheritDoc}
 			 */
@@ -360,8 +433,8 @@ public class BasicFacadeTest extends AbstractUMLTest {
 		};
 	}
 
-	Matcher<Element> hasStereotype(String name) {
-		return new TypeSafeMatcher<Element>() {
+	<E extends Element> Matcher<E> hasStereotype(String name) {
+		return new TypeSafeMatcher<E>() {
 			/**
 			 * {@inheritDoc}
 			 */
@@ -384,5 +457,25 @@ public class BasicFacadeTest extends AbstractUMLTest {
 				.filter(s -> name.equals(s.getName())).findAny().map(s -> element.applyStereotype(s));
 
 		assertThat("Stereotype not applied: " + name, application.isPresent(), is(true));
+	}
+
+	<D extends Dependency> Matcher<D> suppliedBy(Matcher<? super NamedElement> supplier) {
+		return new TypeSafeMatcher<D>() {
+			/**
+			 * {@inheritDoc}
+			 */
+			public void describeTo(Description description) {
+				description.appendText("supplied by element that ") //
+						.appendDescriptionOf(supplier);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected boolean matchesSafely(Dependency item) {
+				return hasItem(supplier).matches(item.getSuppliers());
+			}
+		};
 	}
 }

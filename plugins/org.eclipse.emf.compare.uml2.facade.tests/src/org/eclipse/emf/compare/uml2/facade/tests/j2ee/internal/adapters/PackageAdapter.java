@@ -21,21 +21,28 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.compare.facade.SyncDirectionKind;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Finder;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement;
 import org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.J2EEProfilePackage;
+import org.eclipse.emf.compare.utils.Optionals;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.uml2.uml.Element;
 import org.eclipse.uml2.uml.Interface;
 import org.eclipse.uml2.uml.PackageableElement;
 import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.UMLPackage;
+import org.eclipse.uml2.uml.Usage;
 
 /**
  * Façade adapter for packages in a J2EE model.
@@ -43,6 +50,8 @@ import org.eclipse.uml2.uml.UMLPackage;
  * @author Christian W. Damus
  */
 public class PackageAdapter extends NamedElementAdapter {
+
+	private List<Usage> usages;
 
 	/**
 	 * Initializes me. There is no package stereotype.
@@ -56,6 +65,19 @@ public class PackageAdapter extends NamedElementAdapter {
 			org.eclipse.uml2.uml.Package umlElement) {
 
 		super(facade, umlElement);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void dispose() {
+		super.dispose();
+
+		if (usages != null) {
+			usages.forEach(this::removeAdapter);
+			usages = null;
+		}
 	}
 
 	/**
@@ -102,6 +124,21 @@ public class PackageAdapter extends NamedElementAdapter {
 	 */
 	static PackageAdapter get(Notifier notifier) {
 		return get(notifier, PackageAdapter.class);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean handleNotification(Notification notification) {
+		boolean result = handleDependencies(notification, this::isUsageDependency)
+				|| super.handleNotification(notification);
+
+		if (!result && (usages != null) && usages.contains(notification.getNotifier())) {
+			synchronize((Usage)notification.getNotifier(), getFacade(), false, notification);
+		}
+
+		return result;
 	}
 
 	/**
@@ -272,7 +309,7 @@ public class PackageAdapter extends NamedElementAdapter {
 						UMLPackage.Literals.INTERFACE, true);
 			} else {
 				result = applyStereotype(umlPackage.createOwnedInterface(null),
-						J2EEProfilePackage.Literals.HOME_INTERFACE);
+						J2EEProfilePackage.Literals.FINDER);
 			}
 
 			FinderAdapter.connect(finder, result);
@@ -411,5 +448,88 @@ public class PackageAdapter extends NamedElementAdapter {
 		}
 
 		return result;
+	}
+
+	private boolean isUsageDependency(EReference reference, EObject object) {
+		return (reference == UMLPackage.Literals.PACKAGE__PACKAGED_ELEMENT) && (object instanceof Usage);
+	}
+
+	public void packagedElementAdded(org.eclipse.uml2.uml.Package package_, Usage newUsage) {
+		if (package_ != getUnderlyingElement()) {
+			return;
+		}
+		if ((usages != null) && usages.contains(newUsage)) {
+			return;
+		}
+
+		if (usages == null) {
+			usages = Lists.newArrayListWithExpectedSize(3); // Don't expect many
+		}
+		usages.add(newUsage);
+		addAdapter(newUsage);
+	}
+
+	public void clientDependencyRemoved(org.eclipse.uml2.uml.Package package_, Usage oldUsage) {
+		if (package_ != getUnderlyingElement()) {
+			return;
+		}
+
+		removeAdapter(oldUsage);
+		if (usages != null) {
+			usages.remove(oldUsage);
+		}
+	}
+
+	@SuppressWarnings("unused")
+	public void syncClientToFacade(Usage usage, org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package facade,
+			Notification msg) {
+
+		switch (msg.getEventType()) {
+			case Notification.ADD:
+				if (msg.getNewValue() instanceof Interface) {
+					getInterfaceAdapter((Interface)msg.getNewValue())
+							.ifPresent(adapter -> adapter.initialSync(SyncDirectionKind.TO_FACADE));
+				}
+				break;
+			default:
+				// Pass
+				break;
+		}
+	}
+
+	private Optional<NamedElementAdapter> getInterfaceAdapter(Interface interface_) {
+		return Optionals.map(Optional.of(interface_), HomeInterfaceAdapter::get, FinderAdapter::get);
+	}
+
+	@SuppressWarnings("unused")
+	public void syncSupplierToFacade(Usage usage,
+			org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package facade, Notification msg) {
+
+		if (usage.getClients().isEmpty()) {
+			// Nothing to do for usages that have no clients, yet
+			return;
+		}
+
+		switch (msg.getEventType()) {
+			case Notification.ADD:
+				if (BeanAdapter.isBeanClass(msg.getNewValue())) {
+					usage.getClients().stream() //
+							.filter(Interface.class::isInstance).map(Interface.class::cast) //
+							.map(this::getInterfaceAdapter).filter(Optional::isPresent).map(Optional::get) //
+							.forEach(adapter -> {
+								if (adapter instanceof FinderAdapter) {
+									adapter.initialSync(SyncDirectionKind.TO_FACADE,
+											J2EEPackage.Literals.FINDER__BEAN);
+								} else if (adapter instanceof HomeInterfaceAdapter) {
+									adapter.initialSync(SyncDirectionKind.TO_FACADE,
+											J2EEPackage.Literals.HOME_INTERFACE__BEAN);
+								}
+							});
+				}
+				break;
+			default:
+				// Pass
+				break;
+		}
 	}
 }

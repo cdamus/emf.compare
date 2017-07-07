@@ -12,6 +12,8 @@
  */
 package org.eclipse.emf.compare.utils;
 
+import com.google.common.base.Function;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -52,4 +54,28 @@ public final class Optionals {
 		}
 	}
 
+	/**
+	 * Map an {@code optional} with whichever of two functions first provides a result, in order.
+	 * 
+	 * @param optional
+	 *            an optional
+	 * @param mapper1
+	 *            the first map function
+	 * @param mapper2
+	 *            the second map function
+	 * @return an optional with the result or the first function or the second, or just empty
+	 * @param <T>
+	 *            the optional type
+	 * @param <R>
+	 *            the mapper result type
+	 */
+	public static <T, R> Optional<R> map(Optional<T> optional, Function<? super T, ? extends R> mapper1,
+			Function<? super T, ? extends R> mapper2) {
+
+		Optional<R> result = optional.map(mapper1);
+		if (!result.isPresent()) {
+			result = optional.map(mapper2);
+		}
+		return result;
+	}
 }

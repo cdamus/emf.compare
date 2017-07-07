@@ -12,12 +12,18 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters;
 
+import org.eclipse.emf.compare.facade.SyncDirectionKind;
 import org.eclipse.emf.compare.uml2.facade.UMLFacadeResourceAdapter;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Finder;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.uml2.uml.Interface;
+import org.eclipse.uml2.uml.UMLPackage;
+import org.eclipse.uml2.uml.Usage;
 
 /**
  * Stereotype applications adapter on UML resources for the J2EE façade.
@@ -92,5 +98,41 @@ public class J2EEFacadeResourceAdapter extends UMLFacadeResourceAdapter {
 			org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.Finder finder) {
 
 		return (Finder)J2EEFacadeFactory.create(interface_);
+	}
+
+	/**
+	 * Creates the home or interface finder façade, if any, for the client of a usage.
+	 * 
+	 * @param usage
+	 *            an UML usage
+	 * @param create
+	 *            a create stereotype application attached to it
+	 * @return the home or finder façade
+	 */
+	public NamedElement createFacade(Usage usage, org.eclipse.uml2.uml.profile.standard.Create create) {
+		NamedElement result = null;
+
+		// See if it's a finder interface usage
+		Interface interface_ = null;
+		if (!usage.getClients().isEmpty()) {
+			interface_ = (Interface)EcoreUtil.getObjectByType(usage.getClients(),
+					UMLPackage.Literals.INTERFACE);
+		}
+
+		if (interface_ != null) {
+			result = J2EEFacadeFactory.create(interface_);
+			if (result != null) {
+				// Synchronize its bean-ness
+				if (result instanceof Finder) {
+					FinderAdapter.get(result).initialSync(SyncDirectionKind.TO_FACADE,
+							J2EEPackage.Literals.FINDER__BEAN);
+				} else if (result instanceof HomeInterface) {
+					HomeInterfaceAdapter.get(result).initialSync(SyncDirectionKind.TO_FACADE,
+							J2EEPackage.Literals.HOME_INTERFACE__BEAN);
+				}
+			}
+		}
+
+		return result;
 	}
 }
