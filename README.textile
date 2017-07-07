@@ -1,5 +1,7 @@
 h1. EMF Compare
 
+!https://travis-ci.org/cdamus/emf.compare.svg?branch=uml-facade!:https://travis-ci.org/cdamus/emf.compare
+
 h2. Installation
 
 * The latest version of EMF Compare can be installed from http://download.eclipse.org/modeling/emf/compare/updates/releases/3.0
