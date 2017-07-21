@@ -35,9 +35,12 @@ import java.util.List;
 
 import org.eclipse.emf.compare.Comparison;
 import org.eclipse.emf.compare.Diff;
+import org.eclipse.emf.compare.match.IMatchEngine.Factory.Registry;
+import org.eclipse.emf.compare.match.impl.MatchEngineFactoryImpl;
 import org.eclipse.emf.compare.uml2.facade.tests.data.BasicFacadeInputData;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.BeanKind;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
+import org.eclipse.emf.compare.utils.UseIdentifiers;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -213,7 +216,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void testAddHomeInterfaceRL_a2() throws IOException {
+	public void testAddHomeInterfaceMergeRL_a2() throws IOException {
 		Resource left = input.getA2Left();
 		Resource right = input.getA2Right();
 
@@ -222,12 +225,11 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 		// And the merge's effect on the UML representation
 		left = input.getA2LeftUML();
 		right = input.getA2RightUML();
-		// TODO: Merge needs to recognize that the left side already has the required elements
-		// assertCompareSame(left, right);
+		assertCompareSame(left, right);
 	}
 
 	@Test
-	public void testAddHomeInterfaceLR_a2() throws IOException {
+	public void testAddHomeInterfaceMergeLR_a2() throws IOException {
 		Resource left = input.getA2Left();
 		Resource right = input.getA2Right();
 
@@ -236,8 +238,119 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 		// And the merge's effect on the UML representation
 		left = input.getA2LeftUML();
 		right = input.getA2RightUML();
-		// TODO: Merge needs to recognize that the right side already has the required elements
-		// assertCompareSame(left, right);
+		assertCompareSame(left, right);
+	}
+
+	@Test
+	public void testAddFinder_a3() throws IOException {
+		Resource left = input.getA3Left();
+		Resource right = input.getA3Right();
+		Comparison comparison = compare(left, right);
+
+		testAB3(TestKind.ADD, comparison);
+	}
+
+	private void testAB3(TestKind kind, Comparison comparison) {
+		List<Diff> differences = comparison.getDifferences();
+
+		assertEquals(3, differences.size());
+
+		Predicate<? super Diff> addFinderDescription;
+		Predicate<? super Diff> setFinderBeanDescription;
+		Predicate<? super Diff> addBeanFinderDescription;
+
+		switch (kind) {
+			case DELETE:
+				addFinderDescription = removedFromReference("a3", "finder", "a3.ThingByName");
+				setFinderBeanDescription = changedReference("a3.ThingByName", "bean", "a3.Thing", null);
+				addBeanFinderDescription = removedFromReference("a3.Thing", "finder", "a3.ThingByName");
+				break;
+			case ADD:
+				addFinderDescription = addedToReference("a3", "finder", "a3.ThingByName");
+				setFinderBeanDescription = changedReference("a3.ThingByName", "bean", null, "a3.Thing");
+				addBeanFinderDescription = addedToReference("a3.Thing", "finder", "a3.ThingByName");
+				break;
+			default:
+				fail("Unsupported test kind: " + kind);
+				return; // Unreachable
+		}
+
+		Diff addFinder = Iterators.find(differences.iterator(), addFinderDescription);
+		assertNotNull(addFinder);
+		assertThat(addFinder.getRefinedBy(), not(hasItem(anything())));
+		assertThat(addFinder.getRefines(), not(hasItem(anything())));
+		if (kind == TestKind.ADD) {
+			// The addition of the finder is required by other changes involving it
+			assertThat(addFinder.getRequiredBy(), hasItem(anything()));
+			assertThat(addFinder.getRequires(), not(hasItem(anything())));
+		} else {
+			// The deletion of the finder is not required by other changes involving it
+			// but rather requires them
+			assertThat(addFinder.getRequiredBy(), not(hasItem(anything())));
+			assertThat(addFinder.getRequires(), hasItem(anything()));
+		}
+		assertThat(addFinder.getEquivalence(), nullValue());
+
+		Diff setFinderBean = Iterators.find(differences.iterator(), setFinderBeanDescription);
+		assertNotNull(setFinderBean);
+		assertThat(setFinderBean.getRefinedBy(), not(hasItem(anything())));
+		assertThat(setFinderBean.getRefines(), not(hasItem(anything())));
+		if (kind == TestKind.ADD) {
+			assertThat(setFinderBean.getRequiredBy(), not(hasItem(anything())));
+			assertThat(setFinderBean.getRequires(), hasItem(addFinder));
+		} else {
+			assertThat(setFinderBean.getRequiredBy(), hasItem(addFinder));
+			assertThat(setFinderBean.getRequires(), not(hasItem(anything())));
+		}
+		assertThat(setFinderBean.getEquivalence(), notNullValue()); // It's an eOpposite
+
+		Diff addBeanFinder = Iterators.find(differences.iterator(), addBeanFinderDescription);
+		assertNotNull(addBeanFinder);
+		assertThat(addBeanFinder.getRefinedBy(), not(hasItem(anything())));
+		assertThat(addBeanFinder.getRefines(), not(hasItem(anything())));
+		if (kind == TestKind.ADD) {
+			assertThat(addBeanFinder.getRequiredBy(), not(hasItem(anything())));
+			assertThat(addBeanFinder.getRequires(), hasItem(addFinder));
+		} else {
+			assertThat(addBeanFinder.getRequiredBy(), hasItem(addFinder));
+			assertThat(addBeanFinder.getRequires(), not(hasItem(anything())));
+		}
+		assertThat(addBeanFinder.getEquivalence(), is(setFinderBean.getEquivalence()));
+	}
+
+	@Test
+	public void testDeleteFinder_a3() throws IOException {
+		Resource left = input.getA3Right();
+		Resource right = input.getA3Left();
+		Comparison comparison = compare(left, right);
+
+		testAB3(TestKind.DELETE, comparison);
+	}
+
+	@Test
+	public void testAddFinderMergeRL_a3() throws IOException {
+		Resource left = input.getA3Left();
+		Resource right = input.getA3Right();
+
+		testMergeRightToLeft(left, right, null);
+
+		// And the merge's effect on the UML representation
+		left = input.getA3LeftUML();
+		right = input.getA3RightUML();
+		assertCompareSame(left, right);
+	}
+
+	@Test
+	public void testAddFinderMergeLR_a3() throws IOException {
+		Resource left = input.getA3Left();
+		Resource right = input.getA3Right();
+
+		testMergeLeftToRight(left, right, null);
+
+		// And the merge's effect on the UML representation
+		left = input.getA3LeftUML();
+		right = input.getA3RightUML();
+		assertCompareSame(left, right);
 	}
 
 	//
@@ -252,6 +365,22 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	@AfterClass
 	public static void teardownClass() {
 		resetRegistries();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void fillMatchEngineFactoryRegistry(Registry matchEngineFactoryRegistry) {
+		super.fillMatchEngineFactoryRegistry(matchEngineFactoryRegistry);
+
+		// Match by structure of the model, not identity of elements, because the merge of
+		// the façade creates similar structures in the UML on one side as on the other,
+		// but of course the elements that comprise it will have different XMI IDs
+		MatchEngineFactoryImpl byStructure = new MatchEngineFactoryImpl(UseIdentifiers.NEVER);
+		byStructure.setRanking(Integer.MAX_VALUE);
+
+		matchEngineFactoryRegistry.add(byStructure);
 	}
 
 	/**

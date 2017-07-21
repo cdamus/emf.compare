@@ -243,8 +243,8 @@ public class PackageAdapter extends NamedElementAdapter {
 			// It's not deleted, so ensure the underlying model
 			org.eclipse.uml2.uml.Package umlPackage = getUnderlyingElement();
 			if (bean.getName() != null) {
-				result = (org.eclipse.uml2.uml.Class)umlPackage.getOwnedType(bean.getName(), false,
-						UMLPackage.Literals.CLASS, true);
+				result = applyStereotype((org.eclipse.uml2.uml.Class)umlPackage.getOwnedType(bean.getName(),
+						false, UMLPackage.Literals.CLASS, true), J2EEProfilePackage.Literals.BEAN);
 			} else {
 				result = applyStereotype(umlPackage.createOwnedClass(null, false),
 						J2EEProfilePackage.Literals.BEAN);
@@ -274,8 +274,10 @@ public class PackageAdapter extends NamedElementAdapter {
 			// It's not deleted, so ensure the underlying model
 			org.eclipse.uml2.uml.Package umlPackage = getUnderlyingElement();
 			if (homeInterface.getName() != null) {
-				result = (Interface)umlPackage.getOwnedType(homeInterface.getName(), false,
-						UMLPackage.Literals.INTERFACE, true);
+				result = applyStereotype(
+						(Interface)umlPackage.getOwnedType(homeInterface.getName(), false,
+								UMLPackage.Literals.INTERFACE, true),
+						J2EEProfilePackage.Literals.HOME_INTERFACE);
 			} else {
 				result = applyStereotype(umlPackage.createOwnedInterface(null),
 						J2EEProfilePackage.Literals.HOME_INTERFACE);
@@ -305,8 +307,8 @@ public class PackageAdapter extends NamedElementAdapter {
 			// It's not deleted, so ensure the underlying model
 			org.eclipse.uml2.uml.Package umlPackage = getUnderlyingElement();
 			if (finder.getName() != null) {
-				result = (Interface)umlPackage.getOwnedType(finder.getName(), false,
-						UMLPackage.Literals.INTERFACE, true);
+				result = applyStereotype((Interface)umlPackage.getOwnedType(finder.getName(), false,
+						UMLPackage.Literals.INTERFACE, true), J2EEProfilePackage.Literals.FINDER);
 			} else {
 				result = applyStereotype(umlPackage.createOwnedInterface(null),
 						J2EEProfilePackage.Literals.FINDER);

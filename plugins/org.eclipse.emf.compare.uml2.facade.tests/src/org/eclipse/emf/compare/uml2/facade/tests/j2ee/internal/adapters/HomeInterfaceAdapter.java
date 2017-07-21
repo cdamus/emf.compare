@@ -239,6 +239,26 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	 * @param facade
 	 *            the façade
 	 */
+	public void syncClientToFacade(Usage model, HomeInterface facade) {
+		if (!model.getClients().contains(getUnderlyingElement())) {
+			// This is no longer our usage
+			setUsage(null);
+
+			// If it isn't anyone's usage, it no longer exists
+			if (model.getClients().isEmpty()) {
+				model.destroy();
+			}
+		}
+	}
+
+	/**
+	 * Synchronize the bean from the UML model to the façade by its usage relationship.
+	 * 
+	 * @param model
+	 *            the UML usage element
+	 * @param facade
+	 *            the façade
+	 */
 	public void syncSupplierToFacade(Usage model, HomeInterface facade) {
 		// Just delegate
 		syncBeanToFacade(getUnderlyingElement(), facade);

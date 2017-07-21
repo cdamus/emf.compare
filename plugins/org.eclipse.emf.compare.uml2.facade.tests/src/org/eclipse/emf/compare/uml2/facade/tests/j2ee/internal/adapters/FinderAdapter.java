@@ -242,6 +242,26 @@ public class FinderAdapter extends NamedElementAdapter {
 	 * @param facade
 	 *            the façade
 	 */
+	public void syncClientToFacade(Usage model, Finder facade) {
+		if (!model.getClients().contains(getUnderlyingElement())) {
+			// This is no longer our create usage
+			setCreate(null);
+
+			// If it isn't anyone's create usage, it no longer exists
+			if (model.getClients().isEmpty()) {
+				model.destroy();
+			}
+		}
+	}
+
+	/**
+	 * Synchronize the bean from the UML model to the façade by its usage relationship.
+	 * 
+	 * @param model
+	 *            the UML usage element
+	 * @param facade
+	 *            the façade
+	 */
 	public void syncSupplierToFacade(Usage model, Finder facade) {
 		// Just delegate
 		syncBeanToFacade(getUnderlyingElement(), facade);

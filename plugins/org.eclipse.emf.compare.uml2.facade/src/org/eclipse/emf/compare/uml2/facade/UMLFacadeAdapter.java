@@ -222,7 +222,7 @@ public class UMLFacadeAdapter extends FacadeAdapter {
 	 */
 	protected <E extends Element> E applyStereotype(E element, EClass stereotypeEClass) {
 		Stereotype stereotypeToApply = PrivateUtil.getStereotype(stereotypeEClass, element);
-		if (stereotypeToApply != null) {
+		if ((stereotypeToApply != null) && !element.isStereotypeApplied(stereotypeToApply)) {
 			UMLUtil.safeApplyStereotype(element, stereotypeToApply);
 		}
 

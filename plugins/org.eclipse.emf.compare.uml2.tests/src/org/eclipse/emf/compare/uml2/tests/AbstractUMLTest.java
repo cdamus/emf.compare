@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012, 2016 Obeo and others.
+ * Copyright (c) 2012, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Stefan Dirix - update priority value for UML merger
  *     Philip Langer - bug 501864
  *     Martin Fleck - bug 507177
+ *     Christian W. Damus - customize the matching process in tests
  */
 package org.eclipse.emf.compare.uml2.tests;
 
@@ -44,6 +45,8 @@ import org.eclipse.emf.compare.Diff;
 import org.eclipse.emf.compare.EMFCompare;
 import org.eclipse.emf.compare.EMFCompare.Builder;
 import org.eclipse.emf.compare.ReferenceChange;
+import org.eclipse.emf.compare.match.IMatchEngine;
+import org.eclipse.emf.compare.match.impl.MatchEngineFactoryRegistryImpl;
 import org.eclipse.emf.compare.merge.BatchMerger;
 import org.eclipse.emf.compare.merge.IBatchMerger;
 import org.eclipse.emf.compare.merge.IMergeOptionAware;
@@ -137,7 +140,23 @@ public abstract class AbstractUMLTest {
 		mergerRegistry.add(umlMerger);
 		mergerRegistry.add(umlReferenceChangeMerger);
 		mergerRegistry.add(opaqueElementBodyChangeMerger);
+
+		IMatchEngine.Factory.Registry matchEngineFactoryRegistry = MatchEngineFactoryRegistryImpl
+				.createStandaloneInstance();
+		fillMatchEngineFactoryRegistry(matchEngineFactoryRegistry);
+		builder.setMatchEngineFactoryRegistry(matchEngineFactoryRegistry);
+
 		emfCompare = builder.build();
+	}
+
+	/**
+	 * Overridden by subclasses that need to customize the matching step.
+	 * 
+	 * @param matchEngineFactoryRegistry
+	 *            a registry of match-engine factories to tweak
+	 */
+	protected void fillMatchEngineFactoryRegistry(IMatchEngine.Factory.Registry matchEngineFactoryRegistry) {
+		// Pass
 	}
 
 	/**

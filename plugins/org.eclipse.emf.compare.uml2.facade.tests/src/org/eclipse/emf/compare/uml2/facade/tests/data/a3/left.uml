@@ -14,17 +14,7 @@
       </ownedOperation>
     </packagedElement>
     <packagedElement xmi:type="uml:Usage" xmi:id="_cF2IwGMkEeekBdYfVu2IVg" client="_C59IEGMkEeekBdYfVu2IVg" supplier="_EbFukGD-Eee5h7jApwhmyQ"/>
-    <packagedElement xmi:type="uml:Interface" xmi:id="_EWBoAGMlEeekBdYfVu2IVg" name="ThingByName">
-      <ownedOperation xmi:id="_EWBoAWMlEeekBdYfVu2IVg" name="findThingsByName">
-        <ownedParameter xmi:id="_EWBoAmMlEeekBdYfVu2IVg" name="name" effect="read">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
-        </ownedParameter>
-        <ownedParameter xmi:id="_EWBoA2MlEeekBdYfVu2IVg" type="_EbFukGD-Eee5h7jApwhmyQ" direction="return" effect="create">
-          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_EWBoBGMlEeekBdYfVu2IVg"/>
-          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_Kl-jIGMlEeekBdYfVu2IVg" value="*"/>
-        </ownedParameter>
-      </ownedOperation>
-    </packagedElement>
+    <packagedElement xmi:type="uml:Interface" xmi:id="_EWBoAGMlEeekBdYfVu2IVg" name="ThingByName"/>
     <packagedElement xmi:type="uml:Usage" xmi:id="_EWCPEGMlEeekBdYfVu2IVg" client="_EWBoAGMlEeekBdYfVu2IVg" supplier="_EbFukGD-Eee5h7jApwhmyQ"/>
     <profileApplication xmi:id="_i5CT0GMkEeekBdYfVu2IVg">
       <eAnnotations xmi:id="_i5KPoGMkEeekBdYfVu2IVg" source="http://www.eclipse.org/uml2/2.0.0/UML">
