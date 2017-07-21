@@ -1,12 +1,19 @@
 language: java
 sudo: false
 jdk:
- - oraclejdk8
+- oraclejdk8
 cache:
   directories:
-   - $HOME/.m2
+  - "$HOME/.m2"
 before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
-script: "mvn -f org.eclipse.emf.compare-parent/pom.xml -q -Dsurefire.printSummary=false -P oxygen verify | grep -E -v -e 'Time elapsed: [0-9.]+ sec\\s*$'"
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+- sleep 3
+script: 'mvn -f org.eclipse.emf.compare-parent/pom.xml -q -Dsurefire.printSummary=false
+  -P oxygen verify | grep -E -v -e ''Time elapsed: [0-9.]+ sec\s*$'''
+notifications:
+  pushover:
+    api_key:
+      secure: McSEKL+0TW4HGjqAlxpV+16DCKuj86qO0YtG9dPoWwV16HVSpSCzowG+hBNnoAdHVKVZ/coub0zBBSQjdXDyqv2ZnmksXsTdJcID8+5313dynXpw3MzKePYioaFOnfCvfS/j1sV8QdoMYD+PPEsLQQ6pRs3NQDKQ1ZBd3UFaROG85vCX3tCwaQ+QxqDZHHT7QWbQXcoVcgoxhgNYEhOVY5TFGJCjcl5dBcr+BxxZZmgSMPb/ZOLu5dqenp/lvSW/lzMGDYcC8SiP+5TiACO1WMQFhpm9PPBKKbnxHyBVXFIJZtEwFsPVsy8eDZxq2zjknPTeQWHgSV6P8oy/fntwPqmTMGvcoqs783B1Bly2Qw6HnxVobq4UNC69jxLw9b8HL3GF/pE+EFFmsdWoPjhOKkd0JgJCkOppiGQuY8fza5hPueooBz9t33mfAi/HaFMAJY1ypTyG7K2bFRmPv1mFOLtVgQiemLYEhCYalJ+idYGZqs8wLDxP2/eiegWk8bsTML/6mjUGtqOAZLb9zDQ3bpLlhuCPG7Zy9nFB6sjGG7rZKlONvu10/PulpvwqrRTMyBrCAZz49wAw1NeOtRtzlXGsGCqrbzjcZk6J3yVEKZli1wgQsHbMNnSzlJl2MqrhXU5Jnu9Q3s6u6vJ7nqm3EIm/vdgrOrfZ8ufSAR+u1sM=
+    users:
+      secure: CeITb9Q5uLH738KRye1tmT6bndHZ6O5aniA9xa80HJlt/tD5cZjCqNJvq78mdyUmoxYuDt0L3fYn+kE5v6oCUwSvHN+Z2Q2DwL38uW6isF2Gt20J7ym14JgD142zNkrr3rBG3uCIlMBBaKPUFofMy1SXzUgUqF1ev/gQ5egZbSvgzFCaPvlYHaSJZk7TECrWhnL6FbaMJ7Xfwo6CAYlvaWv7B73zIf56APGK/aEObaavD2ug6jYkzTz63kXxJyRkGs1Bfha8r34APB44Aisfa6TKLe5EAwbpqZu84GcDgPa1+xGJi8T4Yag1OfGswqJRW7y59wpASPCFDDTwP4jR0kWqkju4Q3Zpy8RRIunz0gGZJytsv5EkzkNfZzTrBMJgcy2WTFVY1/O8l5RoO2Kcad5vNgSyNsYQkTj5mYO+YoBaIkUoIgr228xaZ4zJV3gtcg58/ujpLMDSRHBFLKIn2HRnqzr2jCmRaf0ctejfJz9/XOYo3bKLFQbKRDar3xrXveaUH6cjA6rL69wszu6u0dejs6jB2xExfIMfdF2i7E0qAw2R74+ZfrqOx2oG3AF73w3FE6cY3ujoOfryLQPeV1bYAAshefFcX3p15cpd4kN/fTJP38T6uyo4/wmU9V0edbPwGgnpB0xBhVu55NK6VsdKy+sSr41eoJ0tbrQUnU0=
