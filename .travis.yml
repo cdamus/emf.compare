@@ -9,8 +9,7 @@ before_script:
 - export DISPLAY=:99.0
 - sh -e /etc/init.d/xvfb start
 - sleep 3
-script: 'mvn -f org.eclipse.emf.compare-parent/pom.xml -q -Dsurefire.printSummary=false
-  -P oxygen verify | grep -E -v -e ''Time elapsed: [0-9.]+ sec\s*$'''
+script: org.eclipse.emf.compare-parent/releng/travisbuild.sh -P oxygen verify
 notifications:
   pushover:
     api_key:
