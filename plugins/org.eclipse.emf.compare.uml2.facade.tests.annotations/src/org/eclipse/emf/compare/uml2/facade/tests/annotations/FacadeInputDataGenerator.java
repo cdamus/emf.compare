@@ -142,5 +142,11 @@ public class FacadeInputDataGenerator extends AbstractProcessor {
 				side);
 		output.println("\t}"); //$NON-NLS-1$
 		output.println();
+
+		output.printf("\tpublic Resource get%s%sUML() {%n", cap(scenarioName), cap(side)); //$NON-NLS-1$
+		output.printf("\t\treturn getLoadedResource(\"%s/%s.uml\"); //$NON-NLS-1$%n", scenarioName, //$NON-NLS-1$
+				side);
+		output.println("\t}"); //$NON-NLS-1$
+		output.println();
 	}
 }

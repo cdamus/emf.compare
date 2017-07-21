@@ -15,6 +15,7 @@ package org.eclipse.emf.compare.uml2.facade.tests.data;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters.J2EEFacadeFactory;
@@ -22,6 +23,7 @@ import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters.J2EEFaca
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.util.J2EEResource;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.uml2.uml.UMLPackage;
 
@@ -72,6 +74,22 @@ public class AbstractFacadeInputData extends AbstractUMLInputData {
 		result.getContents().add(facade);
 
 		return result;
+	}
+
+	/**
+	 * Obtains the already-loaded resource in any of my resource sets that is loaded from the given
+	 * {@code path}.
+	 * 
+	 * @param path
+	 *            the resource's relative path
+	 * @return the loaded resource
+	 * @throws AssertionError
+	 *             to fail the test if the resource is not found to have been loaded
+	 */
+	protected Resource getLoadedResource(String path) {
+		return getSets().stream().map(ResourceSet::getResources).flatMap(Collection::stream)
+				.filter(r -> r.getURI().toString().endsWith(path)).findAny()
+				.orElseThrow(() -> new AssertionError("No such resource: " + path)); //$NON-NLS-1$
 	}
 
 	/**
