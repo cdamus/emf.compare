@@ -32,7 +32,6 @@ import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Finder;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
-import org.eclipse.emf.compare.uml2.tests.AbstractUMLTest;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EObject;
@@ -46,6 +45,8 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -54,7 +55,7 @@ import org.junit.Test;
  * @author Christian W. Damus
  */
 @SuppressWarnings({"nls", "boxing" })
-public class BasicFacadeTest extends AbstractUMLTest {
+public class BasicFacadeTest extends AbstractFacadeTest {
 
 	private BasicFacadeInputData input = new BasicFacadeInputData();
 
@@ -322,6 +323,16 @@ public class BasicFacadeTest extends AbstractUMLTest {
 	//
 	// Test framework
 	//
+
+	@BeforeClass
+	public static void setupClass() {
+		fillRegistries();
+	}
+
+	@AfterClass
+	public static void teardownClass() {
+		resetRegistries();
+	}
 
 	/**
 	 * {@inheritDoc}
