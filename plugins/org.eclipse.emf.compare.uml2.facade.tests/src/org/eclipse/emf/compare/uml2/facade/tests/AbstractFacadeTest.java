@@ -87,13 +87,41 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 			UMLPlugin.getEPackageNsURIToProfileLocationMap().put(J2EEProfilePackage.eNS_URI,
 					URI.createURI("pathmap://UML2_FACADE_TESTS/j2ee.profile.uml#_0"));
 
-			// Find the location of the profile
-			URL profileURL = AbstractFacadeTest.class.getClassLoader().getResource("j2ee.profile.uml");
-			URI profileURI = URI.createURI(profileURL.toExternalForm());
-			URI baseURI = profileURI.trimSegments(1).appendSegment("");
 			// Map the base resource location
+			URI baseURI = getModelsBaseURI();
 			URIConverter.URI_MAP.put(URI.createURI("pathmap://UML2_FACADE_TESTS/"), baseURI);
 		}
+	}
+
+	/**
+	 * Determine the URI of the {@code model/} folder in the plug-in bundle, whether it is in source form in
+	 * the workspace (accounting for classes being then in a {@code bin/} folder) or in binary form in an
+	 * installed JAR.
+	 * 
+	 * @return the URI of the {@code model/} folder containing profiles and metamodels
+	 */
+	private static URI getModelsBaseURI() {
+		URI result;
+
+		URL classURL = AbstractFacadeTest.class.getResource("AbstractFacadeTest.class");
+		URI classURI = URI.createURI(classURL.toExternalForm());
+
+		int segments = classURI.segmentCount();
+		int trim;
+		for (trim = 1; trim < segments; trim++) {
+			if (classURI.segment(segments - trim).equals("org")) {
+				// Are we in a source project in the workspace?
+				if ((trim < segments) && classURI.segment(segments - trim - 1).equals("bin")) {
+					// Yup.
+					trim++;
+				}
+				break;
+			}
+		}
+
+		result = classURI.trimSegments(trim).appendSegment("model") //
+				.appendSegment(""); // Ensure a trailing separator
+		return result;
 	}
 
 	/**
