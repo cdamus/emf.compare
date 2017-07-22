@@ -12,19 +12,19 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.addedToReference;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.attributeValueMatch;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.changedReference;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.removedFromReference;
 import static org.hamcrest.CoreMatchers.anything;
+import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import com.google.common.base.Predicate;
@@ -32,14 +32,18 @@ import com.google.common.collect.Iterators;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.emf.compare.Comparison;
+import org.eclipse.emf.compare.Conflict;
+import org.eclipse.emf.compare.ConflictKind;
 import org.eclipse.emf.compare.Diff;
 import org.eclipse.emf.compare.match.IMatchEngine.Factory.Registry;
 import org.eclipse.emf.compare.match.impl.MatchEngineFactoryImpl;
 import org.eclipse.emf.compare.uml2.facade.tests.data.BasicFacadeInputData;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.BeanKind;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
+import org.eclipse.emf.compare.utils.EMFComparePredicates;
 import org.eclipse.emf.compare.utils.UseIdentifiers;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.junit.AfterClass;
@@ -51,7 +55,7 @@ import org.junit.Test;
  *
  * @author Christian W. Damus
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "boxing" })
 public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 
 	private BasicFacadeInputData input = new BasicFacadeInputData();
@@ -64,7 +68,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void testChangeBeanKind_a1() throws IOException {
+	public void changeBeanKind_a1() throws IOException {
 		Resource left = input.getA1Left();
 		Resource right = input.getA1Right();
 		Comparison comparison = compare(left, right);
@@ -76,7 +80,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 		List<Diff> differences = comparison.getDifferences();
 
 		// This is a very simple delta
-		assertEquals(1, differences.size());
+		assertThat(differences.size(), is(1));
 
 		Predicate<? super Diff> changeKindDescription;
 
@@ -93,7 +97,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 		}
 
 		Diff changeKind = Iterators.find(differences.iterator(), changeKindDescription);
-		assertNotNull(changeKind);
+		assertThat(changeKind, notNullValue());
 		assertThat(changeKind.getRefinedBy(), not(hasItem(anything())));
 		assertThat(changeKind.getRefines(), not(hasItem(anything())));
 		assertThat(changeKind.getRequiredBy(), not(hasItem(anything())));
@@ -102,7 +106,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void testMergeBeanKindRL_a1() throws IOException {
+	public void mergeBeanKindRL_a1() throws IOException {
 		Resource left = input.getA1Left();
 		Resource right = input.getA1Right();
 
@@ -115,7 +119,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void testMergeBeanKindLR_a1() throws IOException {
+	public void mergeBeanKindLR_a1() throws IOException {
 		Resource left = input.getA1Left();
 		Resource right = input.getA1Right();
 
@@ -128,7 +132,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void testAddHomeInterface_a2() throws IOException {
+	public void addHomeInterface_a2() throws IOException {
 		Resource left = input.getA2Left();
 		Resource right = input.getA2Right();
 		Comparison comparison = compare(left, right);
@@ -139,7 +143,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	private void testAB2(TestKind kind, Comparison comparison) {
 		List<Diff> differences = comparison.getDifferences();
 
-		assertEquals(3, differences.size());
+		assertThat(differences.size(), is(3));
 
 		Predicate<? super Diff> addHomeInterfaceDescription;
 		Predicate<? super Diff> setHomeInterfaceBeanDescription;
@@ -164,7 +168,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 		}
 
 		Diff addHomeInterface = Iterators.find(differences.iterator(), addHomeInterfaceDescription);
-		assertNotNull(addHomeInterface);
+		assertThat(addHomeInterface, notNullValue());
 		assertThat(addHomeInterface.getRefinedBy(), not(hasItem(anything())));
 		assertThat(addHomeInterface.getRefines(), not(hasItem(anything())));
 		if (kind == TestKind.ADD) {
@@ -180,7 +184,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 		assertThat(addHomeInterface.getEquivalence(), nullValue());
 
 		Diff setHomeInterfaceBean = Iterators.find(differences.iterator(), setHomeInterfaceBeanDescription);
-		assertNotNull(setHomeInterfaceBean);
+		assertThat(setHomeInterfaceBean, notNullValue());
 		assertThat(setHomeInterfaceBean.getRefinedBy(), not(hasItem(anything())));
 		assertThat(setHomeInterfaceBean.getRefines(), not(hasItem(anything())));
 		if (kind == TestKind.ADD) {
@@ -193,7 +197,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 		assertThat(setHomeInterfaceBean.getEquivalence(), notNullValue()); // It's an eOpposite
 
 		Diff setBeanHomeInterface = Iterators.find(differences.iterator(), setBeanHomeInterfaceDescription);
-		assertNotNull(setBeanHomeInterface);
+		assertThat(setBeanHomeInterface, notNullValue());
 		assertThat(setBeanHomeInterface.getRefinedBy(), not(hasItem(anything())));
 		assertThat(setBeanHomeInterface.getRefines(), not(hasItem(anything())));
 		if (kind == TestKind.ADD) {
@@ -207,7 +211,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void testDeleteHomeInterface_a2() throws IOException {
+	public void deleteHomeInterface_a2() throws IOException {
 		Resource left = input.getA2Right();
 		Resource right = input.getA2Left();
 		Comparison comparison = compare(left, right);
@@ -216,7 +220,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void testAddHomeInterfaceMergeRL_a2() throws IOException {
+	public void mergeHomeInterfaceRL_a2() throws IOException {
 		Resource left = input.getA2Left();
 		Resource right = input.getA2Right();
 
@@ -229,7 +233,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void testAddHomeInterfaceMergeLR_a2() throws IOException {
+	public void mergeHomeInterfaceLR_a2() throws IOException {
 		Resource left = input.getA2Left();
 		Resource right = input.getA2Right();
 
@@ -242,7 +246,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void testAddFinder_a3() throws IOException {
+	public void addFinder_a3() throws IOException {
 		Resource left = input.getA3Left();
 		Resource right = input.getA3Right();
 		Comparison comparison = compare(left, right);
@@ -253,7 +257,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	private void testAB3(TestKind kind, Comparison comparison) {
 		List<Diff> differences = comparison.getDifferences();
 
-		assertEquals(3, differences.size());
+		assertThat(differences.size(), is(3));
 
 		Predicate<? super Diff> addFinderDescription;
 		Predicate<? super Diff> setFinderBeanDescription;
@@ -276,7 +280,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 		}
 
 		Diff addFinder = Iterators.find(differences.iterator(), addFinderDescription);
-		assertNotNull(addFinder);
+		assertThat(addFinder, notNullValue());
 		assertThat(addFinder.getRefinedBy(), not(hasItem(anything())));
 		assertThat(addFinder.getRefines(), not(hasItem(anything())));
 		if (kind == TestKind.ADD) {
@@ -292,7 +296,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 		assertThat(addFinder.getEquivalence(), nullValue());
 
 		Diff setFinderBean = Iterators.find(differences.iterator(), setFinderBeanDescription);
-		assertNotNull(setFinderBean);
+		assertThat(setFinderBean, notNullValue());
 		assertThat(setFinderBean.getRefinedBy(), not(hasItem(anything())));
 		assertThat(setFinderBean.getRefines(), not(hasItem(anything())));
 		if (kind == TestKind.ADD) {
@@ -305,7 +309,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 		assertThat(setFinderBean.getEquivalence(), notNullValue()); // It's an eOpposite
 
 		Diff addBeanFinder = Iterators.find(differences.iterator(), addBeanFinderDescription);
-		assertNotNull(addBeanFinder);
+		assertThat(addBeanFinder, notNullValue());
 		assertThat(addBeanFinder.getRefinedBy(), not(hasItem(anything())));
 		assertThat(addBeanFinder.getRefines(), not(hasItem(anything())));
 		if (kind == TestKind.ADD) {
@@ -319,7 +323,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void testDeleteFinder_a3() throws IOException {
+	public void deleteFinder_a3() throws IOException {
 		Resource left = input.getA3Right();
 		Resource right = input.getA3Left();
 		Comparison comparison = compare(left, right);
@@ -328,7 +332,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void testAddFinderMergeRL_a3() throws IOException {
+	public void mergeFinderRL_a3() throws IOException {
 		Resource left = input.getA3Left();
 		Resource right = input.getA3Right();
 
@@ -341,7 +345,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void testAddFinderMergeLR_a3() throws IOException {
+	public void mergeFinderLR_a3() throws IOException {
 		Resource left = input.getA3Left();
 		Resource right = input.getA3Right();
 
@@ -351,6 +355,80 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 		left = input.getA3LeftUML();
 		right = input.getA3RightUML();
 		assertCompareSame(left, right);
+	}
+
+	@Test
+	public void addHomeInterface3WayNoConflict_b1() throws IOException {
+		Resource base = input.getB1Base();
+		Resource left = input.getB1Left();
+		Resource right = input.getB1Right();
+		Comparison comparison = preMerge(left, right, base);
+
+		List<Conflict> conflicts = comparison.getConflicts();
+
+		assertThat(conflicts.size(), is(2));
+		assertThat(conflicts, everyItem(isPseudoConflict()));
+
+		List<Diff> leftDiffs = conflicts.stream() //
+				.map(Conflict::getLeftDifferences).flatMap(List::stream) //
+				.collect(Collectors.toList());
+		List<Diff> rightDiffs = conflicts.stream() //
+				.map(Conflict::getRightDifferences).flatMap(List::stream) //
+				.collect(Collectors.toList());
+		assertThat(leftDiffs.size(), is(3));
+		assertThat(rightDiffs.size(), is(3));
+
+		assertThat(leftDiffs, hasItem(matches(Diff.class, "Home interface added to package",
+				addedToReference("b1", "homeInterface", "b1.ThingHome"))));
+		assertThat(leftDiffs, hasItem(matches(Diff.class, "Home interface set in Thing bean",
+				EMFComparePredicates.changedReference("b1.Thing", "homeInterface", null, "b1.ThingHome"))));
+		assertThat(leftDiffs, hasItem(matches(Diff.class, "Bean set in ThingHome interface",
+				EMFComparePredicates.changedReference("b1.ThingHome", "bean", null, "b1.Thing"))));
+
+		// And the UML representation is effectively the same, too
+		assertCompareSame(left, right, base, true);
+	}
+
+	@Test
+	public void addHomeInterface3WayConflict_b2() throws IOException {
+		Resource base = input.getB2Base();
+		Resource left = input.getB2Left();
+		Resource right = input.getB2Right();
+		Comparison comparison = preMerge(left, right, base);
+
+		List<Conflict> conflicts = newArrayList(comparison.getConflicts());
+		conflicts.removeIf(c -> c.getKind() == ConflictKind.PSEUDO);
+
+		assertThat(conflicts.size(), is(1));
+
+		List<Diff> leftDiffs = conflicts.get(0).getLeftDifferences();
+		List<Diff> rightDiffs = conflicts.get(0).getRightDifferences();
+		assertThat(leftDiffs.size(), is(2));
+		assertThat(rightDiffs.size(), is(2));
+
+		assertThat(leftDiffs, hasItem(matches(Diff.class, "Left Thing home interface",
+				changedReference("b2.Thing", "homeInterface", null, "b2.Home1"))));
+		assertThat(leftDiffs, hasItem(matches(Diff.class, "Left home interface bean",
+				changedReference("b2.Home1", "bean", null, "b2.Thing"))));
+		assertThat(rightDiffs, hasItem(matches(Diff.class, "Right Whatsit home interface",
+				changedReference("b2.Whatsit", "homeInterface", null, "b2.Home1"))));
+		assertThat(rightDiffs, hasItem(matches(Diff.class, "Right home interface bean",
+				changedReference("b2.Home1", "bean", null, "b2.Whatsit"))));
+	}
+
+	@Test
+	public void mergeHomeInterface3WayConflictLR_b2() throws IOException {
+		Resource base = input.getB2Base();
+		Resource left = input.getB2Left();
+		Resource right = input.getB2Right();
+
+		testMergeLeftToRight(left, right, base, true);
+
+		// And the merge's effect on the UML representation
+		base = input.getB2BaseUML();
+		left = input.getB2LeftUML();
+		right = input.getB2RightUML();
+		assertCompareSame(left, right, base, true);
 	}
 
 	//

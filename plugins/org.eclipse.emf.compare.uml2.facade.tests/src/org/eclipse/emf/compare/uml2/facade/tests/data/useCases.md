@@ -23,3 +23,20 @@ Two-way comparison of models where the right model already has a finder
 interface for the bean and the left model
 
 * adds another finder for the bean
+
+### Use case b1
+
+Three-way comparison of models where the base model has no home interfaces
+and
+
+* the left model adds a home interface for the Thing bean
+* the right model adds a similar home interface for the Thing bean
+
+### Use case b2
+
+Three-way comparison of models where the base model has no home interfaces
+and
+
+* the left model adds a home interface for the Thing bean
+* the right model adds a home interface of the same name
+but for the Whatsit bean (conflict)
