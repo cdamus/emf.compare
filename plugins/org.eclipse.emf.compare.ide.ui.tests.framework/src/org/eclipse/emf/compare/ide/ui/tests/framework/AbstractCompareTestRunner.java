@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Obeo.
+ * Copyright (c) 2016, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,14 @@
  * 
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Christian W. Damus - integration of façade providers
  *******************************************************************************/
 package org.eclipse.emf.compare.ide.ui.tests.framework;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.eclipse.emf.compare.conflict.DefaultConflictDetector;
 import org.eclipse.emf.compare.conflict.MatchBasedConflictDetector;
@@ -19,6 +22,7 @@ import org.eclipse.emf.compare.diff.DefaultDiffEngine;
 import org.eclipse.emf.compare.equi.DefaultEquiEngine;
 import org.eclipse.emf.compare.ide.ui.tests.framework.annotations.ConflictDetectors;
 import org.eclipse.emf.compare.ide.ui.tests.framework.annotations.DiffEngines;
+import org.eclipse.emf.compare.ide.ui.tests.framework.annotations.DisabledFacadeProviders;
 import org.eclipse.emf.compare.ide.ui.tests.framework.annotations.DisabledMatchEngines;
 import org.eclipse.emf.compare.ide.ui.tests.framework.annotations.DisabledPostProcessors;
 import org.eclipse.emf.compare.ide.ui.tests.framework.annotations.EqEngines;
@@ -66,6 +70,12 @@ public abstract class AbstractCompareTestRunner extends ParentRunner<Runner> {
 	private final Class<?>[] defaultDisabledPostProcessors = new Class<?>[] {};
 
 	/**
+	 * Default list of façade providers disabled if the
+	 * {@link DisabledFacadeProviders @DisabledFacadeProviders} annotation is not used.
+	 */
+	private final Class<?>[] defaultDisabledFacadeProviders = new Class<?>[] {};
+
+	/**
 	 * The constructor.
 	 * 
 	 * @param testClass
@@ -85,61 +95,20 @@ public abstract class AbstractCompareTestRunner extends ParentRunner<Runner> {
 	 * possibilities between match, diff, eq, req and conflict engines.
 	 */
 	private void prepareRunnersForTests() {
-		ResolutionStrategies rStrategies = getTestClass().getAnnotation(ResolutionStrategies.class);
-		final ResolutionStrategyID[] resolutionStrategies;
-		if (rStrategies == null) {
-			resolutionStrategies = defaultResolutionStrategies;
-		} else {
-			resolutionStrategies = rStrategies.value();
-		}
-
-		DisabledMatchEngines mEngines = getTestClass().getAnnotation(DisabledMatchEngines.class);
-		final Class<?>[] disabledMatchEngines;
-		if (mEngines == null) {
-			disabledMatchEngines = defaultDisabledMatchEngines;
-		} else {
-			disabledMatchEngines = mEngines.value();
-		}
-
-		DiffEngines dEngines = getTestClass().getAnnotation(DiffEngines.class);
-		final Class<?>[] diffEngines;
-		if (dEngines == null) {
-			diffEngines = defaultDiffEngines;
-		} else {
-			diffEngines = dEngines.value();
-		}
-
-		EqEngines eEngines = getTestClass().getAnnotation(EqEngines.class);
-		final Class<?>[] eqEngines;
-		if (eEngines == null) {
-			eqEngines = defaultEqEngines;
-		} else {
-			eqEngines = eEngines.value();
-		}
-
-		ReqEngines rEngines = getTestClass().getAnnotation(ReqEngines.class);
-		final Class<?>[] reqEngines;
-		if (rEngines == null) {
-			reqEngines = defaultReqEngines;
-		} else {
-			reqEngines = rEngines.value();
-		}
-
-		ConflictDetectors cEngines = getTestClass().getAnnotation(ConflictDetectors.class);
-		final Class<?>[] conflictDetectors;
-		if (cEngines == null) {
-			conflictDetectors = defaultConflictDetectors;
-		} else {
-			conflictDetectors = cEngines.value();
-		}
-
-		DisabledPostProcessors pProcessors = getTestClass().getAnnotation(DisabledPostProcessors.class);
-		final Class<?>[] disabledPostProcessors;
-		if (pProcessors == null) {
-			disabledPostProcessors = defaultDisabledPostProcessors;
-		} else {
-			disabledPostProcessors = pProcessors.value();
-		}
+		final ResolutionStrategyID[] resolutionStrategies = getAnnotation(ResolutionStrategies.class,
+				ResolutionStrategies::value, defaultResolutionStrategies);
+		final Class<?>[] disabledMatchEngines = getAnnotation(DisabledMatchEngines.class,
+				DisabledMatchEngines::value, defaultDisabledMatchEngines);
+		final Class<?>[] diffEngines = getAnnotation(DiffEngines.class, DiffEngines::value,
+				defaultDiffEngines);
+		final Class<?>[] eqEngines = getAnnotation(EqEngines.class, EqEngines::value, defaultEqEngines);
+		final Class<?>[] reqEngines = getAnnotation(ReqEngines.class, ReqEngines::value, defaultReqEngines);
+		final Class<?>[] conflictDetectors = getAnnotation(ConflictDetectors.class, ConflictDetectors::value,
+				defaultConflictDetectors);
+		final Class<?>[] disabledPostProcessors = getAnnotation(DisabledPostProcessors.class,
+				DisabledPostProcessors::value, defaultDisabledPostProcessors);
+		final Class<?>[] disabledFacadeProviders = getAnnotation(DisabledFacadeProviders.class,
+				DisabledFacadeProviders::value, defaultDisabledFacadeProviders);
 
 		// CHECKSTYLE:OFF those embedded fors are necessary to create all the test possibilities
 		for (ResolutionStrategyID resolutionStrategy : resolutionStrategies) {
@@ -151,7 +120,7 @@ public abstract class AbstractCompareTestRunner extends ParentRunner<Runner> {
 							try {
 								EMFCompareTestConfiguration configuration = new EMFCompareTestConfiguration(
 										disabledMatchEngines, diffEngine, eqEngine, reqEngine,
-										conflictDetector, disabledPostProcessors);
+										conflictDetector, disabledPostProcessors, disabledFacadeProviders);
 								createRunner(getTestClass().getJavaClass(), resolutionStrategy,
 										configuration);
 							} catch (InitializationError e) {
@@ -163,6 +132,36 @@ public abstract class AbstractCompareTestRunner extends ParentRunner<Runner> {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Extracts an array of values from an annotation on the test class, or the given default values if it is
+	 * not present.
+	 * 
+	 * @param annotationType
+	 *            the type of annotation to extract values from
+	 * @param valuesAccessor
+	 *            an accessor of the values (usually a reference to a {@code values()} method)
+	 * @param defaultValues
+	 *            the default values in case the annotation is not present
+	 * @return the annotation values (explicit or implicit)
+	 * @param <A>
+	 *            the annotation type
+	 * @param <T>
+	 *            the value type
+	 */
+	private <A extends Annotation, T> T[] getAnnotation(Class<? extends A> annotationType,
+			Function<? super A, ? extends T[]> valuesAccessor, T[] defaultValues) {
+		A annotation = getTestClass().getAnnotation(annotationType);
+
+		T[] result;
+		if (annotation == null) {
+			result = defaultValues;
+		} else {
+			result = valuesAccessor.apply(annotation);
+		}
+
+		return result;
 	}
 
 	/**

@@ -14,6 +14,7 @@ package org.eclipse.emf.compare.uml2.facade.tests.suite;
 
 import org.eclipse.emf.compare.uml2.facade.tests.BasicFacadeComparisonTest;
 import org.eclipse.emf.compare.uml2.facade.tests.BasicFacadeTest;
+import org.eclipse.emf.compare.uml2.facade.tests.FacadeProviderComparisonTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -30,7 +31,8 @@ import junit.textui.TestRunner;
 @RunWith(Suite.class)
 @SuiteClasses({ //
 		BasicFacadeTest.class, //
-		BasicFacadeComparisonTest.class,//
+		BasicFacadeComparisonTest.class, //
+		FacadeProviderComparisonTest.class, //
 })
 public class AllTests {
 

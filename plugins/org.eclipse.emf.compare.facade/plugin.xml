@@ -14,5 +14,14 @@ Contributors:
 -->
 
 <plugin>
-
+   <extension-point id="facadeProvider" name="EMF Compare Façade Providers" schema="schema/facadeProvider.exsd"/>
+   <extension
+         point="org.eclipse.emf.compare.rcp.matchEngine">
+      <engineFactory
+            class="org.eclipse.emf.compare.facade.internal.match.FacadeMatchEngine$Factory"
+            label="Façade Match Engine"
+            description="A match engine that matches façades wrapping the underlying models being compared."
+            ranking="50">
+      </engineFactory>
+   </extension>
 </plugin>

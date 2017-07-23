@@ -17,6 +17,7 @@ Contributors:
    <extension point="org.eclipse.jdt.apt.core.annotationProcessorFactory">
       <java6processors enableDefault="true">
          <java6processor class="org.eclipse.emf.compare.uml2.facade.tests.annotations.FacadeInputDataGenerator"/>
+         <java6processor class="org.eclipse.emf.compare.uml2.facade.tests.annotations.InputDataGenerator"/>
       </java6processors>
    </extension>
 </plugin>

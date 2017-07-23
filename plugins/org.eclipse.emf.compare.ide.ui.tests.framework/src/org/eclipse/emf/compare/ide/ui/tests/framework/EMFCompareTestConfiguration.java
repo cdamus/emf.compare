@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Obeo.
+ * Copyright (c) 2016, 2017 Obeo, Christian W. Damus, and otherw.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Christian W. Damus - integration of façade providers
  *******************************************************************************/
 package org.eclipse.emf.compare.ide.ui.tests.framework;
 
@@ -35,6 +36,9 @@ public class EMFCompareTestConfiguration {
 	/** The post-processors disabled for this test. */
 	private final Class<?>[] disabledPostProcessors;
 
+	/** The façade providers disabled for this test. */
+	private final Class<?>[] disabledFacadeProviders;
+
 	/**
 	 * The constructor.
 	 * 
@@ -50,16 +54,19 @@ public class EMFCompareTestConfiguration {
 	 *            The conflict detector used for the test
 	 * @param disabledPostProcessors
 	 *            The post processors disabled for the test
+	 * @param disabledFacadeProviders
+	 *            The façade providers disabled for the test
 	 */
 	public EMFCompareTestConfiguration(Class<?>[] disabledMatchEngineFactory, Class<?> diffEngine,
 			Class<?> eqEngine, Class<?> reqEngine, Class<?> conflictDetector,
-			Class<?>[] disabledPostProcessors) {
+			Class<?>[] disabledPostProcessors, Class<?>[] disabledFacadeProviders) {
 		this.disabledMatchEngines = disabledMatchEngineFactory;
 		this.diffEngine = diffEngine;
 		this.eqEngine = eqEngine;
 		this.reqEngine = reqEngine;
 		this.conflictDetector = conflictDetector;
 		this.disabledPostProcessors = disabledPostProcessors;
+		this.disabledFacadeProviders = disabledFacadeProviders;
 	}
 
 	public Class<?>[] getDisabledMatchEngines() {
@@ -86,4 +93,7 @@ public class EMFCompareTestConfiguration {
 		return disabledPostProcessors;
 	}
 
+	public Class<?>[] getDisabledFacadeProviders() {
+		return disabledFacadeProviders;
+	}
 }

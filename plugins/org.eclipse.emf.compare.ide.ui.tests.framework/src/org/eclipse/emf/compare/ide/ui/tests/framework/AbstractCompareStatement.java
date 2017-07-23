@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Obeo and others.
+ * Copyright (c) 2016, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *     Mathias Schaefer - preferences refactoring
+ *     Christian W. Damus - integration of façade providers
  *******************************************************************************/
 package org.eclipse.emf.compare.ide.ui.tests.framework;
 
@@ -84,6 +85,9 @@ public abstract class AbstractCompareStatement extends Statement {
 	/** The default disabled post-processors. */
 	private static final List<String> DEFAULT_DISABLED_POST_PROCESSORS = Collections.emptyList();
 
+	/** The default disabled façade providers. */
+	private static final List<String> DEFAULT_DISABLED_FACADE_PROVIDERS = Collections.emptyList();
+
 	/** The test class. */
 	protected final Object testObject;
 
@@ -119,6 +123,9 @@ public abstract class AbstractCompareStatement extends Statement {
 	/** The post-processors disabled for this test. */
 	private final Class<?>[] disabledPostProcessors;
 
+	/** The façade providers disabled for this test. */
+	private final Class<?>[] disabledFacadeProviders;
+
 	/** The default resolution strategy. */
 	private String defaultResolutionStrategy = "WORKSPACE"; //$NON-NLS-1$
 
@@ -145,6 +152,7 @@ public abstract class AbstractCompareStatement extends Statement {
 		this.reqEngine = configuration.getReqEngine();
 		this.conflictDetector = configuration.getConflictDetector();
 		this.disabledPostProcessors = configuration.getDisabledPostProcessors();
+		this.disabledFacadeProviders = configuration.getDisabledFacadeProviders();
 		setEMFComparePreferencesDefaults();
 	}
 
@@ -179,6 +187,8 @@ public abstract class AbstractCompareStatement extends Statement {
 		rcpPreferenceStore.setDefault(EMFComparePreferences.CONFLICTS_DETECTOR, DEFAULT_CONFLICT_DETECTOR);
 		rcpPreferenceStore.setDefault(EMFComparePreferences.DISABLED_POST_PROCESSOR,
 				join(DEFAULT_DISABLED_POST_PROCESSORS, PREFERENCES_SEPARATOR));
+		rcpPreferenceStore.setDefault(EMFComparePreferences.DISABLED_FACADE_PROVIDER,
+				join(DEFAULT_DISABLED_FACADE_PROVIDERS, PREFERENCES_SEPARATOR));
 	}
 
 	/**
@@ -192,6 +202,7 @@ public abstract class AbstractCompareStatement extends Statement {
 		rcpPreferenceStore.setToDefault(EMFComparePreferences.REQ_ENGINES);
 		rcpPreferenceStore.setToDefault(EMFComparePreferences.CONFLICTS_DETECTOR);
 		rcpPreferenceStore.setToDefault(EMFComparePreferences.DISABLED_POST_PROCESSOR);
+		rcpPreferenceStore.setToDefault(EMFComparePreferences.DISABLED_FACADE_PROVIDER);
 	}
 
 	/**
@@ -205,6 +216,7 @@ public abstract class AbstractCompareStatement extends Statement {
 		setReqPreference();
 		setConflictPreference();
 		setPostProcessorPreference();
+		setFacadeProviderPreference();
 	}
 
 	/**
@@ -327,6 +339,18 @@ public abstract class AbstractCompareStatement extends Statement {
 		}
 		rcpPreferenceStore.setValue(EMFComparePreferences.DISABLED_POST_PROCESSOR,
 				join(postProcessorNames, PREFERENCES_SEPARATOR));
+	}
+
+	/**
+	 * Set the façade providers preference.
+	 */
+	private void setFacadeProviderPreference() {
+		List<String> facadeProviderFactoryNames = Collections.emptyList();
+		for (Class<?> facadeProviderFactory : disabledFacadeProviders) {
+			facadeProviderFactoryNames.add(facadeProviderFactory.getCanonicalName());
+		}
+		rcpPreferenceStore.setValue(EMFComparePreferences.DISABLED_FACADE_PROVIDER,
+				join(facadeProviderFactoryNames, PREFERENCES_SEPARATOR));
 	}
 
 	/**

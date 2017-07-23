@@ -68,4 +68,14 @@ Contributors:
             target="platform:/plugin/org.eclipse.emf.compare.uml2.facade.tests/model/">
       </mapping>
    </extension>
+   
+   <extension
+         point="org.eclipse.emf.compare.facade.facadeProvider">
+      <facadeProviderFactory
+            class="org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EEFacadeProvider$Factory"
+            ranking="10"
+            label="J2EE Profile for UML"
+            description="Facade model for J2EE models in UML with the J2EE Profile">
+      </facadeProviderFactory>
+   </extension>
 </plugin>

@@ -12,7 +12,12 @@
  */
 package org.eclipse.emf.compare.facade.internal;
 
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.emf.compare.facade.IFacadeProvider;
+import org.eclipse.emf.compare.rcp.internal.extension.IItemRegistry;
+import org.eclipse.emf.compare.rcp.internal.extension.impl.ItemRegistry;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -25,8 +30,20 @@ public class EMFCompareFacadePlugin extends Plugin {
 	/** The plug-in ID. */
 	public static final String PLUGIN_ID = "org.eclipse.emf.compare.facade"; //$NON-NLS-1$
 
+	/** The id of the façade provider extension point. */
+	public static final String FACADE_PROVIDER_PPID = "facadeProvider"; //$NON-NLS-1$
+
 	/** This plug-in's shared instance. */
 	private static EMFCompareFacadePlugin plugin;
+
+	/** The registry that keeps references to façade provider factories. */
+	private IItemRegistry<IFacadeProvider.Factory> facadeProviderRegistry;
+
+	/** The API registry that keeps references to façade provider factories. */
+	private FacadeProviderRegistryWrapper facadeProviderRegistryWrapper;
+
+	/** A registry listener that will be used to watch the façade provider extension point. */
+	private FacadeProviderRegistryListener facadeProviderRegistryListener;
 
 	/**
 	 * Obtains the shared instance.
@@ -41,11 +58,54 @@ public class EMFCompareFacadePlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+
+		createFacadeProviderRegistry(registry);
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+
+		disposeFacadeProviderRegistry(registry);
+
 		plugin = null;
 		super.stop(context);
+	}
+
+	public IItemRegistry<IFacadeProvider.Factory> getFacadeProviderItemRegistry() {
+		return facadeProviderRegistry;
+	}
+
+	public IFacadeProvider.Factory.Registry getFacadeProviderRegistry() {
+		return facadeProviderRegistryWrapper;
+	}
+
+	/**
+	 * Initialize the extension-based façade provider registry.
+	 * 
+	 * @param registry
+	 *            {@link IExtensionRegistry} to listen to in order to fill the registry
+	 */
+	private void createFacadeProviderRegistry(IExtensionRegistry registry) {
+		facadeProviderRegistry = new ItemRegistry<IFacadeProvider.Factory>();
+		facadeProviderRegistryListener = new FacadeProviderRegistryListener(PLUGIN_ID, FACADE_PROVIDER_PPID,
+				getLog(), facadeProviderRegistry);
+		facadeProviderRegistryListener.readRegistry(registry);
+		facadeProviderRegistryWrapper = new FacadeProviderRegistryWrapper(facadeProviderRegistry);
+	}
+
+	/**
+	 * Discard the extension-based façade provider registry.
+	 * 
+	 * @param registry
+	 *            IExtensionRegistry to remove listener(s) from
+	 */
+	private void disposeFacadeProviderRegistry(final IExtensionRegistry registry) {
+		registry.removeListener(facadeProviderRegistryListener);
+		facadeProviderRegistryListener = null;
+		facadeProviderRegistry = null;
+		facadeProviderRegistryWrapper = null;
 	}
 }

@@ -30,7 +30,6 @@ import static org.junit.Assert.fail;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,7 +67,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void changeBeanKind_a1() throws IOException {
+	public void changeBeanKind_a1() {
 		Resource left = input.getA1Left();
 		Resource right = input.getA1Right();
 		Comparison comparison = compare(left, right);
@@ -106,7 +105,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void mergeBeanKindRL_a1() throws IOException {
+	public void mergeBeanKindRL_a1() {
 		Resource left = input.getA1Left();
 		Resource right = input.getA1Right();
 
@@ -119,7 +118,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void mergeBeanKindLR_a1() throws IOException {
+	public void mergeBeanKindLR_a1() {
 		Resource left = input.getA1Left();
 		Resource right = input.getA1Right();
 
@@ -132,7 +131,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void addHomeInterface_a2() throws IOException {
+	public void addHomeInterface_a2() {
 		Resource left = input.getA2Left();
 		Resource right = input.getA2Right();
 		Comparison comparison = compare(left, right);
@@ -211,7 +210,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void deleteHomeInterface_a2() throws IOException {
+	public void deleteHomeInterface_a2() {
 		Resource left = input.getA2Right();
 		Resource right = input.getA2Left();
 		Comparison comparison = compare(left, right);
@@ -220,7 +219,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void mergeHomeInterfaceRL_a2() throws IOException {
+	public void mergeHomeInterfaceRL_a2() {
 		Resource left = input.getA2Left();
 		Resource right = input.getA2Right();
 
@@ -233,7 +232,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void mergeHomeInterfaceLR_a2() throws IOException {
+	public void mergeHomeInterfaceLR_a2() {
 		Resource left = input.getA2Left();
 		Resource right = input.getA2Right();
 
@@ -246,7 +245,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void addFinder_a3() throws IOException {
+	public void addFinder_a3() {
 		Resource left = input.getA3Left();
 		Resource right = input.getA3Right();
 		Comparison comparison = compare(left, right);
@@ -323,7 +322,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void deleteFinder_a3() throws IOException {
+	public void deleteFinder_a3() {
 		Resource left = input.getA3Right();
 		Resource right = input.getA3Left();
 		Comparison comparison = compare(left, right);
@@ -332,7 +331,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void mergeFinderRL_a3() throws IOException {
+	public void mergeFinderRL_a3() {
 		Resource left = input.getA3Left();
 		Resource right = input.getA3Right();
 
@@ -345,7 +344,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void mergeFinderLR_a3() throws IOException {
+	public void mergeFinderLR_a3() {
 		Resource left = input.getA3Left();
 		Resource right = input.getA3Right();
 
@@ -358,7 +357,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void addHomeInterface3WayNoConflict_b1() throws IOException {
+	public void addHomeInterface3WayNoConflict_b1() {
 		Resource base = input.getB1Base();
 		Resource left = input.getB1Left();
 		Resource right = input.getB1Right();
@@ -390,7 +389,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void addHomeInterface3WayConflict_b2() throws IOException {
+	public void addHomeInterface3WayConflict_b2() {
 		Resource base = input.getB2Base();
 		Resource left = input.getB2Left();
 		Resource right = input.getB2Right();
@@ -417,7 +416,7 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 	}
 
 	@Test
-	public void mergeHomeInterface3WayConflictLR_b2() throws IOException {
+	public void mergeHomeInterface3WayConflictLR_b2() {
 		Resource base = input.getB2Base();
 		Resource left = input.getB2Left();
 		Resource right = input.getB2Right();

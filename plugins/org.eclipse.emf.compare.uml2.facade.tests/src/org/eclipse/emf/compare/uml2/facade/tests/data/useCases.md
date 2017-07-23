@@ -40,3 +40,13 @@ and
 * the left model adds a home interface for the Thing bean
 * the right model adds a home interface of the same name
 but for the Whatsit bean (conflict)
+
+### Use case u1
+
+A pure UML scenario (no profile, no façade) for verification that UML models
+without façades are still sensibly compared.  Provides a three-way comparison
+in which
+
+* the base model has a class with an attribute of some primitive type
+* the left model changes the attribute's type to some other primitive type
+* the right model changes that attribute's type to some third type

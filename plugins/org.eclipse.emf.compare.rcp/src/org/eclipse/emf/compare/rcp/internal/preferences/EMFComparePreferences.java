@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2016 Obeo.
+ * Copyright (c) 2014, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Christian W. Damus - integration of façade providers
  *******************************************************************************/
 package org.eclipse.emf.compare.rcp.internal.preferences;
 
@@ -45,6 +46,11 @@ public final class EMFComparePreferences {
 
 	/** Disabled adapter factories preference. */
 	public static final String DISABLED_ADAPTER_FACTORY = "org.eclipse.emf.compare.preference.disabled.adapter.factories"; //$NON-NLS-1$
+
+	/**
+	 * Disabled façade providers preference. (Key to use in the registry to retrieve the provider descriptor).
+	 */
+	public static final String DISABLED_FACADE_PROVIDER = "org.eclipse.emf.compare.preference.facade.provider"; //$NON-NLS-1$
 
 	/** Preference key for log4j file name. */
 	public static final String LOG_FILENAME_KEY = "org.eclipse.emf.compare.log.file.name"; //$NON-NLS-1$
