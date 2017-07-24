@@ -16,17 +16,21 @@ import org.eclipse.emf.common.util.Monitor;
 import org.eclipse.emf.compare.Comparison;
 import org.eclipse.emf.compare.facade.IFacadeProvider;
 import org.eclipse.emf.compare.facade.internal.EMFCompareFacadePlugin;
+import org.eclipse.emf.compare.facade.internal.FacadeProviderRegistryImpl;
 import org.eclipse.emf.compare.match.DefaultComparisonFactory;
 import org.eclipse.emf.compare.match.DefaultEqualityHelperFactory;
 import org.eclipse.emf.compare.match.DefaultMatchEngine;
 import org.eclipse.emf.compare.match.IComparisonFactory;
 import org.eclipse.emf.compare.match.IMatchEngine;
 import org.eclipse.emf.compare.match.eobject.IEObjectMatcher;
+import org.eclipse.emf.compare.match.eobject.WeightProvider;
+import org.eclipse.emf.compare.match.eobject.WeightProviderDescriptorRegistryImpl;
 import org.eclipse.emf.compare.match.resource.IResourceMatcher;
 import org.eclipse.emf.compare.match.resource.StrategyResourceMatcher;
 import org.eclipse.emf.compare.rcp.EMFCompareRCPPlugin;
 import org.eclipse.emf.compare.rcp.internal.match.DefaultRCPMatchEngineFactory;
 import org.eclipse.emf.compare.scope.IComparisonScope;
+import org.eclipse.emf.compare.utils.UseIdentifiers;
 
 /**
  * A match engine that matches façades for comparison instead of the underlying model elements, where façades
@@ -111,15 +115,141 @@ public class FacadeMatchEngine extends DefaultMatchEngine {
 	//
 
 	/**
-	 * The factory for the {@link FacadeMatchEngine}.
+	 * The factory for the stand-alone (not using Eclipse extensions) {@link FacadeMatchEngine}.
 	 *
 	 * @author Christian W. Damus
 	 */
-	public static class Factory extends DefaultRCPMatchEngineFactory {
+	public static class Factory implements IMatchEngine.Factory {
+
+		/** My relative ranking. */
+		private int ranking;
+
+		/** The option for identifier-based matching. */
+		private final UseIdentifiers useIDs;
+
+		/** Registry of weight-providers for structure-based (non-identifier-based) matching. */
+		private final WeightProvider.Descriptor.Registry weightProviderRegistry;
+
+		/** Registry of weight-providers for façade-based matching. */
+		private final IFacadeProvider.Factory.Registry facadeProviderRegistry;
+
+		/**
+		 * Initializes me with the option for matching on identifiers when they are available. For
+		 * structure-based matching I use the default stand-alone weight-provider registry and the default
+		 * façade providers.
+		 */
+		public Factory() {
+			this(UseIdentifiers.WHEN_AVAILABLE);
+		}
+
+		/**
+		 * Initializes me with the specified option for matching on identifiers. For structure-based matching
+		 * I use the default stand-alone weight-provider registry and the default façade providers.
+		 * 
+		 * @param useIDs
+		 *            the option for matching on identifiers
+		 */
+		public Factory(UseIdentifiers useIDs) {
+			this(useIDs, WeightProviderDescriptorRegistryImpl.createStandaloneInstance());
+		}
+
+		/**
+		 * Initializes me with the specified option for matching on identifiers and a particular
+		 * weight-provider registry. I use the default façade providers.
+		 * 
+		 * @param useIDs
+		 *            the option for matching on identifiers
+		 * @param weightProviderRegistry
+		 *            weight-provider registry for structural (non-identifier-based) matching
+		 */
+		public Factory(UseIdentifiers useIDs, WeightProvider.Descriptor.Registry weightProviderRegistry) {
+			this(useIDs, weightProviderRegistry, FacadeProviderRegistryImpl.createStandaloneInstance());
+		}
+
+		/**
+		 * Initializes me with the specified option for matching on identifiers and a particular
+		 * façade-provider registry. I use the default stand-alone wight-provider registry.
+		 * 
+		 * @param useIDs
+		 *            the option for matching on identifiers
+		 * @param facadeProviderRegistry
+		 *            the façade-provider registry for façade-based matching (and comparisons)
+		 */
+		public Factory(UseIdentifiers useIDs, IFacadeProvider.Factory.Registry facadeProviderRegistry) {
+			this(useIDs, WeightProviderDescriptorRegistryImpl.createStandaloneInstance(),
+					facadeProviderRegistry);
+		}
+
+		/**
+		 * Initializes me with the specified option for matching on identifiers and a particular
+		 * weight-provider registry and façade-provider registry.
+		 * 
+		 * @param useIDs
+		 *            the option for matching on identifiers
+		 * @param weightProviderRegistry
+		 *            weight-provider registry for structural (non-identifier-based) matching
+		 * @param facadeProviderRegistry
+		 *            the façade-provider registry for façade-based matching (and comparisons)
+		 */
+		public Factory(UseIdentifiers useIDs, WeightProvider.Descriptor.Registry weightProviderRegistry,
+				IFacadeProvider.Factory.Registry facadeProviderRegistry) {
+
+			this.useIDs = useIDs;
+			this.weightProviderRegistry = weightProviderRegistry;
+			this.facadeProviderRegistry = facadeProviderRegistry;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int getRanking() {
+			return ranking;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setRanking(int ranking) {
+			this.ranking = ranking;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isMatchEngineFactoryFor(IComparisonScope scope) {
+			return true;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public IMatchEngine getMatchEngine() {
+			IComparisonFactory comparisonFactory = new DefaultComparisonFactory(
+					new DefaultEqualityHelperFactory());
+			IEObjectMatcher eObjectMatcher = createDefaultEObjectMatcher(useIDs, weightProviderRegistry);
+			IResourceMatcher resourceMatcher = new StrategyResourceMatcher();
+
+			IMatchEngine result = new FacadeMatchEngine(eObjectMatcher, resourceMatcher, comparisonFactory,
+					facadeProviderRegistry);
+
+			return result;
+		}
+	}
+
+	/**
+	 * The factory for the RCP-based (using Eclipse extensions) {@link FacadeMatchEngine}.
+	 *
+	 * @author Christian W. Damus
+	 */
+	public static class RCPFactory extends DefaultRCPMatchEngineFactory {
 		/**
 		 * Initializes me.
 		 */
-		public Factory() {
+		public RCPFactory() {
 			super();
 		}
 

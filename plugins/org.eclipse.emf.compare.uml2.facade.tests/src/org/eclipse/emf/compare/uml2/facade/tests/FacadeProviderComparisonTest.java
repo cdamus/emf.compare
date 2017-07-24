@@ -28,17 +28,22 @@ import com.google.common.collect.Iterators;
 
 import java.util.List;
 
+import org.eclipse.emf.common.EMFPlugin;
 import org.eclipse.emf.compare.Comparison;
 import org.eclipse.emf.compare.Conflict;
 import org.eclipse.emf.compare.ConflictKind;
 import org.eclipse.emf.compare.Diff;
+import org.eclipse.emf.compare.facade.IFacadeProvider;
+import org.eclipse.emf.compare.facade.internal.EMFCompareFacadePlugin;
+import org.eclipse.emf.compare.facade.internal.FacadeProviderRegistryImpl;
 import org.eclipse.emf.compare.facade.internal.match.FacadeMatchEngine;
 import org.eclipse.emf.compare.match.IMatchEngine;
-import org.eclipse.emf.compare.match.IMatchEngine.Factory.Registry;
 import org.eclipse.emf.compare.uml2.facade.tests.data.UMLInputData;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.BeanKind;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EEFacadeProvider;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
 import org.eclipse.emf.compare.utils.EMFComparePredicates;
+import org.eclipse.emf.compare.utils.UseIdentifiers;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -49,7 +54,7 @@ import org.junit.Test;
  *
  * @author Christian W. Damus
  */
-@SuppressWarnings({"nls", "boxing" })
+@SuppressWarnings({"nls", "boxing", "restriction" })
 public class FacadeProviderComparisonTest extends AbstractFacadeTest {
 
 	private UMLInputData input = new UMLInputData();
@@ -161,13 +166,23 @@ public class FacadeProviderComparisonTest extends AbstractFacadeTest {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void fillMatchEngineFactoryRegistry(Registry matchEngineFactoryRegistry) {
+	protected void fillMatchEngineFactoryRegistry(IMatchEngine.Factory.Registry matchEngineFactoryRegistry) {
 		super.fillMatchEngineFactoryRegistry(matchEngineFactoryRegistry);
+
+		IFacadeProvider.Factory.Registry facadeProviderRegistry;
+		if (EMFPlugin.IS_ECLIPSE_RUNNING) {
+			// Use the extension-based registry
+			facadeProviderRegistry = EMFCompareFacadePlugin.getDefault().getFacadeProviderRegistry();
+		} else {
+			facadeProviderRegistry = FacadeProviderRegistryImpl.createStandaloneInstance();
+			facadeProviderRegistry.add(new J2EEFacadeProvider.Factory());
+		}
 
 		// Match by structure of the model, not identity of elements, because the merge of
 		// the façade creates similar structures in the UML on one side as on the other,
 		// but of course the elements that comprise it will have different XMI IDs
-		IMatchEngine.Factory matchEngineFactory = new FacadeMatchEngine.Factory();
+		IMatchEngine.Factory matchEngineFactory = new FacadeMatchEngine.Factory(UseIdentifiers.NEVER,
+				facadeProviderRegistry);
 		matchEngineFactory.setRanking(Integer.MAX_VALUE);
 
 		matchEngineFactoryRegistry.add(matchEngineFactory);

@@ -18,7 +18,7 @@ Contributors:
    <extension
          point="org.eclipse.emf.compare.rcp.matchEngine">
       <engineFactory
-            class="org.eclipse.emf.compare.facade.internal.match.FacadeMatchEngine$Factory"
+            class="org.eclipse.emf.compare.facade.internal.match.FacadeMatchEngine$RCPFactory"
             label="Façade Match Engine"
             description="A match engine that matches façades wrapping the underlying models being compared."
             ranking="50">

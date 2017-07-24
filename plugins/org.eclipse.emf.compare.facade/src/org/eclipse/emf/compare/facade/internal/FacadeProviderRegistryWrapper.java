@@ -15,9 +15,10 @@ package org.eclipse.emf.compare.facade.internal;
 import static com.google.common.base.Predicates.in;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.transform;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import java.util.Collection;
@@ -28,7 +29,6 @@ import org.eclipse.emf.compare.facade.IFacadeProvider;
 import org.eclipse.emf.compare.rcp.EMFCompareRCPPlugin;
 import org.eclipse.emf.compare.rcp.internal.extension.IItemDescriptor;
 import org.eclipse.emf.compare.rcp.internal.extension.IItemRegistry;
-import org.eclipse.emf.compare.rcp.internal.extension.impl.AbstractItemDescriptor;
 import org.eclipse.emf.compare.rcp.internal.extension.impl.ItemUtil;
 import org.eclipse.emf.compare.rcp.internal.extension.impl.WrapperItemDescriptor;
 import org.eclipse.emf.compare.rcp.internal.preferences.EMFComparePreferences;
@@ -57,40 +57,44 @@ public class FacadeProviderRegistryWrapper implements IFacadeProvider.Factory.Re
 	}
 
 	/**
-	 * Queries the current enabled (by user preferences) façade provider factories.
+	 * Queries the descriptors of currently enabled (by user preferences) façade provider factories.
 	 * 
 	 * @return the factories
 	 */
-	private Collection<IFacadeProvider.Factory> getEnabledFactories() {
-		Collection<IItemDescriptor<IFacadeProvider.Factory>> enabledFactories = Collections2
-				.filter(registry.getItemDescriptors(), not(in(getDisabledFacadeProviders())));
-		return Collections2.transform(enabledFactories, AbstractItemDescriptor.getItemFunction());
+	private Iterable<IItemDescriptor<IFacadeProvider.Factory>> getEnabledFactories() {
+		return Iterables.filter(registry.getItemDescriptors(), not(in(getDisabledFacadeProviders())));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public IFacadeProvider.Factory getHighestRankingFacadeProviderFactory(IComparisonScope scope) {
-		IItemDescriptor<IFacadeProvider.Factory> result = null;
+		IItemDescriptor<IFacadeProvider.Factory> highest = null;
+		IFacadeProvider.Factory result = null;
 
-		for (IItemDescriptor<IFacadeProvider.Factory> next : registry.getItemDescriptors()) {
-			if ((result == null) || (next.getRank() > result.getRank())) {
-				result = next;
+		for (IItemDescriptor<IFacadeProvider.Factory> next : getEnabledFactories()) {
+			if ((highest == null) || (highest.getRank() > highest.getRank())) {
+				IFacadeProvider.Factory factory = next.getItem();
+				if (factory.isFacadeProviderFactoryFor(scope)) {
+					highest = next;
+					result = factory;
+				}
 			}
 		}
 
-		if (result != null) {
-			return result.getItem();
-		} else {
-			return IFacadeProvider.Factory.NULL_FACTORY;
+		if (result == null) {
+			result = IFacadeProvider.Factory.NULL_FACTORY;
 		}
+
+		return result;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public List<IFacadeProvider.Factory> getFacadeProviderFactories(IComparisonScope scope) {
-		Iterable<IFacadeProvider.Factory> result = filter(getEnabledFactories(),
+		Iterable<IFacadeProvider.Factory> result = filter(
+				transform(getEnabledFactories(), IItemDescriptor::getItem),
 				factory -> factory.isFacadeProviderFactoryFor(scope));
 		return Lists.newArrayList(result);
 	}
