@@ -11,10 +11,11 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.ide.ui.tests.framework;
 
+import static org.eclipse.emf.compare.utils.ReflectiveDispatch.safeInvoke;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.eclipse.emf.compare.conflict.DefaultConflictDetector;
 import org.eclipse.emf.compare.conflict.MatchBasedConflictDetector;
@@ -96,19 +97,18 @@ public abstract class AbstractCompareTestRunner extends ParentRunner<Runner> {
 	 */
 	private void prepareRunnersForTests() {
 		final ResolutionStrategyID[] resolutionStrategies = getAnnotation(ResolutionStrategies.class,
-				ResolutionStrategies::value, defaultResolutionStrategies);
-		final Class<?>[] disabledMatchEngines = getAnnotation(DisabledMatchEngines.class,
-				DisabledMatchEngines::value, defaultDisabledMatchEngines);
-		final Class<?>[] diffEngines = getAnnotation(DiffEngines.class, DiffEngines::value,
-				defaultDiffEngines);
-		final Class<?>[] eqEngines = getAnnotation(EqEngines.class, EqEngines::value, defaultEqEngines);
-		final Class<?>[] reqEngines = getAnnotation(ReqEngines.class, ReqEngines::value, defaultReqEngines);
-		final Class<?>[] conflictDetectors = getAnnotation(ConflictDetectors.class, ConflictDetectors::value,
+				ResolutionStrategyID[].class, defaultResolutionStrategies);
+		final Class<?>[] disabledMatchEngines = getAnnotation(DisabledMatchEngines.class, Class[].class,
+				defaultDisabledMatchEngines);
+		final Class<?>[] diffEngines = getAnnotation(DiffEngines.class, Class[].class, defaultDiffEngines);
+		final Class<?>[] eqEngines = getAnnotation(EqEngines.class, Class[].class, defaultEqEngines);
+		final Class<?>[] reqEngines = getAnnotation(ReqEngines.class, Class[].class, defaultReqEngines);
+		final Class<?>[] conflictDetectors = getAnnotation(ConflictDetectors.class, Class[].class,
 				defaultConflictDetectors);
-		final Class<?>[] disabledPostProcessors = getAnnotation(DisabledPostProcessors.class,
-				DisabledPostProcessors::value, defaultDisabledPostProcessors);
-		final Class<?>[] disabledFacadeProviders = getAnnotation(DisabledFacadeProviders.class,
-				DisabledFacadeProviders::value, defaultDisabledFacadeProviders);
+		final Class<?>[] disabledPostProcessors = getAnnotation(DisabledPostProcessors.class, Class[].class,
+				defaultDisabledPostProcessors);
+		final Class<?>[] disabledFacadeProviders = getAnnotation(DisabledFacadeProviders.class, Class[].class,
+				defaultDisabledFacadeProviders);
 
 		// CHECKSTYLE:OFF those embedded fors are necessary to create all the test possibilities
 		for (ResolutionStrategyID resolutionStrategy : resolutionStrategies) {
@@ -140,8 +140,8 @@ public abstract class AbstractCompareTestRunner extends ParentRunner<Runner> {
 	 * 
 	 * @param annotationType
 	 *            the type of annotation to extract values from
-	 * @param valuesAccessor
-	 *            an accessor of the values (usually a reference to a {@code values()} method)
+	 * @param valueArrayType
+	 *            the type of value array provided by the annotation
 	 * @param defaultValues
 	 *            the default values in case the annotation is not present
 	 * @return the annotation values (explicit or implicit)
@@ -151,14 +151,14 @@ public abstract class AbstractCompareTestRunner extends ParentRunner<Runner> {
 	 *            the value type
 	 */
 	private <A extends Annotation, T> T[] getAnnotation(Class<? extends A> annotationType,
-			Function<? super A, ? extends T[]> valuesAccessor, T[] defaultValues) {
+			Class<? extends T[]> valueArrayType, T[] defaultValues) {
 		A annotation = getTestClass().getAnnotation(annotationType);
 
 		T[] result;
 		if (annotation == null) {
 			result = defaultValues;
 		} else {
-			result = valuesAccessor.apply(annotation);
+			result = valueArrayType.cast(safeInvoke(annotation, "value")); //$NON-NLS-1$
 		}
 
 		return result;

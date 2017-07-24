@@ -13,9 +13,9 @@
 package org.eclipse.emf.compare.facade;
 
 import static java.util.Objects.requireNonNull;
-import static org.eclipse.emf.compare.facade.ReflectiveDispatch.getMethods;
-import static org.eclipse.emf.compare.facade.ReflectiveDispatch.resolveMethod;
-import static org.eclipse.emf.compare.facade.ReflectiveDispatch.safeInvoke;
+import static org.eclipse.emf.compare.utils.ReflectiveDispatch.getMethods;
+import static org.eclipse.emf.compare.utils.ReflectiveDispatch.lookupMethod;
+import static org.eclipse.emf.compare.utils.ReflectiveDispatch.safeInvoke;
 
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
@@ -24,15 +24,17 @@ import com.google.common.cache.LoadingCache;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.Optional;
+import java.util.Spliterator;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+import java.util.stream.StreamSupport;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.compare.utils.ReflectiveDispatch;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
@@ -363,21 +365,21 @@ public class FacadeAdapter implements Adapter.Internal {
 				toInitialUpperCase(key.featureName), directionName);
 
 		// Try first with a notification for specificity, then without
-		Optional<Method> syncMethod = resolveMethod(key.owner, syncMethodName, key.sourceType, key.targetType,
+		Method syncMethod = lookupMethod(key.owner, syncMethodName, key.sourceType, key.targetType,
 				Notification.class);
 
-		return syncMethod
-				.<Synchronizer> map(
-						method -> (adapter, from, to, msg) -> safeInvoke(adapter, method, from, to, msg))
-				.orElseGet(() -> {
-					// Optional should have a flatting or-else
-					Optional<Method> syncMethodWithoutNotification = resolveMethod(key.owner, syncMethodName,
-							key.sourceType, key.targetType);
+		if (syncMethod != null) {
+			return (adapter, from, to, msg) -> safeInvoke(adapter, syncMethod, from, to, msg);
+		}
 
-					return syncMethodWithoutNotification.<Synchronizer> map(
-							method -> (adapter, from, to, msg) -> safeInvoke(adapter, method, from, to))
-							.orElse(Synchronizer.PASS);
-				});
+		// Try the variant signature without the notification parameter
+		Method syncMethodWoN = lookupMethod(key.owner, syncMethodName, key.sourceType, key.targetType);
+		if (syncMethodWoN != null) {
+			return (adapter, from, to, msg) -> safeInvoke(adapter, syncMethodWoN, from, to);
+		}
+
+		// No synchronization
+		return Synchronizer.PASS;
 	}
 
 	/**
@@ -531,7 +533,7 @@ public class FacadeAdapter implements Adapter.Internal {
 	 *         {@link Synchronizer#PASS PASS} instance
 	 */
 	private static Synchronizer resolveInitializer(CacheKey key) {
-		Predicate<String> methodNameFilter;
+		com.google.common.base.Predicate<String> methodNameFilter;
 
 		if (key.toModel) {
 			methodNameFilter = syncToModelName(key.featureName);
@@ -539,7 +541,9 @@ public class FacadeAdapter implements Adapter.Internal {
 			methodNameFilter = syncToFacadeName(key.featureName);
 		}
 
-		return getMethods(key.owner, methodNameFilter, key.sourceType, key.targetType)
+		Spliterator<Method> methods = getMethods(key.owner, methodNameFilter, key.sourceType, key.targetType)
+				.spliterator();
+		return StreamSupport.stream(methods, false)
 				.<Synchronizer> map(m -> (adapter, from, to, msg) -> safeInvoke(adapter, m, from, to))
 				.reduce(Synchronizer::andThen) //
 				.orElse(Synchronizer.PASS);
@@ -552,7 +556,7 @@ public class FacadeAdapter implements Adapter.Internal {
 	 *            the feature name, or {@code null} to match any feature
 	 * @return the to-model synchronization method name filter
 	 */
-	private static Predicate<String> syncToModelName(String featureName) {
+	private static com.google.common.base.Predicate<String> syncToModelName(String featureName) {
 		if (featureName == null) {
 			return s -> s.startsWith("sync") && s.endsWith("ToModel"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
@@ -567,7 +571,7 @@ public class FacadeAdapter implements Adapter.Internal {
 	 *            the feature name, or {@code null} to match any feature
 	 * @return the to-façade synchronization method name filter
 	 */
-	private static Predicate<String> syncToFacadeName(String featureName) {
+	private static com.google.common.base.Predicate<String> syncToFacadeName(String featureName) {
 		if (featureName == null) {
 			return s -> s.startsWith("sync") && s.endsWith("ToFacade"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {

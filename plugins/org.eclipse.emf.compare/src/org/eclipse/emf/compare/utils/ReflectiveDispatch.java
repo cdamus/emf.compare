@@ -10,28 +10,38 @@
  *     Christian W. Damus - initial API and implementation
  *
  */
-package org.eclipse.emf.compare.facade;
+package org.eclipse.emf.compare.utils;
 
+import static com.google.common.base.Predicates.and;
+import static com.google.common.collect.Iterables.filter;
+
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
-import org.eclipse.emf.compare.facade.FacadeAdapter.Synchronizer;
 
 /**
- * An adapter that links a façade object with its underlying model element, coördination synchronziation of
- * changes between the two.
+ * Convenient dynamic (reflective) access to methods of objects where those methods are not required to exist.
+ * Suitable for patterns of <em>call-backs</em> or <em>hooks</em> that the framework will attempt to invoke
+ * but that objects may optionally not declare. Because of this degree of flexibility in method dispatch,
+ * run-time failures in the form of exceptions are suppressed (but logged). Virtual machine errors are
+ * propagated.
  *
  * @author Christian W. Damus
+ * @since 3.6
  */
 public final class ReflectiveDispatch {
 	/** The logger. */
@@ -39,7 +49,11 @@ public final class ReflectiveDispatch {
 
 	/** Cache of resolved methods. */
 	private static LoadingCache<CacheKey, Optional<Method>> methodCache = CacheBuilder.newBuilder()
-			.concurrencyLevel(4).build(CacheLoader.from(ReflectiveDispatch::resolveMethod));
+			.concurrencyLevel(4).build(CacheLoader.from(new Function<CacheKey, Optional<Method>>() {
+				public Optional<Method> apply(CacheKey input) {
+					return resolveMethod(input);
+				}
+			}));
 
 	/**
 	 * Not instantiable by clients.
@@ -107,7 +121,7 @@ public final class ReflectiveDispatch {
 	 * @return the resolved method, or {@code null} if there is no method that can accept the arguments
 	 */
 	public static Method lookupMethod(Class<?> owner, String name, Class<?>... argType) {
-		return methodCache.getUnchecked(new CacheKey(owner, name, argType)).orElse(null);
+		return methodCache.getUnchecked(new CacheKey(owner, name, argType)).orNull();
 	}
 
 	/**
@@ -115,8 +129,7 @@ public final class ReflectiveDispatch {
 	 * 
 	 * @param key
 	 *            a caching key
-	 * @return the method to cache. Must not be {@code null}, but instead in that case should be the
-	 *         {@link Synchronizer#PASS PASS} instance
+	 * @return the optional method to cache, possibly empty but of course not {@code null}
 	 */
 	private static Optional<Method> resolveMethod(CacheKey key) {
 		return resolveMethod(key.owner, key.methodName, key.argTypes);
@@ -134,12 +147,27 @@ public final class ReflectiveDispatch {
 	 *            types of proposed arguments to be passed to the method parameters
 	 * @return the applicable methods
 	 */
-	public static Stream<Method> getMethods(Class<?> owner, Predicate<? super String> nameFilter,
-			Class<?>... argType) {
+	public static Iterable<Method> getMethods(Class<?> owner, final Predicate<? super String> nameFilter,
+			final Class<?>... argType) {
 
-		return Stream.of(owner.getMethods()).filter(m -> nameFilter.test(m.getName()))
-				.filter(m -> m.getParameterCount() == argType.length)
-				.filter(m -> signatureCompatible(m.getParameterTypes(), argType));
+		Predicate<Method> byName = new Predicate<Method>() {
+			public boolean apply(Method input) {
+				return nameFilter.test(input.getName());
+			}
+		};
+		Predicate<Method> byParameterCount = new Predicate<Method>() {
+			public boolean apply(Method input) {
+				return input.getParameterCount() == argType.length;
+			}
+		};
+		Predicate<Method> bySignature = new Predicate<Method>() {
+			public boolean apply(Method input) {
+				return signatureCompatible(input.getParameterTypes(), argType);
+			}
+		};
+
+		return filter(ImmutableList.copyOf(owner.getMethods()),
+				and(byName, and(byParameterCount, bySignature)));
 	}
 
 	/**
@@ -154,10 +182,20 @@ public final class ReflectiveDispatch {
 	 *            types of anticipated arguments to be passed to the resulting method
 	 * @return the matching method
 	 */
-	static Optional<Method> resolveMethod(Class<?> owner, String name, Class<?>... argType) {
-		return getMethods(owner, name::equals, argType)
-				.sorted(Comparator.comparing(Method::getParameterTypes, signatureSpecificity())) //
-				.findFirst();
+	private static Optional<Method> resolveMethod(Class<?> owner, String name, Class<?>... argType) {
+		Iterable<Method> possibleResults = getMethods(owner, Predicates.equalTo(name), argType);
+		if (Iterables.isEmpty(possibleResults)) {
+			return Optional.absent();
+		} else {
+			Function<Method, Class<?>[]> parameterTypes = new Function<Method, Class<?>[]>() {
+				public Class<?>[] apply(Method input) {
+					return input.getParameterTypes();
+				}
+			};
+
+			return Optional.of(
+					Ordering.from(signatureSpecificity()).onResultOf(parameterTypes).max(possibleResults));
+		}
 	}
 
 	/**
@@ -189,15 +227,17 @@ public final class ReflectiveDispatch {
 	 * @return a method overload signature-specificity comparator
 	 */
 	private static Comparator<Class<?>[]> signatureSpecificity() {
-		return (a, b) -> {
-			if (signatureCompatible(a, b)) {
-				if (signatureCompatible(b, a)) {
-					return 0;
+		return new Comparator<Class<?>[]>() {
+			public int compare(Class<?>[] a, Class<?>[] b) {
+				if (signatureCompatible(a, b)) {
+					if (signatureCompatible(b, a)) {
+						return 0;
+					} else {
+						return +1;
+					}
 				} else {
-					return +1;
+					return -1;
 				}
-			} else {
-				return -1;
 			}
 		};
 	}
@@ -217,7 +257,7 @@ public final class ReflectiveDispatch {
 		try {
 			return method.invoke(owner, arg);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			LOGGER.error("Failed to invoke facade synchronization method", e); //$NON-NLS-1$
+			LOGGER.error(String.format("Failed to invoke %s on receiver %s", method, owner), e); //$NON-NLS-1$
 			return null;
 		}
 	}
@@ -269,7 +309,7 @@ public final class ReflectiveDispatch {
 			int result = 1;
 			result = prime * result + ((owner == null) ? 0 : owner.hashCode());
 			result = prime * result + ((methodName == null) ? 0 : methodName.hashCode());
-			result = prime * result + ((argTypes == null) ? 0 : argTypes.hashCode());
+			result = prime * result + ((argTypes == null) ? 0 : Arrays.hashCode(argTypes));
 			return result;
 		}
 		// CHECKSTYLE:ON

@@ -12,9 +12,5 @@
   <artifactId>org.eclipse.emf.compare.ide.ui.tests.framework</artifactId>
   <version>1.0.1-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
-   
-  <properties>
-  	<source-java-version>1.8</source-java-version>
-  </properties>
   
 </project>
