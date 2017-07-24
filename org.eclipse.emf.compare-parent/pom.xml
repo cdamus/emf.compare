@@ -411,6 +411,7 @@
         <module>../packaging/org.eclipse.emf.compare.diagram.sirius-feature</module>
         
         <module>../plugins/org.eclipse.emf.compare.facade</module>
+        <module>../plugins/org.eclipse.emf.compare.facade.edit</module>
         <module>../plugins/org.eclipse.emf.compare.facade.ui</module>
         <module>../plugins/org.eclipse.emf.compare.uml2.facade</module>
         <module>../plugins/org.eclipse.emf.compare.uml2.facade.tests.annotations</module>

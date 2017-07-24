@@ -2,8 +2,8 @@
 <genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:genmodel="http://www.eclipse.org/uml2/2.2.0/GenModel"
     copyrightText="Copyright (c) 2017 Christian W. Damus and others.&#xA;&#xA;All rights reserved. This program and the accompanying materials&#xA;are made available under the terms of the Eclipse Public License v1.0&#xA;which accompanies this distribution, and is available at&#xA;http://www.eclipse.org/legal/epl-v10.html&#xA;&#xA;Contributors:&#xA;   Christian W. Damus - Initial API and implementation&#xA;"
-    modelDirectory="/org.eclipse.emf.compare.uml2.facade.tests/src-facade" editDirectory="/org.eclipse.emf.compare.uml2.facade.tests.edit/src-facade"
-    editorDirectory="/org.eclipse.emf.compare.uml2.facade.tests.editor/src-facade"
+    modelDirectory="/org.eclipse.emf.compare.uml2.facade.tests/src-facade" creationIcons="false"
+    editDirectory="/org.eclipse.emf.compare.uml2.facade.tests.edit/src-facade" editorDirectory="/org.eclipse.emf.compare.uml2.facade.tests.editor/src-facade"
     modelPluginID="org.eclipse.emf.compare.uml2.facade.tests" modelName="J2EE" nonNLSMarkers="true"
     rootExtendsInterface="org.eclipse.emf.compare.facade.FacadeObject" rootExtendsClass="org.eclipse.emf.compare.facade.FacadeObjectImpl"
     codeFormatting="true" testsDirectory="/org.eclipse.emf.compare.uml2.facade.tests.tests/src-facade"
@@ -47,8 +47,8 @@
       <genEnumLiterals xsi:type="genmodel:GenEnumLiteral" ecoreEnumLiteral="j2ee.ecore#//BeanKind/messagedriven"/>
     </genEnums>
     <genClasses xsi:type="genmodel:GenClass" ecoreClass="j2ee.ecore#//Package">
-      <genFeatures xsi:type="genmodel:GenFeature" property="Readonly" notify="false"
-          createChild="false" ecoreFeature="ecore:EReference j2ee.ecore#//Package/member"/>
+      <genFeatures xsi:type="genmodel:GenFeature" property="None" notify="false" createChild="false"
+          ecoreFeature="ecore:EReference j2ee.ecore#//Package/member"/>
       <genFeatures xsi:type="genmodel:GenFeature" property="None" children="true"
           createChild="true" ecoreFeature="ecore:EReference j2ee.ecore#//Package/bean"/>
       <genFeatures xsi:type="genmodel:GenFeature" property="None" children="true"
@@ -59,7 +59,7 @@
     <genClasses xsi:type="genmodel:GenClass" image="false" ecoreClass="j2ee.ecore#//NamedElement">
       <genFeatures xsi:type="genmodel:GenFeature" createChild="false" ecoreFeature="ecore:EAttribute j2ee.ecore#//NamedElement/name"
           key="true"/>
-      <genFeatures xsi:type="genmodel:GenFeature" notify="false" createChild="false"
+      <genFeatures xsi:type="genmodel:GenFeature" property="None" notify="false" createChild="false"
           propertySortChoices="true" ecoreFeature="ecore:EReference j2ee.ecore#//NamedElement/package"/>
       <genOperations xsi:type="genmodel:GenOperation" ecoreOperation="j2ee.ecore#//NamedElement/getPackage"/>
       <genOperations xsi:type="genmodel:GenOperation" ecoreOperation="j2ee.ecore#//NamedElement/setPackage">
@@ -73,8 +73,8 @@
           propertySortChoices="true" ecoreFeature="ecore:EReference j2ee.ecore#//Bean/superclass"/>
       <genFeatures xsi:type="genmodel:GenFeature" notify="false" createChild="false"
           propertySortChoices="true" ecoreFeature="ecore:EReference j2ee.ecore#//Bean/homeInterface"/>
-      <genFeatures xsi:type="genmodel:GenFeature" property="Readonly" notify="false"
-          createChild="false" ecoreFeature="ecore:EReference j2ee.ecore#//Bean/finder"/>
+      <genFeatures xsi:type="genmodel:GenFeature" notify="false" createChild="false"
+          propertySortChoices="true" ecoreFeature="ecore:EReference j2ee.ecore#//Bean/finder"/>
     </genClasses>
     <genClasses xsi:type="genmodel:GenClass" ecoreClass="j2ee.ecore#//HomeInterface">
       <genFeatures xsi:type="genmodel:GenFeature" notify="false" createChild="false"
