@@ -14,7 +14,6 @@ package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers;
 
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.compare.facade.IFacadeProvider;
-import org.eclipse.emf.compare.scope.IComparisonScope;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters.J2EEFacadeFactory;
 import org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.J2EEProfilePackage;
 import org.eclipse.emf.ecore.EObject;
@@ -55,9 +54,8 @@ public class J2EEFacadeProvider implements IFacadeProvider {
 		/**
 		 * {@inheritDoc}
 		 */
-		public boolean isFacadeProviderFactoryFor(IComparisonScope scope) {
-			return hasJ2EEPackage(scope.getLeft()) || hasJ2EEPackage(scope.getRight())
-					|| hasJ2EEPackage(scope.getOrigin());
+		public boolean isFacadeProviderFactoryFor(Notifier notifier) {
+			return hasJ2EEPackage(notifier);
 		}
 
 		protected boolean hasJ2EEPackage(Notifier notifier) {

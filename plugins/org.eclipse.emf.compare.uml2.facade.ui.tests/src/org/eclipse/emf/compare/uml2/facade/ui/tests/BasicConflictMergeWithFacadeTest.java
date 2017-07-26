@@ -13,8 +13,8 @@
 package org.eclipse.emf.compare.uml2.facade.ui.tests;
 
 import static org.eclipse.emf.compare.DifferenceState.UNRESOLVED;
-import static org.eclipse.emf.compare.uml2.facade.tests.CompareMatchers.isRealConflict;
-import static org.eclipse.emf.compare.uml2.facade.tests.CompareMatchers.matches;
+import static org.eclipse.emf.compare.tests.framework.CompareMatchers.isRealConflict;
+import static org.eclipse.emf.compare.tests.framework.CompareMatchers.matches;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.hasState;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;

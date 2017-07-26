@@ -16,6 +16,8 @@ import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Iterators.filter;
 import static com.google.common.collect.Iterators.transform;
 
+import com.google.common.collect.AbstractIterator;
+
 import java.util.Iterator;
 import java.util.Set;
 
@@ -35,24 +37,28 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
  * @author Christian W. Damus
  */
 class FacadeComparisonScope implements IComparisonScope {
-	/** The façade provider that owns me. */
+	/** The façade provider factory that I use to get façade providers for each resource. */
+	private final IFacadeProvider.Factory facadeProviderFactory;
+
+	/** The façade provider that I use on resources that have façades. */
 	private final IFacadeProvider facadeProvider;
 
 	/** The comparison scope that provides the underlying model elements to be compared via the façade. */
 	private final IComparisonScope delegate;
 
 	/**
-	 * Initializes me with my façade provider and underlying comparison scope.
+	 * Initializes me with my façade provider factory and underlying comparison scope.
 	 * 
-	 * @param facadeProvider
-	 *            the provider of façade model elements
+	 * @param facadeProviderFactory
+	 *            the factory of providers of façade model elements
 	 * @param delegate
 	 *            the provider of underlying model elements to be compared via the façade
 	 */
-	FacadeComparisonScope(IFacadeProvider facadeProvider, IComparisonScope delegate) {
+	FacadeComparisonScope(IFacadeProvider.Factory facadeProviderFactory, IComparisonScope delegate) {
 		super();
 
-		this.facadeProvider = facadeProvider;
+		this.facadeProviderFactory = facadeProviderFactory;
+		this.facadeProvider = facadeProviderFactory.getFacadeProvider();
 		this.delegate = delegate;
 	}
 
@@ -145,7 +151,45 @@ class FacadeComparisonScope implements IComparisonScope {
 	 * {@inheritDoc}
 	 */
 	public Iterator<? extends EObject> getCoveredEObjects(Resource resource) {
-		return filter(transform(delegate.getCoveredEObjects(resource), this::facade), notNull());
+		if (!facadeProviderFactory.isFacadeProviderFactoryFor(resource)) {
+			// No façades in here
+			return delegate.getCoveredEObjects(resource);
+		}
+
+		Iterator<? extends EObject> roots = filter(transform(resource.getContents().iterator(), this::facade),
+				notNull());
+
+		return new AbstractIterator<EObject>() {
+			private Iterator<? extends EObject> currentTree;
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected EObject computeNext() {
+				EObject result;
+
+				if (currentTree == null) {
+					if (roots.hasNext()) {
+						result = roots.next();
+						currentTree = getChildren(result);
+					} else {
+						result = endOfData();
+					}
+				} else {
+					if (currentTree.hasNext()) {
+						result = currentTree.next();
+					} else {
+						// This tail-recursive call will go into the previous top-level
+						// if-case, so it won't recurse any further
+						currentTree = null;
+						result = computeNext();
+					}
+				}
+
+				return result;
+			}
+		};
 	}
 
 	/**

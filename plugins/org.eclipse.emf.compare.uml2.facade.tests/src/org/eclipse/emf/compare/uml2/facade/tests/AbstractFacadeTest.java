@@ -14,7 +14,7 @@ package org.eclipse.emf.compare.uml2.facade.tests;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
-import static org.eclipse.emf.compare.uml2.facade.tests.CompareMatchers.hasPseudoConflict;
+import static org.eclipse.emf.compare.tests.framework.CompareMatchers.hasPseudoConflict;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.hasNoDirectOrIndirectConflict;
 import static org.hamcrest.CoreMatchers.anything;
 import static org.hamcrest.CoreMatchers.everyItem;

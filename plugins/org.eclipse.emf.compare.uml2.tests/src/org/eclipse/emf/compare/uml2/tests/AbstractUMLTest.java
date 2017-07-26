@@ -21,8 +21,10 @@ import static org.eclipse.emf.compare.merge.AbstractMerger.SUB_DIFF_AWARE_OPTION
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.hasDirectOrIndirectConflict;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
@@ -31,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.emf.common.EMFPlugin;
@@ -55,6 +58,7 @@ import org.eclipse.emf.compare.postprocessor.IPostProcessor;
 import org.eclipse.emf.compare.postprocessor.PostProcessorDescriptorRegistryImpl;
 import org.eclipse.emf.compare.scope.DefaultComparisonScope;
 import org.eclipse.emf.compare.scope.IComparisonScope;
+import org.eclipse.emf.compare.tests.framework.junit.AnnotationRule;
 import org.eclipse.emf.compare.tests.postprocess.data.TestPostProcessor;
 import org.eclipse.emf.compare.uml2.internal.StereotypedElementChange;
 import org.eclipse.emf.compare.uml2.internal.UMLDiff;
@@ -65,23 +69,38 @@ import org.eclipse.emf.compare.uml2.internal.postprocessor.OpaqueElementBodyChan
 import org.eclipse.emf.compare.uml2.internal.postprocessor.UMLPostProcessor;
 import org.eclipse.emf.compare.uml2.profile.test.uml2comparetestprofile.UML2CompareTestProfilePackage;
 import org.eclipse.emf.compare.utils.ReferenceUtil;
+import org.eclipse.emf.compare.utils.ReflectiveDispatch;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
 import org.eclipse.uml2.uml.UMLPackage;
 import org.eclipse.uml2.uml.internal.resource.UMLResourceFactoryImpl;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 
 /**
+ * This class provides hooks in the comparison process that subclasses may choose to implement by providing
+ * public methods:
+ * <ul>
+ * <li><tt>verifyComparisonScope(<i>scope-type</i> scope)</tt>: check details of the scope input to the
+ * comparison. The <i>scope-type</i> should be {@link IComparisonScope} or some type conforming to it if only
+ * specific a implementation of the scope should be verified</li>
+ * </ul>
+ * 
  * @author <a href="mailto:cedric.notot@obeo.fr">Cedric Notot</a>
  */
 @SuppressWarnings({"nls", "restriction" })
 public abstract class AbstractUMLTest {
+
+	@Rule
+	public final AnnotationRule<AdditionalResources, AdditionalResourcesKind> additionalResourcesKind = AnnotationRule
+			.create(AdditionalResources.class, AdditionalResourcesKind.NONE);
 
 	protected EMFCompare emfCompare;
 
@@ -197,8 +216,85 @@ public abstract class AbstractUMLTest {
 	}
 
 	protected Comparison compare(Notifier left, Notifier right, Notifier origin) {
-		IComparisonScope scope = new DefaultComparisonScope(left, right, origin);
-		return getCompare().compare(scope);
+		IComparisonScope scope;
+
+		switch (additionalResourcesKind.get()) {
+			case NONE:
+				scope = new DefaultComparisonScope(left, right, origin);
+				break;
+			case REFERENCED_LOCAL:
+			case REFERENCED_ALL:
+				if (!((left instanceof Resource) || (right instanceof Resource)
+						|| (origin instanceof Resource))) {
+					scope = new DefaultComparisonScope(left, right, origin);
+				} else {
+					ResourceSet leftSet = null;
+					ResourceSet rightSet = null;
+					ResourceSet originSet = null;
+					if (left != null) {
+						leftSet = ((Resource)left).getResourceSet();
+					}
+					if (right != null) {
+						rightSet = ((Resource)right).getResourceSet();
+					}
+					if (origin != null) {
+						originSet = ((Resource)origin).getResourceSet();
+					}
+					DefaultComparisonScope theScope = new DefaultComparisonScope(leftSet, rightSet,
+							originSet);
+					scope = theScope;
+					theScope.setResourceSetContentFilter(
+							reachedFromAny(additionalResourcesKind.get().isLocal(), (Resource)left,
+									(Resource)right, (Resource)origin));
+				}
+				break;
+			default:
+				fail("Unsupported additional-resources kind: " + additionalResourcesKind.get());
+				scope = null; // Unreachable
+				break;
+		}
+
+		Comparison result = getCompare().compare(scope);
+
+		ReflectiveDispatch.safeInvoke(this, "verifyComparisonScope", AssertionError.class, scope);
+
+		return result;
+	}
+
+	/**
+	 * A predicate matching resources that are transitively reachable from any of a set of starting resources
+	 * (such as inputs of the comparison).
+	 * 
+	 * @param localOnly
+	 *            whether to consider reachability only locally in each resource's storage domain
+	 * @param startingResource
+	 *            the starting resources for reachability analysis
+	 * @return the reachability predicate
+	 */
+	Predicate<Resource> reachedFromAny(boolean localOnly, Resource... startingResource) {
+		ImmutableSet.Builder<Resource> builder = ImmutableSet.builder();
+		for (Resource next : startingResource) {
+			if (next != null) {
+				builder.add(next);
+			}
+		}
+		final Set<Resource> startingResources = builder.build();
+
+		final ResourceGraph resourceGraph = new ResourceGraph(localOnly);
+		for (Resource next : startingResources) {
+			resourceGraph.addAdapter(next.getResourceSet());
+			EcoreUtil.resolveAll(next); // Discover the cross-reference graph
+		}
+
+		return new Predicate<Resource>() {
+			/**
+			 * {@inheritDoc}
+			 */
+			public boolean apply(Resource input) {
+				return resourceGraph.anyReaches(startingResources, input);
+			}
+		};
+
 	}
 
 	protected IMerger.Registry getMergerRegistry() {

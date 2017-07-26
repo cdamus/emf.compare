@@ -10,7 +10,7 @@
  *     Christian W. Damus - initial API and implementation
  *
  */
-package org.eclipse.emf.compare.uml2.facade.tests;
+package org.eclipse.emf.compare.tests.framework;
 
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.hasDirectOrIndirectConflict;
 
@@ -46,7 +46,7 @@ public final class CompareMatchers {
 	 * @return the pseudo-conflict diff matcher
 	 */
 	public static Matcher<Diff> hasPseudoConflict() {
-		Predicate<? super Diff> delegate = hasDirectOrIndirectConflict(ConflictKind.PSEUDO);
+		final Predicate<? super Diff> delegate = hasDirectOrIndirectConflict(ConflictKind.PSEUDO);
 
 		return new TypeSafeMatcher<Diff>() {
 			/**
@@ -91,7 +91,7 @@ public final class CompareMatchers {
 	 *            the conflict kind to match
 	 * @return the pseudo-conflict matcher
 	 */
-	public static Matcher<Conflict> isConflict(ConflictKind ofKind) {
+	public static Matcher<Conflict> isConflict(final ConflictKind ofKind) {
 		return new TypeSafeDiagnosingMatcher<Conflict>() {
 			/**
 			 * {@inheritDoc}
@@ -127,8 +127,8 @@ public final class CompareMatchers {
 	 *            the predicate to wrap
 	 * @return the Hamcrest matcher
 	 */
-	public static <T> Matcher<T> matches(Class<? extends T> type, String message,
-			Predicate<? super T> predicate) {
+	public static <T> Matcher<T> matches(final Class<? extends T> type, final String message,
+			final Predicate<? super T> predicate) {
 		return new BaseMatcher<T>() {
 			/**
 			 * {@inheritDoc}

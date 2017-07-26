@@ -39,7 +39,14 @@ and
 
 * the left model adds a home interface for the Thing bean
 * the right model adds a home interface of the same name
-but for the Whatsit bean (conflict)
+but for the Whatsit bean (**conflict**)
+
+### Use case m1
+
+Two-way comparison of mixed-mode models, with a UML design model that references a J2EE model.  The left-side models
+
+* add another finder for a bean in the J2EE content
+* change the type of a Collaboration role in the UML design model to the new finder interface
 
 ### Use case u1
 

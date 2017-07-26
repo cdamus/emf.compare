@@ -17,7 +17,7 @@ package org.eclipse.emf.compare.uml2.facade.tests.data;
  *
  * @author Christian W. Damus
  */
-@Input({"a1", "u1" }) // Generate resource accessors
+@Input({"a1", "m1", "u1" }) // Generate resource accessors
 public class UMLInputData extends UMLInputDataGen {
 
 	/**

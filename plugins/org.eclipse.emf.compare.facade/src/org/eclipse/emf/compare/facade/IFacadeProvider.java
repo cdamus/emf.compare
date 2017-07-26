@@ -16,6 +16,7 @@ import com.google.common.base.Supplier;
 
 import java.util.List;
 
+import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.compare.scope.IComparisonScope;
 import org.eclipse.emf.ecore.EObject;
 
@@ -86,7 +87,7 @@ public interface IFacadeProvider {
 			/**
 			 * {@inheritDoc}
 			 */
-			public boolean isFacadeProviderFactoryFor(IComparisonScope scope) {
+			public boolean isFacadeProviderFactoryFor(Notifier notifier) {
 				return true;
 			}
 
@@ -129,7 +130,23 @@ public interface IFacadeProvider {
 		 *            the scope of the comparison that is possibly to be re-directed to façades
 		 * @return whether I can create façades for the model elements within the {@code scope}
 		 */
-		boolean isFacadeProviderFactoryFor(IComparisonScope scope);
+		default boolean isFacadeProviderFactoryFor(IComparisonScope scope) {
+			// CHECKSTYLE:OFF Sorry, but this just isn't complex to understand
+			return ((scope.getLeft() != null) && isFacadeProviderFactoryFor(scope.getLeft()))
+					|| ((scope.getRight() != null) && isFacadeProviderFactoryFor(scope.getRight()))
+					|| ((scope.getOrigin() != null) && isFacadeProviderFactoryFor(scope.getOrigin()));
+			// CHECKSTYLE:ON
+		}
+
+		/**
+		 * Queries whether the façade provider can create suitable façades for the given {@code notifier} in a
+		 * comparison.
+		 * 
+		 * @param notifier
+		 *            one of the two or three sides in a comparison
+		 * @return whether I can create façades for the model elements within the {@code notifier}
+		 */
+		boolean isFacadeProviderFactoryFor(Notifier notifier);
 
 		/**
 		 * Composes myself with another factory in ranking order (higher-ranked factory first).
@@ -171,6 +188,14 @@ public interface IFacadeProvider {
 				public boolean isFacadeProviderFactoryFor(IComparisonScope scope) {
 					return higherDelegate.isFacadeProviderFactoryFor(scope)
 							|| lesserDelegate.isFacadeProviderFactoryFor(scope);
+				}
+
+				/**
+				 * {@inheritDoc}
+				 */
+				public boolean isFacadeProviderFactoryFor(Notifier notifier) {
+					return higherDelegate.isFacadeProviderFactoryFor(notifier)
+							|| lesserDelegate.isFacadeProviderFactoryFor(notifier);
 				}
 			}
 

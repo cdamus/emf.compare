@@ -86,11 +86,11 @@ public class FacadeMatchEngine extends DefaultMatchEngine {
 	@Override
 	public Comparison match(IComparisonScope scope, Monitor monitor) {
 		IComparisonScope scopeToMatch = scope;
-		IFacadeProvider facadeProvider = facadeProviderRegistry.getFacadeProviderFactory(scope)
-				.getFacadeProvider();
+		IFacadeProvider.Factory facadeProviderFactory = facadeProviderRegistry
+				.getFacadeProviderFactory(scope);
 
-		if (facadeProvider != IFacadeProvider.NULL_PROVIDER) {
-			scopeToMatch = wrap(scope, facadeProvider);
+		if (facadeProviderFactory != IFacadeProvider.Factory.NULL_FACTORY) {
+			scopeToMatch = wrap(scope, facadeProviderFactory);
 		} // else there are no façades
 
 		return super.match(scopeToMatch, monitor);
@@ -101,13 +101,13 @@ public class FacadeMatchEngine extends DefaultMatchEngine {
 	 * 
 	 * @param delegate
 	 *            a comparison scope to wrap
-	 * @param facadeProvider
-	 *            the provider of façades for the {@code scope}
+	 * @param facadeProviderFactory
+	 *            creates providers of façades for the {@code scope}
 	 * @return the wrapping scope
 	 */
-	protected IComparisonScope wrap(IComparisonScope delegate, IFacadeProvider facadeProvider) {
-
-		return new FacadeComparisonScope(facadeProvider, delegate);
+	protected IComparisonScope wrap(IComparisonScope delegate,
+			IFacadeProvider.Factory facadeProviderFactory) {
+		return new FacadeComparisonScope(facadeProviderFactory, delegate);
 	}
 
 	//

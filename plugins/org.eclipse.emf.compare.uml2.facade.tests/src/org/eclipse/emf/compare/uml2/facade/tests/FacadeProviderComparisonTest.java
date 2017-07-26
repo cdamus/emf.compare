@@ -12,8 +12,13 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests;
 
+import static org.eclipse.emf.compare.tests.framework.CompareMatchers.matches;
+import static org.eclipse.emf.compare.uml2.tests.AdditionalResourcesKind.REFERENCED_LOCAL;
+import static org.eclipse.emf.compare.utils.EMFComparePredicates.addedToReference;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.attributeValueMatch;
+import static org.eclipse.emf.compare.utils.EMFComparePredicates.changedReference;
 import static org.hamcrest.CoreMatchers.anything;
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -38,19 +43,21 @@ import org.eclipse.emf.compare.facade.internal.EMFCompareFacadePlugin;
 import org.eclipse.emf.compare.facade.internal.FacadeProviderRegistryImpl;
 import org.eclipse.emf.compare.facade.internal.match.FacadeMatchEngine;
 import org.eclipse.emf.compare.match.IMatchEngine;
+import org.eclipse.emf.compare.scope.IComparisonScope;
 import org.eclipse.emf.compare.uml2.facade.tests.data.UMLInputData;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.BeanKind;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EEFacadeProvider;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
-import org.eclipse.emf.compare.utils.EMFComparePredicates;
+import org.eclipse.emf.compare.uml2.tests.AdditionalResources;
 import org.eclipse.emf.compare.utils.UseIdentifiers;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.uml2.uml.resource.UMLResource;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * This is the {@code FacadeProviderComparisonTest} type. Enjoy.
+ * Test cases for comparison based on pluggable façade model providers.
  *
  * @author Christian W. Damus
  */
@@ -140,12 +147,28 @@ public class FacadeProviderComparisonTest extends AbstractFacadeTest {
 		assertThat(conflict.getLeftDifferences().size(), is(1));
 		assertThat(conflict.getRightDifferences().size(), is(1));
 
-		Diff leftDiff = Iterables.find(conflict.getLeftDifferences(), EMFComparePredicates
-				.changedReference("u1.Person.age", "type", "PrimitiveTypes.String", "PrimitiveTypes.Real"));
+		Diff leftDiff = Iterables.find(conflict.getLeftDifferences(),
+				changedReference("u1.Person.age", "type", "PrimitiveTypes.String", "PrimitiveTypes.Real"));
 		assertThat(leftDiff, notNullValue());
-		Diff rightDiff = Iterables.find(conflict.getRightDifferences(), EMFComparePredicates.changedReference(
-				"u1.Person.age", "type", "PrimitiveTypes.String", "PrimitiveTypes.Integer"));
+		Diff rightDiff = Iterables.find(conflict.getRightDifferences(),
+				changedReference("u1.Person.age", "type", "PrimitiveTypes.String", "PrimitiveTypes.Integer"));
 		assertThat(rightDiff, notNullValue());
+	}
+
+	@Test
+	@AdditionalResources(REFERENCED_LOCAL)
+	public void basicMixedModeComparison_m1() {
+		Resource left = input.getM1Left();
+		Resource right = input.getM1Right();
+		Comparison comparison = compare(left, right);
+
+		List<Diff> differences = comparison.getDifferences();
+
+		assertThat(differences, hasItem(matches(Diff.class, "Add finder façade",
+				addedToReference("j2ee-app", "finder", "j2ee-app.ThingByName"))));
+
+		assertThat(differences, hasItem(matches(Diff.class, "Change UML collaboration role", changedReference(
+				"m1.lookup_thing.finder", "type", "j2ee-app.ThingByID", "j2ee-app.ThingByName"))));
 	}
 
 	//
@@ -194,6 +217,17 @@ public class FacadeProviderComparisonTest extends AbstractFacadeTest {
 	@Override
 	protected AbstractUMLInputData getInput() {
 		return input;
+	}
+
+	/**
+	 * Assert that, after comparison, the {@code scope} has only collected UML resource URIs.
+	 * 
+	 * @param scope
+	 *            a comparison scope
+	 */
+	public void verifyComparisonScope(IComparisonScope scope) {
+		scope.getResourceURIs().stream().forEach(
+				uri -> assertThat("Not an UML URI", uri, endsWith("." + UMLResource.FILE_EXTENSION)));
 	}
 
 }

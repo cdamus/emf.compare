@@ -13,13 +13,14 @@
 package org.eclipse.emf.compare.uml2.facade.tests;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.eclipse.emf.compare.uml2.facade.tests.CompareMatchers.isPseudoConflict;
-import static org.eclipse.emf.compare.uml2.facade.tests.CompareMatchers.matches;
+import static org.eclipse.emf.compare.tests.framework.CompareMatchers.isPseudoConflict;
+import static org.eclipse.emf.compare.tests.framework.CompareMatchers.matches;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.addedToReference;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.attributeValueMatch;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.changedReference;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.removedFromReference;
 import static org.hamcrest.CoreMatchers.anything;
+import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -41,8 +42,10 @@ import org.eclipse.emf.compare.ConflictKind;
 import org.eclipse.emf.compare.Diff;
 import org.eclipse.emf.compare.match.IMatchEngine.Factory.Registry;
 import org.eclipse.emf.compare.match.impl.MatchEngineFactoryImpl;
+import org.eclipse.emf.compare.scope.IComparisonScope;
 import org.eclipse.emf.compare.uml2.facade.tests.data.BasicFacadeInputData;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.BeanKind;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.util.J2EEResource;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
 import org.eclipse.emf.compare.utils.EMFComparePredicates;
 import org.eclipse.emf.compare.utils.UseIdentifiers;
@@ -470,4 +473,14 @@ public class BasicFacadeComparisonTest extends AbstractFacadeTest {
 		return input;
 	}
 
+	/**
+	 * Assert that, after comparison, the {@code scope} has only collected façade resource URIs.
+	 * 
+	 * @param scope
+	 *            a comparison scope
+	 */
+	public void verifyComparisonScope(IComparisonScope scope) {
+		scope.getResourceURIs().stream().forEach(
+				uri -> assertThat("Not a façade URI", uri, endsWith("." + J2EEResource.FILE_EXTENSION)));
+	}
 }

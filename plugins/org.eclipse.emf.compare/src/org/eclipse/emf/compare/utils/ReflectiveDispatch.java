@@ -84,6 +84,35 @@ public final class ReflectiveDispatch {
 	}
 
 	/**
+	 * Safely invokes a method by reflection, optionally allowing the given exception type to be thrown.
+	 * 
+	 * @param target
+	 *            the object on which to invoke the method
+	 * @param name
+	 *            the name of the method to invoke on it
+	 * @param throwableType
+	 *            the throwable type to propagate, or {@code null} if none
+	 * @param arg
+	 *            the arguments to pass to it
+	 * @return the result of the method invocation, or {@code null} if it failed
+	 * @throws X
+	 *             an exception of the expected type, if thrown by the method execution
+	 * @param <X>
+	 *            the throwable type to propagate
+	 */
+	public static <X extends Throwable> Object safeInvoke(Object target, String name, Class<X> throwableType,
+			Object... arg) throws X {
+
+		Method method = lookupMethod(target, name, arg);
+
+		if (method == null) {
+			return null;
+		} else {
+			return safeInvoke(target, method, throwableType, arg);
+		}
+	}
+
+	/**
 	 * Resolves the most specific overload of the {@code name}d method that is applicable to the given
 	 * arguments.
 	 * 
@@ -256,7 +285,54 @@ public final class ReflectiveDispatch {
 	public static Object safeInvoke(Object owner, Method method, Object... arg) {
 		try {
 			return method.invoke(owner, arg);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (IllegalAccessException | IllegalArgumentException e) {
+			LOGGER.error(String.format("Failed to invoke %s on receiver %s", method, owner), e); //$NON-NLS-1$
+			return null;
+		} catch (InvocationTargetException e) {
+			LOGGER.error(String.format("Method %s execution failed on receiver %s", method, owner), //$NON-NLS-1$
+					e.getTargetException());
+			return null;
+		}
+	}
+
+	/**
+	 * Safely invokes a method by reflection, optionally allowing the given exception type to be thrown.
+	 * 
+	 * @param owner
+	 *            the owner of the method to invoke
+	 * @param method
+	 *            the method to invoke on it
+	 * @param throwableType
+	 *            the throwable type to propagate, or {@code null} if none
+	 * @param arg
+	 *            the arguments to pass to it
+	 * @return the result of the method invocation, or {@code null} if it failed
+	 * @throws X
+	 *             an exception of the expected type, if thrown by the method execution
+	 * @param <X>
+	 *            the throwable type to propagate
+	 */
+	public static <X extends Throwable> Object safeInvoke(Object owner, Method method, Class<X> throwableType,
+			Object... arg) throws X {
+
+		try {
+			return method.invoke(owner, arg);
+		} catch (InvocationTargetException e) {
+			if (throwableType == null) {
+				// It is optional, after all
+				LOGGER.error(String.format("Method %s execution failed on receiver %s", method, owner), //$NON-NLS-1$
+						e.getTargetException());
+				return null;
+			}
+
+			if (throwableType.isInstance(e.getTargetException())) {
+				// Propagate
+				throw throwableType.cast(e.getTargetException());
+			}
+			LOGGER.error(String.format("Unexpected exception in %s on receiver %s: %s", method, owner, //$NON-NLS-1$
+					e.getClass().getName()), e);
+			return null;
+		} catch (IllegalAccessException | IllegalArgumentException e) {
 			LOGGER.error(String.format("Failed to invoke %s on receiver %s", method, owner), e); //$NON-NLS-1$
 			return null;
 		}
