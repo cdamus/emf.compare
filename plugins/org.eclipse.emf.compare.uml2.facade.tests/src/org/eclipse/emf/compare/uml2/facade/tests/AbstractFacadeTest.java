@@ -14,15 +14,13 @@ package org.eclipse.emf.compare.uml2.facade.tests;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
-import static org.eclipse.emf.compare.utils.EMFComparePredicates.hasDirectOrIndirectConflict;
+import static org.eclipse.emf.compare.uml2.facade.tests.CompareMatchers.hasPseudoConflict;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.hasNoDirectOrIndirectConflict;
 import static org.hamcrest.CoreMatchers.anything;
 import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-
-import com.google.common.base.Predicate;
 
 import java.net.URL;
 import java.util.List;
@@ -33,7 +31,6 @@ import org.eclipse.emf.common.util.BasicMonitor;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.compare.Comparison;
-import org.eclipse.emf.compare.Conflict;
 import org.eclipse.emf.compare.ConflictKind;
 import org.eclipse.emf.compare.Diff;
 import org.eclipse.emf.compare.merge.BatchMerger;
@@ -49,11 +46,7 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.URIConverter;
 import org.eclipse.uml2.uml.UMLPlugin;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
-import org.hamcrest.TypeSafeMatcher;
 
 /**
  * This is the {@code AbstractFacadeTest} type. Enjoy.
@@ -185,80 +178,5 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 			assertion = not(hasItem(anything()));
 		}
 		assertThat("No differences expected", differences, assertion);
-	}
-
-	protected static Matcher<Diff> hasPseudoConflict() {
-		Predicate<? super Diff> delegate = hasDirectOrIndirectConflict(ConflictKind.PSEUDO);
-
-		return new TypeSafeMatcher<Diff>() {
-			/**
-			 * {@inheritDoc}
-			 */
-			public void describeTo(Description description) {
-				description.appendText("has a pseudo-conflict");
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected boolean matchesSafely(Diff item) {
-				return delegate.apply(item);
-			}
-		};
-	}
-
-	protected static Matcher<Conflict> isPseudoConflict() {
-		return new TypeSafeDiagnosingMatcher<Conflict>() {
-			/**
-			 * {@inheritDoc}
-			 */
-			public void describeTo(Description description) {
-				description.appendText("is a pseudo-conflict");
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			protected boolean matchesSafely(Conflict item, Description mismatchDescription) {
-				boolean result = item.getKind() == ConflictKind.PSEUDO;
-
-				if (!result) {
-					mismatchDescription.appendText(item.getKind().name()).appendText(" conflict");
-				}
-
-				return result;
-			}
-		};
-	}
-
-	/**
-	 * Wrap a Guava predicate as a Hamcrest matcher.
-	 * 
-	 * @param type
-	 *            the target type of the predicate
-	 * @param message
-	 *            a message to supply in case of match failure
-	 * @param predicate
-	 *            the predicate to wrap
-	 * @return the Hamcrest matcher
-	 */
-	protected static <T> Matcher<T> matches(Class<? extends T> type, String message, Predicate<T> predicate) {
-		return new BaseMatcher<T>() {
-			/**
-			 * {@inheritDoc}
-			 */
-			public void describeTo(Description description) {
-				description.appendText(message);
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			public boolean matches(Object item) {
-				return type.isInstance(item) && predicate.apply(type.cast(item));
-			}
-		};
 	}
 }

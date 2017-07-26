@@ -65,7 +65,7 @@ public class FacadeProviderRegistryImpl implements IFacadeProvider.Factory.Regis
 	 * {@inheritDoc}
 	 */
 	public Factory add(IFacadeProvider.Factory facadeProviderFactory) {
-		return factories.put(facadeProviderFactory.getClass().getCanonicalName(), facadeProviderFactory);
+		return factories.put(facadeProviderFactory.getClass().getName(), facadeProviderFactory);
 	}
 
 	/**

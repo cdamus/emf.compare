@@ -13,6 +13,8 @@
 package org.eclipse.emf.compare.uml2.facade.tests;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.eclipse.emf.compare.uml2.facade.tests.CompareMatchers.isPseudoConflict;
+import static org.eclipse.emf.compare.uml2.facade.tests.CompareMatchers.matches;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.addedToReference;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.attributeValueMatch;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.changedReference;

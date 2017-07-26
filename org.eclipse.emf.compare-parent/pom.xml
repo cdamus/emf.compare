@@ -416,6 +416,7 @@
         <module>../plugins/org.eclipse.emf.compare.uml2.facade.tests.annotations</module>
         <module>../plugins/org.eclipse.emf.compare.uml2.facade.tests</module>
         <module>../plugins/org.eclipse.emf.compare.uml2.facade.tests.edit</module>
+        <module>../plugins/org.eclipse.emf.compare.uml2.facade.ui.tests</module>
         <module>../packaging/org.eclipse.emf.compare.facade-feature</module>
       </modules>
     </profile>

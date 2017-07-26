@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.ide.ui.tests.framework;
 
+import static com.google.common.collect.Lists.newArrayListWithExpectedSize;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -233,7 +235,7 @@ public abstract class AbstractCompareStatement extends Statement {
 	 * Set the match engine preference.
 	 */
 	private void setMatchPreference() {
-		List<String> matchEngineNames = Collections.emptyList();
+		List<String> matchEngineNames = newArrayListWithExpectedSize(1);
 		for (Class<?> matchEngine : disabledMatchEngines) {
 			matchEngineNames.add(matchEngine.getCanonicalName());
 		}
@@ -333,7 +335,7 @@ public abstract class AbstractCompareStatement extends Statement {
 	 * Set the post-processors preference.
 	 */
 	private void setPostProcessorPreference() {
-		List<String> postProcessorNames = Collections.emptyList();
+		List<String> postProcessorNames = newArrayListWithExpectedSize(1);
 		for (Class<?> postProcessor : disabledPostProcessors) {
 			postProcessorNames.add(postProcessor.getCanonicalName());
 		}
@@ -345,9 +347,9 @@ public abstract class AbstractCompareStatement extends Statement {
 	 * Set the façade providers preference.
 	 */
 	private void setFacadeProviderPreference() {
-		List<String> facadeProviderFactoryNames = Collections.emptyList();
+		List<String> facadeProviderFactoryNames = newArrayListWithExpectedSize(1);
 		for (Class<?> facadeProviderFactory : disabledFacadeProviders) {
-			facadeProviderFactoryNames.add(facadeProviderFactory.getCanonicalName());
+			facadeProviderFactoryNames.add(facadeProviderFactory.getName());
 		}
 		rcpPreferenceStore.setValue(EMFComparePreferences.DISABLED_FACADE_PROVIDER,
 				join(facadeProviderFactoryNames, PREFERENCES_SEPARATOR));
