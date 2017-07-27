@@ -12,12 +12,18 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests;
 
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.tryFind;
+import static org.eclipse.emf.compare.DifferenceSource.LEFT;
+import static org.eclipse.emf.compare.DifferenceSource.RIGHT;
+import static org.eclipse.emf.compare.tests.framework.CompareMatchers.isProxy;
 import static org.eclipse.emf.compare.tests.framework.CompareMatchers.matches;
+import static org.eclipse.emf.compare.tests.framework.CompareMatchers.named;
 import static org.eclipse.emf.compare.uml2.tests.AdditionalResourcesKind.REFERENCED_LOCAL;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.addedToReference;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.attributeValueMatch;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.changedReference;
+import static org.eclipse.uml2.uml.util.UMLUtil.findNamedElements;
 import static org.hamcrest.CoreMatchers.anything;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -27,6 +33,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeThat;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -52,6 +59,9 @@ import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
 import org.eclipse.emf.compare.uml2.tests.AdditionalResources;
 import org.eclipse.emf.compare.utils.UseIdentifiers;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.uml2.uml.Collaboration;
+import org.eclipse.uml2.uml.Dependency;
+import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.resource.UMLResource;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -220,6 +230,96 @@ public class FacadeProviderComparisonTest extends AbstractFacadeTest {
 		Resource right = input.getM2Right();
 
 		testMergeRightToLeft(left, right, base, true);
+	}
+
+	@Test
+	@AdditionalResources(REFERENCED_LOCAL)
+	public void resolveMixedModeConflictAcceptLeft_m2() {
+		Resource base = input.getM2Base();
+		Resource left = input.getM2Left();
+		Resource right = input.getM2Right();
+
+		Comparison comparison = compare(left, right, base);
+
+		List<Conflict> conflicts = comparison.getConflicts();
+		// Don't be redundant with the more basic test case
+		assumeThat(conflicts.size(), is(1));
+		Conflict conflict = conflicts.get(0);
+
+		acceptAllNonConflicting(comparison);
+
+		// Verify the left-side model (conventional merge result)
+		org.eclipse.uml2.uml.Package j2eeApp = Iterables.getOnlyElement(filter(
+				findNamedElements(left.getResourceSet(), "j2ee-app"), org.eclipse.uml2.uml.Package.class));
+
+		// Left-side addition of a finder
+		Type thingByName = j2eeApp.getOwnedType("ThingByName");
+		assertThat("Merge lost left side addition", thingByName, notNullValue());
+		assertThat(thingByName.getClientDependencies().size(), is(1));
+		Dependency usage = thingByName.getClientDependencies().get(0);
+		assertThat(usage.getSuppliers(), hasItem(named("Thing")));
+
+		// Right-side addition of a finder
+		Type thingByChance = j2eeApp.getOwnedType("ThingByChance");
+		assertThat("Merge lost right side addition", thingByChance, notNullValue());
+		assertThat(thingByChance.getClientDependencies().size(), is(1));
+		usage = thingByChance.getClientDependencies().get(0);
+		assertThat(usage.getSuppliers(), hasItem(named("Thing")));
+
+		accept(LEFT, conflict);
+
+		// The left-side collaboration role type is retained
+		Collaboration collaboration = Iterables.getOnlyElement(
+				filter(findNamedElements(left.getResourceSet(), "m2::lookup_thing"), Collaboration.class));
+		Type finderType = collaboration.getCollaborationRole("finder", null).getType();
+		assertThat("Collaboration role type lost", finderType, notNullValue());
+		assertThat("Collaboration role is a proxy", finderType, not(isProxy()));
+		assertThat("Wrong collaboration role type", finderType.getName(), is("ThingByName"));
+	}
+
+	@Test
+	@AdditionalResources(REFERENCED_LOCAL)
+	public void resolveMixedModeConflictAcceptRight_m2() {
+		Resource base = input.getM2Base();
+		Resource left = input.getM2Left();
+		Resource right = input.getM2Right();
+
+		Comparison comparison = compare(left, right, base);
+
+		List<Conflict> conflicts = comparison.getConflicts();
+		// Don't be redundant with the more basic test case
+		assumeThat(conflicts.size(), is(1));
+		Conflict conflict = conflicts.get(0);
+
+		acceptAllNonConflicting(comparison);
+
+		// Verify the left-side model (conventional merge result)
+		org.eclipse.uml2.uml.Package j2eeApp = Iterables.getOnlyElement(filter(
+				findNamedElements(left.getResourceSet(), "j2ee-app"), org.eclipse.uml2.uml.Package.class));
+
+		// Right-side addition of a finder
+		Type thingByChance = j2eeApp.getOwnedType("ThingByChance");
+		assertThat("Merge lost right side addition", thingByChance, notNullValue());
+		assertThat(thingByChance.getClientDependencies().size(), is(1));
+		Dependency usage = thingByChance.getClientDependencies().get(0);
+		assertThat(usage.getSuppliers(), hasItem(named("Thing")));
+
+		// Left-side addition of a finder
+		Type thingByName = j2eeApp.getOwnedType("ThingByName");
+		assertThat("Merge lost right side addition", thingByName, notNullValue());
+		assertThat(thingByName.getClientDependencies().size(), is(1));
+		usage = thingByName.getClientDependencies().get(0);
+		assertThat(usage.getSuppliers(), hasItem(named("Thing")));
+
+		accept(RIGHT, conflict);
+
+		// The right-side collaboration role type is merged
+		Collaboration collaboration = Iterables.getOnlyElement(
+				filter(findNamedElements(left.getResourceSet(), "m2::lookup_thing"), Collaboration.class));
+		Type finderType = collaboration.getCollaborationRole("finder", null).getType();
+		assertThat("Collaboration role type lost", finderType, notNullValue());
+		assertThat("Collaboration role is a proxy", finderType, not(isProxy()));
+		assertThat("Wrong collaboration role type", finderType.getName(), is("ThingByChance"));
 	}
 
 	//

@@ -19,6 +19,9 @@ import com.google.common.base.Predicate;
 import org.eclipse.emf.compare.Conflict;
 import org.eclipse.emf.compare.ConflictKind;
 import org.eclipse.emf.compare.Diff;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.uml2.common.util.UML2Util;
+import org.eclipse.uml2.uml.NamedElement;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -142,6 +145,56 @@ public final class CompareMatchers {
 			 */
 			public boolean matches(Object item) {
 				return type.isInstance(item) && predicate.apply(type.cast(item));
+			}
+		};
+	}
+
+	/**
+	 * Match elements having the given {@code name}.
+	 * 
+	 * @param name
+	 *            the name of element to match
+	 * @return the name matcher
+	 */
+	public static Matcher<NamedElement> named(final String name) {
+		return new TypeSafeMatcher<NamedElement>() {
+			/**
+			 * {@inheritDoc}
+			 */
+			public void describeTo(Description description) {
+				description.appendText("named ").appendText(name);
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected boolean matchesSafely(NamedElement item) {
+				return UML2Util.safeEquals(item.getName(), name);
+			}
+		};
+	}
+
+	/**
+	 * Matcher for unresolved proxies.
+	 * 
+	 * @return th proxy matcher
+	 */
+	public static Matcher<EObject> isProxy() {
+		return new TypeSafeMatcher<EObject>() {
+			/**
+			 * {@inheritDoc}
+			 */
+			public void describeTo(Description description) {
+				description.appendText("is proxy");
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected boolean matchesSafely(EObject item) {
+				return item.eIsProxy();
 			}
 		};
 	}

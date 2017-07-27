@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 Obeo and others.
+ * Copyright (c) 2012, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Stefan Dirix - bug 441172
  *     Philip Langer - add additional predicates
  *     Tanja Mayerhofer - bug 501864
+ *     Christian W. Damus - integration of façade providers
  *******************************************************************************/
 package org.eclipse.emf.compare.utils;
 
@@ -19,6 +20,7 @@ import static com.google.common.base.Predicates.not;
 import static com.google.common.base.Predicates.or;
 import static com.google.common.collect.Iterables.all;
 import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Sets.newEnumSet;
 import static org.eclipse.emf.compare.ConflictKind.PSEUDO;
 import static org.eclipse.emf.compare.ConflictKind.REAL;
 import static org.eclipse.emf.compare.DifferenceKind.ADD;
@@ -30,6 +32,7 @@ import static org.eclipse.emf.compare.internal.utils.DiffUtil.getAllRefiningDiff
 import com.google.common.base.Predicate;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -951,10 +954,12 @@ public final class EMFComparePredicates {
 	 * @return The created predicate.
 	 */
 	public static Predicate<? super Diff> hasConflict(final ConflictKind... kinds) {
+		final EnumSet<ConflictKind> theKinds = newEnumSet(Arrays.asList(kinds), ConflictKind.class);
+
 		return new Predicate<Diff>() {
 			public boolean apply(Diff input) {
 				return input != null && input.getConflict() != null
-						&& Arrays.asList(kinds).contains(input.getConflict().getKind());
+						&& theKinds.contains(input.getConflict().getKind());
 			}
 		};
 	}
@@ -967,9 +972,11 @@ public final class EMFComparePredicates {
 	 * @return The created predicate.
 	 */
 	public static Predicate<? super Diff> hasState(final DifferenceState... states) {
+		final EnumSet<DifferenceState> theStates = newEnumSet(Arrays.asList(states), DifferenceState.class);
+
 		return new Predicate<Diff>() {
 			public boolean apply(Diff input) {
-				return input != null && Arrays.asList(states).contains(input.getState());
+				return input != null && theStates.contains(input.getState());
 			}
 		};
 	}
@@ -993,10 +1000,11 @@ public final class EMFComparePredicates {
 	 * @return The created predicate.
 	 */
 	public static Predicate<? super Conflict> containsConflictOfTypes(final ConflictKind... kinds) {
+		final EnumSet<ConflictKind> theKinds = newEnumSet(Arrays.asList(kinds), ConflictKind.class);
+
 		return new Predicate<Conflict>() {
 			public boolean apply(Conflict input) {
-				return input != null && input.getKind() != null
-						&& Arrays.asList(kinds).contains(input.getKind());
+				return input != null && input.getKind() != null && theKinds.contains(input.getKind());
 			}
 		};
 	}
@@ -1212,10 +1220,12 @@ public final class EMFComparePredicates {
 	 * @since 3.4
 	 */
 	public static Predicate<Diff> isNotRefinedDirectlyConflicting(final ConflictKind... kinds) {
+		final EnumSet<ConflictKind> theKinds = newEnumSet(Arrays.asList(kinds), ConflictKind.class);
+
 		return new Predicate<Diff>() {
 			public boolean apply(Diff input) {
 				return input != null && input.getConflict() != null && input.getRefinedBy().isEmpty()
-						&& Arrays.asList(kinds).contains(input.getConflict().getKind());
+						&& theKinds.contains(input.getConflict().getKind());
 			}
 		};
 	}
