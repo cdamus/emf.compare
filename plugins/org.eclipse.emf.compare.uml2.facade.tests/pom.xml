@@ -41,6 +41,12 @@
 				<artifactId>org.eclipse.emf.compare.uml2.facade.tests.annotations</artifactId>
 				<version>1.0.0-SNAPSHOT</version>
 			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>15.0</version>
+				<scope>compile</scope>
+			</dependency>
 		  </dependencies>
 		</plugin>
         <plugin>
