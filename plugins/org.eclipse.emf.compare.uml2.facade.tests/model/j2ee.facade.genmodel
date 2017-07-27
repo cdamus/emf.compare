@@ -59,8 +59,11 @@
     <genClasses xsi:type="genmodel:GenClass" image="false" ecoreClass="j2ee.ecore#//NamedElement">
       <genFeatures xsi:type="genmodel:GenFeature" createChild="false" ecoreFeature="ecore:EAttribute j2ee.ecore#//NamedElement/name"
           key="true"/>
+      <genFeatures xsi:type="genmodel:GenFeature" property="Readonly" createChild="false"
+          ecoreFeature="ecore:EAttribute j2ee.ecore#//NamedElement/qualifiedName"/>
       <genFeatures xsi:type="genmodel:GenFeature" property="None" notify="false" createChild="false"
           propertySortChoices="true" ecoreFeature="ecore:EReference j2ee.ecore#//NamedElement/package"/>
+      <genOperations xsi:type="genmodel:GenOperation" ecoreOperation="j2ee.ecore#//NamedElement/getQualifiedName"/>
       <genOperations xsi:type="genmodel:GenOperation" ecoreOperation="j2ee.ecore#//NamedElement/getPackage"/>
       <genOperations xsi:type="genmodel:GenOperation" ecoreOperation="j2ee.ecore#//NamedElement/setPackage">
         <genParameters xsi:type="genmodel:GenParameter" ecoreParameter="j2ee.ecore#//NamedElement/setPackage/newPackage"/>

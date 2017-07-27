@@ -222,8 +222,8 @@ public class J2EEPackageImpl extends EPackageImpl implements J2EEPackage {
 	 * @generated
 	 */
 	@Override
-	public EReference getNamedElement_Package() {
-		return (EReference)namedElementEClass.getEStructuralFeatures().get(1);
+	public EAttribute getNamedElement_QualifiedName() {
+		return (EAttribute)namedElementEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -232,7 +232,17 @@ public class J2EEPackageImpl extends EPackageImpl implements J2EEPackage {
 	 * @generated
 	 */
 	@Override
-	public EOperation getNamedElement__GetPackage() {
+	public EReference getNamedElement_Package() {
+		return (EReference)namedElementEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EOperation getNamedElement__GetQualifiedName() {
 		return namedElementEClass.getEOperations().get(0);
 	}
 
@@ -242,8 +252,18 @@ public class J2EEPackageImpl extends EPackageImpl implements J2EEPackage {
 	 * @generated
 	 */
 	@Override
-	public EOperation getNamedElement__SetPackage__Package() {
+	public EOperation getNamedElement__GetPackage() {
 		return namedElementEClass.getEOperations().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EOperation getNamedElement__SetPackage__Package() {
+		return namedElementEClass.getEOperations().get(2);
 	}
 
 	/**
@@ -394,7 +414,9 @@ public class J2EEPackageImpl extends EPackageImpl implements J2EEPackage {
 
 		namedElementEClass = createEClass(NAMED_ELEMENT);
 		createEAttribute(namedElementEClass, NAMED_ELEMENT__NAME);
+		createEAttribute(namedElementEClass, NAMED_ELEMENT__QUALIFIED_NAME);
 		createEReference(namedElementEClass, NAMED_ELEMENT__PACKAGE);
+		createEOperation(namedElementEClass, NAMED_ELEMENT___GET_QUALIFIED_NAME);
 		createEOperation(namedElementEClass, NAMED_ELEMENT___GET_PACKAGE);
 		createEOperation(namedElementEClass, NAMED_ELEMENT___SET_PACKAGE__PACKAGE);
 
@@ -478,9 +500,15 @@ public class J2EEPackageImpl extends EPackageImpl implements J2EEPackage {
 		initEAttribute(getNamedElement_Name(), theTypesPackage.getString(), "name", null, 1, 1, //$NON-NLS-1$
 				NamedElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID,
 				IS_UNIQUE, !IS_DERIVED, !IS_ORDERED);
+		initEAttribute(getNamedElement_QualifiedName(), theTypesPackage.getString(), "qualifiedName", null, 1, //$NON-NLS-1$
+				1, NamedElement.class, IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, IS_ID,
+				IS_UNIQUE, IS_DERIVED, !IS_ORDERED);
 		initEReference(getNamedElement_Package(), this.getPackage(), this.getPackage_Member(), "package", //$NON-NLS-1$
 				null, 0, 1, NamedElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
 				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, !IS_ORDERED);
+
+		initEOperation(getNamedElement__GetQualifiedName(), theTypesPackage.getString(), "getQualifiedName", //$NON-NLS-1$
+				1, 1, IS_UNIQUE, !IS_ORDERED);
 
 		initEOperation(getNamedElement__GetPackage(), this.getPackage(), "getPackage", 0, 1, IS_UNIQUE, //$NON-NLS-1$
 				!IS_ORDERED);

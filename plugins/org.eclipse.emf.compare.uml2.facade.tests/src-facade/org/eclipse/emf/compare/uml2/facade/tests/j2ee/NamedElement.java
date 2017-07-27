@@ -24,6 +24,7 @@ import org.eclipse.emf.compare.facade.FacadeObject;
  * </p>
  * <ul>
  *   <li>{@link org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement#getName <em>Name</em>}</li>
+ *   <li>{@link org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement#getQualifiedName <em>Qualified Name</em>}</li>
  *   <li>{@link org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement#getPackage <em>Package</em>}</li>
  * </ul>
  *
@@ -58,6 +59,21 @@ public interface NamedElement extends FacadeObject {
 	 * @generated
 	 */
 	void setName(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Qualified Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Qualified Name</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Qualified Name</em>' attribute.
+	 * @see org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage#getNamedElement_QualifiedName()
+	 * @model id="true" dataType="org.eclipse.uml2.types.String" required="true" transient="true" changeable="false" volatile="true" derived="true" ordered="false"
+	 * @generated
+	 */
+	String getQualifiedName();
 
 	/**
 	 * Returns the value of the '<em><b>Package</b></em>' reference.

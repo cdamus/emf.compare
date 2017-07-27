@@ -35,6 +35,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * </p>
  * <ul>
  *   <li>{@link org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.impl.NamedElementImpl#getName <em>Name</em>}</li>
+ *   <li>{@link org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.impl.NamedElementImpl#getQualifiedName <em>Qualified Name</em>}</li>
  *   <li>{@link org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.impl.NamedElementImpl#getPackage <em>Package</em>}</li>
  * </ul>
  *
@@ -60,6 +61,16 @@ public abstract class NamedElementImpl extends FacadeObjectImpl implements Named
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getQualifiedName() <em>Qualified Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getQualifiedName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String QUALIFIED_NAME_EDEFAULT = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -111,6 +122,16 @@ public abstract class NamedElementImpl extends FacadeObjectImpl implements Named
 	 * @generated
 	 */
 	@Override
+	public String getQualifiedName() {
+		return NamedElementOperations.getQualifiedName(this);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package getPackage() {
 		org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package package_ = basicGetPackage();
 		return package_ != null && ((EObject)package_).eIsProxy()
@@ -148,6 +169,8 @@ public abstract class NamedElementImpl extends FacadeObjectImpl implements Named
 		switch (featureID) {
 			case J2EEPackage.NAMED_ELEMENT__NAME:
 				return getName();
+			case J2EEPackage.NAMED_ELEMENT__QUALIFIED_NAME:
+				return getQualifiedName();
 			case J2EEPackage.NAMED_ELEMENT__PACKAGE:
 				if (resolve)
 					return getPackage();
@@ -202,6 +225,9 @@ public abstract class NamedElementImpl extends FacadeObjectImpl implements Named
 		switch (featureID) {
 			case J2EEPackage.NAMED_ELEMENT__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case J2EEPackage.NAMED_ELEMENT__QUALIFIED_NAME:
+				return QUALIFIED_NAME_EDEFAULT == null ? getQualifiedName() != null
+						: !QUALIFIED_NAME_EDEFAULT.equals(getQualifiedName());
 			case J2EEPackage.NAMED_ELEMENT__PACKAGE:
 				return basicGetPackage() != null;
 		}

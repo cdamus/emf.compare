@@ -97,13 +97,22 @@ public interface J2EEPackage extends EPackage {
 	int NAMED_ELEMENT__NAME = 0;
 
 	/**
+	 * The feature id for the '<em><b>Qualified Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NAMED_ELEMENT__QUALIFIED_NAME = 1;
+
+	/**
 	 * The feature id for the '<em><b>Package</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NAMED_ELEMENT__PACKAGE = 1;
+	int NAMED_ELEMENT__PACKAGE = 2;
 
 	/**
 	 * The number of structural features of the '<em>Named Element</em>' class.
@@ -112,7 +121,16 @@ public interface J2EEPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NAMED_ELEMENT_FEATURE_COUNT = 2;
+	int NAMED_ELEMENT_FEATURE_COUNT = 3;
+
+	/**
+	 * The operation id for the '<em>Get Qualified Name</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NAMED_ELEMENT___GET_QUALIFIED_NAME = 0;
 
 	/**
 	 * The operation id for the '<em>Get Package</em>' operation.
@@ -121,7 +139,7 @@ public interface J2EEPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NAMED_ELEMENT___GET_PACKAGE = 0;
+	int NAMED_ELEMENT___GET_PACKAGE = 1;
 
 	/**
 	 * The operation id for the '<em>Set Package</em>' operation.
@@ -130,7 +148,7 @@ public interface J2EEPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NAMED_ELEMENT___SET_PACKAGE__PACKAGE = 1;
+	int NAMED_ELEMENT___SET_PACKAGE__PACKAGE = 2;
 
 	/**
 	 * The number of operations of the '<em>Named Element</em>' class.
@@ -139,7 +157,7 @@ public interface J2EEPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NAMED_ELEMENT_OPERATION_COUNT = 2;
+	int NAMED_ELEMENT_OPERATION_COUNT = 3;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.impl.PackageImpl <em>Package</em>}' class.
@@ -159,6 +177,15 @@ public interface J2EEPackage extends EPackage {
 	 * @ordered
 	 */
 	int PACKAGE__NAME = NAMED_ELEMENT__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Qualified Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PACKAGE__QUALIFIED_NAME = NAMED_ELEMENT__QUALIFIED_NAME;
 
 	/**
 	 * The feature id for the '<em><b>Package</b></em>' reference.
@@ -215,6 +242,15 @@ public interface J2EEPackage extends EPackage {
 	int PACKAGE_FEATURE_COUNT = NAMED_ELEMENT_FEATURE_COUNT + 4;
 
 	/**
+	 * The operation id for the '<em>Get Qualified Name</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PACKAGE___GET_QUALIFIED_NAME = NAMED_ELEMENT___GET_QUALIFIED_NAME;
+
+	/**
 	 * The operation id for the '<em>Get Package</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -259,6 +295,15 @@ public interface J2EEPackage extends EPackage {
 	 * @ordered
 	 */
 	int BEAN__NAME = NAMED_ELEMENT__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Qualified Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BEAN__QUALIFIED_NAME = NAMED_ELEMENT__QUALIFIED_NAME;
 
 	/**
 	 * The feature id for the '<em><b>Package</b></em>' reference.
@@ -324,6 +369,15 @@ public interface J2EEPackage extends EPackage {
 	int BEAN_FEATURE_COUNT = NAMED_ELEMENT_FEATURE_COUNT + 5;
 
 	/**
+	 * The operation id for the '<em>Get Qualified Name</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int BEAN___GET_QUALIFIED_NAME = NAMED_ELEMENT___GET_QUALIFIED_NAME;
+
+	/**
 	 * The operation id for the '<em>Get Package</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -370,6 +424,15 @@ public interface J2EEPackage extends EPackage {
 	int HOME_INTERFACE__NAME = NAMED_ELEMENT__NAME;
 
 	/**
+	 * The feature id for the '<em><b>Qualified Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int HOME_INTERFACE__QUALIFIED_NAME = NAMED_ELEMENT__QUALIFIED_NAME;
+
+	/**
 	 * The feature id for the '<em><b>Package</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -395,6 +458,15 @@ public interface J2EEPackage extends EPackage {
 	 * @ordered
 	 */
 	int HOME_INTERFACE_FEATURE_COUNT = NAMED_ELEMENT_FEATURE_COUNT + 1;
+
+	/**
+	 * The operation id for the '<em>Get Qualified Name</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int HOME_INTERFACE___GET_QUALIFIED_NAME = NAMED_ELEMENT___GET_QUALIFIED_NAME;
 
 	/**
 	 * The operation id for the '<em>Get Package</em>' operation.
@@ -443,6 +515,15 @@ public interface J2EEPackage extends EPackage {
 	int FINDER__NAME = NAMED_ELEMENT__NAME;
 
 	/**
+	 * The feature id for the '<em><b>Qualified Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FINDER__QUALIFIED_NAME = NAMED_ELEMENT__QUALIFIED_NAME;
+
+	/**
 	 * The feature id for the '<em><b>Package</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -468,6 +549,15 @@ public interface J2EEPackage extends EPackage {
 	 * @ordered
 	 */
 	int FINDER_FEATURE_COUNT = NAMED_ELEMENT_FEATURE_COUNT + 1;
+
+	/**
+	 * The operation id for the '<em>Get Qualified Name</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FINDER___GET_QUALIFIED_NAME = NAMED_ELEMENT___GET_QUALIFIED_NAME;
 
 	/**
 	 * The operation id for the '<em>Get Package</em>' operation.
@@ -582,6 +672,17 @@ public interface J2EEPackage extends EPackage {
 	EAttribute getNamedElement_Name();
 
 	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement#getQualifiedName <em>Qualified Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Qualified Name</em>'.
+	 * @see org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement#getQualifiedName()
+	 * @see #getNamedElement()
+	 * @generated
+	 */
+	EAttribute getNamedElement_QualifiedName();
+
+	/**
 	 * Returns the meta object for the reference '{@link org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement#getPackage <em>Package</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -591,6 +692,16 @@ public interface J2EEPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getNamedElement_Package();
+
+	/**
+	 * Returns the meta object for the '{@link org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement#getQualifiedName() <em>Get Qualified Name</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the '<em>Get Qualified Name</em>' operation.
+	 * @see org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement#getQualifiedName()
+	 * @generated
+	 */
+	EOperation getNamedElement__GetQualifiedName();
 
 	/**
 	 * Returns the meta object for the '{@link org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement#getPackage() <em>Get Package</em>}' operation.
@@ -813,12 +924,28 @@ public interface J2EEPackage extends EPackage {
 		EAttribute NAMED_ELEMENT__NAME = eINSTANCE.getNamedElement_Name();
 
 		/**
+		 * The meta object literal for the '<em><b>Qualified Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute NAMED_ELEMENT__QUALIFIED_NAME = eINSTANCE.getNamedElement_QualifiedName();
+
+		/**
 		 * The meta object literal for the '<em><b>Package</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference NAMED_ELEMENT__PACKAGE = eINSTANCE.getNamedElement_Package();
+
+		/**
+		 * The meta object literal for the '<em><b>Get Qualified Name</b></em>' operation.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EOperation NAMED_ELEMENT___GET_QUALIFIED_NAME = eINSTANCE.getNamedElement__GetQualifiedName();
 
 		/**
 		 * The meta object literal for the '<em><b>Get Package</b></em>' operation.

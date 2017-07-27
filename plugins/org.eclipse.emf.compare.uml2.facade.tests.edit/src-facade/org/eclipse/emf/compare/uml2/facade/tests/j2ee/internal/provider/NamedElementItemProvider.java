@@ -64,6 +64,7 @@ public class NamedElementItemProvider extends ItemProviderAdapter implements IEd
 			super.getPropertyDescriptors(object);
 
 			addNamePropertyDescriptor(object);
+			addQualifiedNamePropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -81,6 +82,22 @@ public class NamedElementItemProvider extends ItemProviderAdapter implements IEd
 						getString("_UI_PropertyDescriptor_description", "_UI_NamedElement_name_feature", //$NON-NLS-1$//$NON-NLS-2$
 								"_UI_NamedElement_type"), //$NON-NLS-1$
 						J2EEPackage.Literals.NAMED_ELEMENT__NAME, true, false, false,
+						ItemPropertyDescriptor.GENERIC_VALUE_IMAGE, null, null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Qualified Name feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addQualifiedNamePropertyDescriptor(Object object) {
+		itemPropertyDescriptors
+				.add(createItemPropertyDescriptor(((ComposeableAdapterFactory) adapterFactory).getRootAdapterFactory(),
+						getResourceLocator(), getString("_UI_NamedElement_qualifiedName_feature"), //$NON-NLS-1$
+						getString("_UI_PropertyDescriptor_description", "_UI_NamedElement_qualifiedName_feature", //$NON-NLS-1$//$NON-NLS-2$
+								"_UI_NamedElement_type"), //$NON-NLS-1$
+						J2EEPackage.Literals.NAMED_ELEMENT__QUALIFIED_NAME, false, false, false,
 						ItemPropertyDescriptor.GENERIC_VALUE_IMAGE, null, null));
 	}
 
@@ -120,6 +137,7 @@ public class NamedElementItemProvider extends ItemProviderAdapter implements IEd
 
 		switch (notification.getFeatureID(NamedElement.class)) {
 		case J2EEPackage.NAMED_ELEMENT__NAME:
+		case J2EEPackage.NAMED_ELEMENT__QUALIFIED_NAME:
 			fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 			return;
 		}

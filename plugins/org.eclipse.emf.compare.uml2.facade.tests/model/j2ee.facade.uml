@@ -27,19 +27,25 @@
       <ownedAttribute xmi:id="NamedElement-name" name="name">
         <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
       </ownedAttribute>
+      <ownedAttribute xmi:id="_ns6GEHLIEeeEc4Gd2aZy8A" name="qualifiedName" isReadOnly="true" isDerived="true" isID="true">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedAttribute>
       <ownedAttribute xmi:id="NamedElement-package" name="package" type="Package" isDerived="true" association="_packagedElement.8">
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="NamedElement-package-_lowerValue"/>
       </ownedAttribute>
+      <ownedOperation xmi:id="_w18HIHLIEeeEc4Gd2aZy8A" name="getQualifiedName" visibility="protected">
+        <ownedParameter xmi:id="_w18HIXLIEeeEc4Gd2aZy8A" direction="return" effect="read">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+        </ownedParameter>
+      </ownedOperation>
       <ownedOperation xmi:id="NamedElement-getPackage" name="getPackage" visibility="protected">
         <ownedParameter xmi:id="NamedElement-getPackage-_ownedParameter.0" type="Package" direction="return" effect="read">
           <lowerValue xmi:type="uml:LiteralInteger" xmi:id="NamedElement-getPackage-_ownedParameter.0-_lowerValue"/>
-          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="NamedElement-getPackage-_ownedParameter.0-_upperValue" value="1"/>
         </ownedParameter>
       </ownedOperation>
       <ownedOperation xmi:id="NamedElement-setPackage" name="setPackage" visibility="protected">
         <ownedParameter xmi:id="NamedElement-setPackage-newPackage" name="newPackage" type="Package" effect="read">
           <lowerValue xmi:type="uml:LiteralInteger" xmi:id="NamedElement-setPackage-newPackage-_lowerValue"/>
-          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="NamedElement-setPackage-newPackage-_upperValue" value="1"/>
         </ownedParameter>
       </ownedOperation>
     </packagedElement>
@@ -106,4 +112,5 @@
   <standard:Metaclass xmi:id="_sxB7kGDSEee6MpbwmItUiw" base_Class="Package"/>
   <Ecore:EOperation xmi:id="_Wi_2UGDWEee6MpbwmItUiw" base_Operation="NamedElement-getPackage" visibility="None"/>
   <Ecore:EOperation xmi:id="_ZFVQMGDWEee6MpbwmItUiw" base_Operation="NamedElement-setPackage" visibility="None"/>
+  <Ecore:EOperation xmi:id="_w2VvwHLIEeeEc4Gd2aZy8A" base_Operation="_w18HIHLIEeeEc4Gd2aZy8A" visibility="None"/>
 </xmi:XMI>
