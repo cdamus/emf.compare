@@ -12,6 +12,7 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests;
 
+import static com.google.common.collect.Iterables.tryFind;
 import static org.eclipse.emf.compare.tests.framework.CompareMatchers.matches;
 import static org.eclipse.emf.compare.uml2.tests.AdditionalResourcesKind.REFERENCED_LOCAL;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.addedToReference;
@@ -171,6 +172,56 @@ public class FacadeProviderComparisonTest extends AbstractFacadeTest {
 				"m1.lookup_thing.finder", "type", "j2ee-app.ThingByID", "j2ee-app.ThingByName"))));
 	}
 
+	@Test
+	@AdditionalResources(REFERENCED_LOCAL)
+	public void mixedModeThreeWayConflictInUML_m2() {
+		Resource base = input.getM2Base();
+		Resource left = input.getM2Left();
+		Resource right = input.getM2Right();
+		Comparison comparison = compare(left, right, base);
+
+		List<Diff> differences = comparison.getDifferences();
+
+		Diff leftAdd = tryFind(differences, addedToReference("j2ee-app", "finder", "j2ee-app.ThingByName"))
+				.orNull();
+		assertThat("Left addition of finder not found", leftAdd, notNullValue());
+		Diff rightAdd = tryFind(differences, addedToReference("j2ee-app", "finder", "j2ee-app.ThingByChance"))
+				.orNull();
+		assertThat("Right addition of finder not found", rightAdd, notNullValue());
+
+		List<Conflict> conflicts = comparison.getConflicts();
+		assertThat(conflicts.size(), is(1));
+
+		Conflict conflict = conflicts.get(0);
+
+		assertThat(conflict.getLeftDifferences(),
+				hasItem(matches(Diff.class, "Change UML collaboration role", changedReference(
+						"m2.lookup_thing.finder", "type", "j2ee-app.ThingByID", "j2ee-app.ThingByName"))));
+		assertThat(conflict.getRightDifferences(),
+				hasItem(matches(Diff.class, "Change UML collaboration role", changedReference(
+						"m2.lookup_thing.finder", "type", "j2ee-app.ThingByID", "j2ee-app.ThingByChance"))));
+	}
+
+	@Test
+	@AdditionalResources(REFERENCED_LOCAL)
+	public void mergeMixedModeThreeWayConflictLR_m2() {
+		Resource base = input.getM2Base();
+		Resource left = input.getM2Left();
+		Resource right = input.getM2Right();
+
+		testMergeLeftToRight(left, right, base, true);
+	}
+
+	@Test
+	@AdditionalResources(REFERENCED_LOCAL)
+	public void mergeMixedModeThreeWayConflictRL_m2() {
+		Resource base = input.getM2Base();
+		Resource left = input.getM2Left();
+		Resource right = input.getM2Right();
+
+		testMergeRightToLeft(left, right, base, true);
+	}
+
 	//
 	// Test framework
 	//
@@ -201,10 +252,7 @@ public class FacadeProviderComparisonTest extends AbstractFacadeTest {
 			facadeProviderRegistry.add(new J2EEFacadeProvider.Factory());
 		}
 
-		// Match by structure of the model, not identity of elements, because the merge of
-		// the façade creates similar structures in the UML on one side as on the other,
-		// but of course the elements that comprise it will have different XMI IDs
-		IMatchEngine.Factory matchEngineFactory = new FacadeMatchEngine.Factory(UseIdentifiers.NEVER,
+		IMatchEngine.Factory matchEngineFactory = new FacadeMatchEngine.Factory(UseIdentifiers.WHEN_AVAILABLE,
 				facadeProviderRegistry);
 		matchEngineFactory.setRanking(Integer.MAX_VALUE);
 

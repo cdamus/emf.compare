@@ -48,6 +48,22 @@ Two-way comparison of mixed-mode models, with a UML design model that references
 * add another finder for a bean in the J2EE content
 * change the type of a Collaboration role in the UML design model to the new finder interface
 
+### Use case m2
+
+Three-way comparison of mixed-mode models, with a UML design model that references a J2EE model.  The left-side models
+
+* add another finder for a bean in the J2EE content
+* change the type of a Collaboration role in the UML design model to the new finder interface
+
+whereas the right-side models
+
+* add a different new finder for the same bean in the J2EE content
+* change the type of the same Collaboration role as the left side to the right side's new finder interface
+
+So, there is no conflict in the J2EE content (two new finder interfaces independently added) but
+there is a conflict in the UML content, where both sides change the same collaboration role to
+assign a different type.
+
 ### Use case u1
 
 A pure UML scenario (no profile, no façade) for verification that UML models
