@@ -12,35 +12,24 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests;
 
-import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.stream.StreamSupport.stream;
-import static org.eclipse.emf.compare.ConflictKind.REAL;
-import static org.eclipse.emf.compare.DifferenceSource.LEFT;
-import static org.eclipse.emf.compare.DifferenceSource.RIGHT;
 import static org.eclipse.emf.compare.tests.framework.CompareMatchers.hasPseudoConflict;
-import static org.eclipse.emf.compare.utils.EMFComparePredicates.fromSide;
-import static org.eclipse.emf.compare.utils.EMFComparePredicates.hasConflict;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.hasNoDirectOrIndirectConflict;
 import static org.hamcrest.CoreMatchers.anything;
 import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.eclipse.emf.common.EMFPlugin;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.util.BasicMonitor;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.Monitor;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.compare.Comparison;
 import org.eclipse.emf.compare.Conflict;
@@ -51,6 +40,7 @@ import org.eclipse.emf.compare.merge.BatchMerger;
 import org.eclipse.emf.compare.merge.IBatchMerger;
 import org.eclipse.emf.compare.scope.DefaultComparisonScope;
 import org.eclipse.emf.compare.scope.IComparisonScope;
+import org.eclipse.emf.compare.uml2.facade.tests.framework.MergeUtils;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.util.J2EEResource;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.util.J2EEResourceFactoryImpl;
@@ -168,15 +158,7 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 	}
 
 	protected void acceptAllNonConflicting(Comparison comparison) {
-		Monitor monitor = new BasicMonitor();
-		Iterable<Diff> nonConflicting = filter(comparison.getDifferences(), not(hasConflict(REAL)));
-		IBatchMerger merger = new BatchMerger(getMergerRegistry());
-
-		Iterable<Diff> fromRight = filter(nonConflicting, fromSide(RIGHT));
-		merger.copyAllRightToLeft(fromRight, monitor);
-
-		Iterable<Diff> fromLeft = filter(nonConflicting, fromSide(LEFT));
-		merger.copyAllLeftToRight(fromLeft, monitor);
+		MergeUtils.acceptAllNonConflicting(comparison, getMergerRegistry());
 	}
 
 	protected void accept(DifferenceSource side, Conflict... conflict) {
@@ -184,22 +166,7 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 	}
 
 	protected void accept(DifferenceSource side, Iterable<? extends Conflict> conflicts) {
-		Monitor monitor = new BasicMonitor();
-		List<Diff> conflicting = stream(conflicts.spliterator(), false).map(Conflict::getDifferences)
-				.flatMap(Collection::stream).collect(Collectors.toList());
-
-		IBatchMerger merger = new BatchMerger(getMergerRegistry());
-		switch (side) {
-			case LEFT:
-				merger.copyAllLeftToRight(conflicting, monitor);
-				break;
-			case RIGHT:
-				merger.copyAllRightToLeft(conflicting, monitor);
-				break;
-			default:
-				fail("Cannot accept changes on side " + side);
-				break; // Unreachable
-		}
+		MergeUtils.accept(side, getMergerRegistry(), conflicts);
 	}
 
 	protected void assertCompareSame(Notifier left, Notifier right) {
