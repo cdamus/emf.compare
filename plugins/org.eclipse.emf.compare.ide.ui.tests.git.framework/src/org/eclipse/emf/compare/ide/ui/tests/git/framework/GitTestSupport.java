@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Obeo and others.
+ * Copyright (c) 2016, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     Obeo - initial API and implementation
  *     Philip Langer - add convenience methods
  *     Martin Fleck - bug 512562
+ *     Christian W. Damus - integration of façade providers
  *******************************************************************************/
 package org.eclipse.emf.compare.ide.ui.tests.git.framework;
 
@@ -87,6 +88,12 @@ public class GitTestSupport extends InternalGitTestSupport {
 	 * it.
 	 */
 	public static final String COMPARE_NO_PROJECT_SELECTED = "noProject"; //$NON-NLS-1$
+
+	/** Convenience for the boolean {@code threeWay} parameter to specify a two-way comparison. */
+	public static final boolean TWO_WAY = false;
+
+	/** Convenience for the boolean {@code threeWay} parameter to specify a three-way comparison. */
+	public static final boolean THREE_WAY = true;
 
 	/** The result of the merge operation. */
 	private MergeResult mergeResult;
@@ -229,20 +236,21 @@ public class GitTestSupport extends InternalGitTestSupport {
 	}
 
 	/**
-	 * <pre>
-	 * Compare the file on the given path between the two given branches. This method is attended to be used
-	 * when their is only one project in the repository.
-	 * 
-	 * If their is multiple projects use {@code compare(from, to , fileName, containerName)} with the name of 
-	 * the containing project instead.
-	 * </pre>
+	 * <p>
+	 * Do a three-way comparison of the file with the given path between the two given branches. This method
+	 * is intended to be used when there is only one project in the repository.
+	 * </p>
+	 * <p>
+	 * If there are multiple projects, then use {@link #compare(String, String, String, String)} with the name
+	 * of the containing project, instead.
+	 * </p>
 	 * 
 	 * @param from
-	 *            The branch checkouted (for example "master" or "refs/for/master", both syntaxes are
+	 *            The branch to check out (for example "master" or "refs/heads/master", both syntaxes are
 	 *            accepted)
 	 * @param to
-	 *            The branch to compare with (for example "master" or "refs/for/master", both syntaxes are
-	 *            accepted)
+	 *            The branch to compare with (for example "mybranch" or "refs/heads/mybranch", both syntaxes
+	 *            are accepted)
 	 * @param fileName
 	 *            The file to compare (the relative path to the file from the project)
 	 * @return the comparison
@@ -256,26 +264,59 @@ public class GitTestSupport extends InternalGitTestSupport {
 	}
 
 	/**
-	 * <pre>
-	 * Compare the file on the given path between the two given branches. This method is attended to be used
-	 * when their is several projects in the repository.
-	 *  
-	 * If their is only one project use {@code compare(from, to , fileName)} instead or give the value
-	 * {@code EMFCompareGitTestsSupport.COMPARE_NO_PROJECT_SELECTED} to the parameter containerProject.
-	 * </pre>
+	 * <p>
+	 * Compare a file with the given path between the two given branches. This method is intended to be used
+	 * when there is only one project in the repository.
+	 * </p>
+	 * <p>
+	 * If there are multiple projects, then use {@link #compare(String, String, String, String, boolean)} with
+	 * the name of the containing project, instead.
+	 * </p>
 	 * 
 	 * @param from
-	 *            The branch checkouted (for example "master" or "refs/for/master", both syntaxes are
+	 *            The branch to check out (for example "master" or "refs/heads/master", both syntaxes are
 	 *            accepted)
 	 * @param to
-	 *            The branch to compare with (for example "master" or "refs/for/master", both syntaxes are
+	 *            The branch to compare with (for example "mybranch" or "refs/heads/mybranch", both syntaxes
+	 *            are accepted)
+	 * @param fileName
+	 *            The file to compare (the relative path to the file from the project)
+	 * @param threeWay
+	 *            {@code true} to perform a three-way comparison; {@code false} for a two-way comparison
+	 * @return the comparison
+	 * @throws IOException
+	 *             Thrown if the checkout operation went wrong
+	 * @throws CoreException
+	 *             Thrown if the checkout operation went wrong
+	 */
+	public Comparison compare(String from, String to, String fileName, boolean threeWay)
+			throws IOException, CoreException {
+		return compare(from, to, fileName, COMPARE_NO_PROJECT_SELECTED, threeWay);
+	}
+
+	/**
+	 * <p>
+	 * Do a three-way compare on the file with the given path between the two given branches, accounting for
+	 * their common ancestor. This method is intended to be used when there are multiple projects in the
+	 * repository.
+	 * </p>
+	 * <p>
+	 * If there is only one project, then use {@link #compare(String, String, String)} instead or pass
+	 * {@link GitTestSupport#COMPARE_NO_PROJECT_SELECTED} as the {@code containerProject}.
+	 * </p>
+	 * 
+	 * @param from
+	 *            The branch to check out (for example "master" or "refs/heads/master", both syntaxes are
 	 *            accepted)
+	 * @param to
+	 *            The branch to compare with (for example "mybranch" or "refs/heads/mybranch", both syntaxes
+	 *            are accepted)
 	 * @param fileName
 	 *            The file to compare (the relative path to the file from the project)
 	 * @param containerProject
 	 *            The project containing the file to compare. If
-	 *            {@code EMFCompareGitTestsSupport.COMPARE_NO_PROJECT_SELECTED} is used, the first correct
-	 *            file will be used (use this when their is only one project)
+	 *            {@link GitTestSupport#COMPARE_NO_PROJECT_SELECTED} is used, the first correct file will be
+	 *            used (use this when their is only one project)
 	 * @return the comparison
 	 * @throws IOException
 	 *             Thrown if the checkout operation went wrong
@@ -284,6 +325,42 @@ public class GitTestSupport extends InternalGitTestSupport {
 	 */
 	public Comparison compare(String from, String to, String fileName, String containerProject)
 			throws IOException, CoreException {
+		return compare(from, to, fileName, containerProject, true);
+	}
+
+	/**
+	 * <p>
+	 * Compare the file with the given path between the two given branches. This method is intended to be used
+	 * when there are multiple projects in the repository.
+	 * </p>
+	 * <p>
+	 * If there is only one project, then use {@link #compare(String, String, String, boolean)} instead or
+	 * pass {@link GitTestSupport#COMPARE_NO_PROJECT_SELECTED} as the {@code containerProject}.
+	 * </p>
+	 * 
+	 * @param from
+	 *            The branch to check out (for example "master" or "refs/heads/master", both syntaxes are
+	 *            accepted)
+	 * @param to
+	 *            The branch to compare with (for example "mybranch" or "refs/heads/mybranch", both syntaxes
+	 *            are accepted)
+	 * @param fileName
+	 *            The file to compare (the relative path to the file from the project)
+	 * @param containerProject
+	 *            The project containing the file to compare. If
+	 *            {@link GitTestSupport#COMPARE_NO_PROJECT_SELECTED} is used, the first correct file will be
+	 *            used (use this when their is only one project)
+	 * @param threeWay
+	 *            {@code true} to perform a three-way comparison; {@code false} for a two-way comparison
+	 * @return the comparison
+	 * @throws IOException
+	 *             Thrown if the checkout operation went wrong
+	 * @throws CoreException
+	 *             Thrown if the checkout operation went wrong
+	 */
+	public Comparison compare(String from, String to, String fileName, String containerProject,
+			boolean threeWay) throws IOException, CoreException {
+
 		String normalizedFrom = normalizeBranch(from);
 		String normalizedTo = normalizeBranch(to);
 		IFile file = null;
@@ -368,15 +445,25 @@ public class GitTestSupport extends InternalGitTestSupport {
 		final ComparisonScopeBuilder scopeBuilder = new ComparisonScopeBuilder(resolver,
 				EMFCompareIDEUIPlugin.getDefault().getModelMinimizerRegistry().getCompoundMinimizer(),
 				accessor);
-		final IComparisonScope scope = scopeBuilder.build(left, right, origin, monitor);
+		final IComparisonScope scope;
+		if (threeWay) {
+			scope = scopeBuilder.build(left, right, origin, monitor);
+		} else {
+			scope = scopeBuilder.build(left, right, monitor);
+		}
 
 		final ResourceSet leftResourceSet = (ResourceSet)scope.getLeft();
 		final ResourceSet rightResourceSet = (ResourceSet)scope.getRight();
 		final ResourceSet originResourceSet = (ResourceSet)scope.getOrigin();
 
-		assertFalse(leftResourceSet.getResources().isEmpty());
-		assertFalse(rightResourceSet.getResources().isEmpty());
-		assertFalse(originResourceSet.getResources().isEmpty());
+		// It would be very odd, indeed, for the three-way comparison not to find pseudoconflicts
+		// at least, which means that the comparison will have resources to compare. But we use
+		// two-way comparisons in the tests to verify that a merge and some expected result are
+		// not different which, in the best base, actually resources in no resources being
+		// compared because they are indistinguishable
+		assertFalse(threeWay && leftResourceSet.getResources().isEmpty());
+		assertFalse(threeWay && rightResourceSet.getResources().isEmpty());
+		assertFalse(threeWay && originResourceSet.getResources().isEmpty());
 
 		final Builder comparisonBuilder = EMFCompare.builder();
 		EMFCompareBuilderConfigurator.createDefault().configure(comparisonBuilder);

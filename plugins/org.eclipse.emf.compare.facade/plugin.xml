@@ -15,6 +15,7 @@ Contributors:
 
 <plugin>
    <extension-point id="facadeProvider" name="EMF Compare Façade Providers" schema="schema/facadeProvider.exsd"/>
+
    <extension
          point="org.eclipse.emf.compare.rcp.matchEngine">
       <engineFactory
@@ -23,5 +24,20 @@ Contributors:
             description="A match engine that matches façades wrapping the underlying models being compared."
             ranking="50">
       </engineFactory>
+   </extension>
+   
+   <extension
+         point="org.eclipse.emf.compare.rcp.xmiidCopier">
+      <xmiidCopier
+            class="org.eclipse.emf.compare.facade.internal.merge.FacadeXMIIDCopier"
+            ranking="1"
+            label="Façade XMI ID copier"
+            description="Copies the XMI IDs of the model elements underlying a façade object that was copied by a merge operation.">
+         <enablement>
+            <instanceof
+                  value="org.eclipse.emf.compare.facade.FacadeObject">
+            </instanceof>
+         </enablement>
+      </xmiidCopier>
    </extension>
 </plugin>

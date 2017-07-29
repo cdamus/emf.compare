@@ -20,6 +20,7 @@ import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
 import org.eclipse.emf.compare.utils.Optionals;
+import org.eclipse.uml2.uml.Element;
 import org.eclipse.uml2.uml.Interface;
 import org.eclipse.uml2.uml.NamedElement;
 import org.eclipse.uml2.uml.Usage;
@@ -133,7 +134,7 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	 *            a façade or UML model element
 	 * @return the adapter, or {@code null}
 	 */
-	static HomeInterfaceAdapter get(Notifier notifier) {
+	public static HomeInterfaceAdapter get(Notifier notifier) {
 		return get(notifier, HomeInterfaceAdapter.class);
 	}
 
@@ -161,14 +162,18 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	public void syncBeanToModel(HomeInterface facade, Interface model) {
 		org.eclipse.uml2.uml.Class oldBeanClass = getBean(model);
 		Bean bean = facade.getBean();
-		org.eclipse.uml2.uml.Class newBeanClass = (org.eclipse.uml2.uml.Class)bean.getUnderlyingElement();
+
+		org.eclipse.uml2.uml.Class newBeanClass = null;
+		if (bean != null) {
+			newBeanClass = (org.eclipse.uml2.uml.Class)bean.getUnderlyingElement();
+		}
 
 		if (newBeanClass != oldBeanClass) {
 			setBean(model, newBeanClass);
 		}
 	}
 
-	protected Optional<Usage> getBeanRelationship(Interface homeInterface) {
+	public Optional<Usage> getBeanRelationship(Interface homeInterface) {
 		return homeInterface.getClientDependencies().stream() //
 				.filter(Usage.class::isInstance).map(Usage.class::cast) //
 				.filter(u -> u.getSuppliers().stream().anyMatch(BeanAdapter::isBeanClass)) //
@@ -185,15 +190,19 @@ public class HomeInterfaceAdapter extends NamedElementAdapter {
 	}
 
 	protected void setBean(Interface homeInterface, org.eclipse.uml2.uml.Class beanClass) {
-		Optionals.ifPresentElse(getBeanRelationship(homeInterface), u -> {
-			List<NamedElement> suppliers = u.getSuppliers();
-			if (suppliers.size() == 1) {
-				suppliers.set(0, beanClass);
-			} else {
-				suppliers.clear();
-				suppliers.add(beanClass);
-			}
-		}, () -> setUsage(homeInterface.createUsage(beanClass)));
+		if (beanClass == null) {
+			getBeanRelationship(homeInterface).ifPresent(Element::destroy);
+		} else {
+			Optionals.ifPresentElse(getBeanRelationship(homeInterface), u -> {
+				List<NamedElement> suppliers = u.getSuppliers();
+				if (suppliers.size() == 1) {
+					suppliers.set(0, beanClass);
+				} else {
+					suppliers.clear();
+					suppliers.add(beanClass);
+				}
+			}, () -> setUsage(homeInterface.createUsage(beanClass)));
+		}
 	}
 
 	protected void setUsage(Usage newUsage) {

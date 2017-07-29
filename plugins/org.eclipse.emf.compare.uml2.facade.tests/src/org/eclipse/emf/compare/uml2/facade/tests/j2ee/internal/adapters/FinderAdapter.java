@@ -20,6 +20,7 @@ import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Finder;
 import org.eclipse.emf.compare.utils.Optionals;
+import org.eclipse.uml2.uml.Element;
 import org.eclipse.uml2.uml.Interface;
 import org.eclipse.uml2.uml.NamedElement;
 import org.eclipse.uml2.uml.Usage;
@@ -135,7 +136,7 @@ public class FinderAdapter extends NamedElementAdapter {
 	 *            a façade or UML model element
 	 * @return the adapter, or {@code null}
 	 */
-	static FinderAdapter get(Notifier notifier) {
+	public static FinderAdapter get(Notifier notifier) {
 		return get(notifier, FinderAdapter.class);
 	}
 
@@ -163,14 +164,18 @@ public class FinderAdapter extends NamedElementAdapter {
 	public void syncBeanToModel(Finder facade, Interface model) {
 		org.eclipse.uml2.uml.Class oldBeanClass = getBean(model);
 		Bean bean = facade.getBean();
-		org.eclipse.uml2.uml.Class newBeanClass = (org.eclipse.uml2.uml.Class)bean.getUnderlyingElement();
+
+		org.eclipse.uml2.uml.Class newBeanClass = null;
+		if (bean != null) {
+			newBeanClass = (org.eclipse.uml2.uml.Class)bean.getUnderlyingElement();
+		}
 
 		if (newBeanClass != oldBeanClass) {
 			setBean(model, newBeanClass);
 		}
 	}
 
-	protected Optional<Usage> getBeanRelationship(Interface finder) {
+	public Optional<Usage> getBeanRelationship(Interface finder) {
 		return finder.getClientDependencies().stream() //
 				.filter(Usage.class::isInstance).map(Usage.class::cast) //
 				.filter(d -> UMLUtil.getStereotypeApplication(d, Create.class) != null) //
@@ -188,15 +193,20 @@ public class FinderAdapter extends NamedElementAdapter {
 	}
 
 	protected void setBean(Interface finder, org.eclipse.uml2.uml.Class beanClass) {
-		Optionals.ifPresentElse(getBeanRelationship(finder), u -> {
-			List<NamedElement> suppliers = u.getSuppliers();
-			if (suppliers.size() == 1) {
-				suppliers.set(0, beanClass);
-			} else {
-				suppliers.clear();
-				suppliers.add(beanClass);
-			}
-		}, () -> setCreate(applyStereotype(finder.createUsage(beanClass), StandardPackage.Literals.CREATE)));
+		if (beanClass == null) {
+			getBeanRelationship(finder).ifPresent(Element::destroy);
+		} else {
+			Optionals.ifPresentElse(getBeanRelationship(finder), u -> {
+				List<NamedElement> suppliers = u.getSuppliers();
+				if (suppliers.size() == 1) {
+					suppliers.set(0, beanClass);
+				} else {
+					suppliers.clear();
+					suppliers.add(beanClass);
+				}
+			}, () -> setCreate(
+					applyStereotype(finder.createUsage(beanClass), StandardPackage.Literals.CREATE)));
+		}
 	}
 
 	protected void setCreate(Usage newCreate) {

@@ -78,4 +78,22 @@ public final class Optionals {
 		}
 		return result;
 	}
+
+	/**
+	 * Perform a side-effect {@code action} if an {@code optional} is absent.
+	 * 
+	 * @param optional
+	 *            an optional
+	 * @param action
+	 *            a side-effect to run if the {@code optional} is {@linkplain Optional#isPresent() absent}
+	 * @return the {@code optional} for fluent call chaining
+	 * @param <T>
+	 *            the optional type
+	 */
+	public static <T> Optional<T> ifAbsent(Optional<T> optional, Runnable action) {
+		if (!optional.isPresent()) {
+			action.run();
+		}
+		return optional;
+	}
 }

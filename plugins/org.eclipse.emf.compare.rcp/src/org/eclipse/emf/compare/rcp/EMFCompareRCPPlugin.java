@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2016 Obeo and others.
+ * Copyright (c) 2013, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     Obeo - initial API and implementation
  *     Martin Fleck - bug 483798
  *     Mathias Schaefer - preferences refactoring
+ *     Christian W. Damus - integration of façade providers
  *******************************************************************************/
 package org.eclipse.emf.compare.rcp;
 
@@ -73,6 +74,7 @@ import org.eclipse.emf.compare.rcp.internal.match.MatchEngineFactoryRegistryList
 import org.eclipse.emf.compare.rcp.internal.match.MatchEngineFactoryRegistryWrapper;
 import org.eclipse.emf.compare.rcp.internal.match.WeightProviderDescriptorRegistryListener;
 import org.eclipse.emf.compare.rcp.internal.merger.MergerExtensionRegistryListener;
+import org.eclipse.emf.compare.rcp.internal.merger.XMIIDCopierExtensionRegistryListener;
 import org.eclipse.emf.compare.rcp.internal.policy.LoadOnDemandPolicyRegistryImpl;
 import org.eclipse.emf.compare.rcp.internal.policy.LoadOnDemandPolicyRegistryListener;
 import org.eclipse.emf.compare.rcp.internal.postprocessor.PostProcessorFactoryRegistryListener;
@@ -122,6 +124,9 @@ public class EMFCompareRCPPlugin extends Plugin {
 
 	/** The id of the adapter factory extension point. */
 	public static final String FACTORY_PPID = "adapterFactory"; //$NON-NLS-1$
+
+	/** The ID of the XMI ID copier extension point. */
+	public static final String XMI_ID_COPIERS_PPID = "xmiidCopier"; //$NON-NLS-1$
 
 	/**
 	 * Log4j logger to use throughout EMFCompare for logging purposes.
@@ -206,6 +211,9 @@ public class EMFCompareRCPPlugin extends Plugin {
 	/** Will listen to preference changes and update log4j configuration accordingly. */
 	private LoggingPreferenceChangeListener preferenceChangeListener;
 
+	/** The registry listener for the XMI ID copiers extension point. */
+	private AbstractRegistryEventListener xmiidCopierRegistryListener;
+
 	/**
 	 * Keep all resources graphs identified by their id.
 	 */
@@ -241,6 +249,8 @@ public class EMFCompareRCPPlugin extends Plugin {
 		setUpReqEngineRegistry(registry);
 
 		setUpConflictDetectorRegistry(registry);
+
+		setUpXMIIDCopierRegistry(registry);
 
 		initLogging();
 	}
@@ -392,6 +402,19 @@ public class EMFCompareRCPPlugin extends Plugin {
 				getLog(), weightProviderRegistry);
 		registry.addListener(weightProviderListener);
 		weightProviderListener.readRegistry(registry);
+	}
+
+	/**
+	 * Set the XMI ID Copiers registry.
+	 * 
+	 * @param registry
+	 *            {@link IExtensionRegistry} to listen in order to fill the registry
+	 */
+	private void setUpXMIIDCopierRegistry(final IExtensionRegistry registry) {
+		xmiidCopierRegistryListener = new XMIIDCopierExtensionRegistryListener(PLUGIN_ID, XMI_ID_COPIERS_PPID,
+				getLog());
+		registry.addListener(xmiidCopierRegistryListener, PLUGIN_ID + '.' + XMI_ID_COPIERS_PPID);
+		xmiidCopierRegistryListener.readRegistry(registry);
 	}
 
 	/*

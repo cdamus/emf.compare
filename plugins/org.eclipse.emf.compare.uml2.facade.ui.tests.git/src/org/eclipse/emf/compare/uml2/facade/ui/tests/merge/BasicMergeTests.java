@@ -8,20 +8,23 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.uml2.facade.ui.tests.merge;
 
-import static org.eclipse.emf.compare.ConflictKind.PSEUDO;
+import static com.google.common.base.Predicates.and;
+import static org.eclipse.emf.compare.DifferenceKind.MOVE;
 import static org.eclipse.emf.compare.DifferenceSource.LEFT;
 import static org.eclipse.emf.compare.DifferenceSource.RIGHT;
+import static org.eclipse.emf.compare.ide.ui.tests.git.framework.GitTestSupport.TWO_WAY;
 import static org.eclipse.emf.compare.tests.framework.CompareMatchers.isProxy;
 import static org.eclipse.emf.compare.tests.framework.CompareMatchers.isRealConflict;
 import static org.eclipse.emf.compare.tests.framework.CompareMatchers.matches;
-import static org.eclipse.emf.compare.utils.EMFComparePredicates.hasDirectOrIndirectConflict;
+import static org.eclipse.emf.compare.utils.EMFComparePredicates.ofKind;
+import static org.eclipse.emf.compare.utils.EMFComparePredicates.onFeature;
 import static org.eclipse.emf.ecore.resource.Resource.OPTION_SAVE_ONLY_IF_CHANGED;
 import static org.eclipse.emf.ecore.resource.Resource.OPTION_SAVE_ONLY_IF_CHANGED_MEMORY_BUFFER;
+import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assume.assumeThat;
 
@@ -47,7 +50,7 @@ import org.eclipse.jgit.api.Status;
 import org.eclipse.uml2.uml.Interface;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.Type;
-import org.junit.Ignore;
+import org.eclipse.uml2.uml.UMLPackage;
 import org.junit.runner.RunWith;
 
 @RunWith(GitTestRunner.class)
@@ -55,17 +58,19 @@ import org.junit.runner.RunWith;
 @SuppressWarnings({"nls", "unused", "boxing" })
 public class BasicMergeTests {
 
-	@Ignore("Merging references to new elements in remote results in unresolved proxies")
 	@GitMerge(local = "master", remote = "aleatory")
 	@GitInput("data/add-finder-bothSides-noConflict.zip")
 	public void mergeInUML(Status status, GitTestSupport support) throws Exception {
 		assertThat(status.hasUncommittedChanges(), is(false));
 		assertThat(status.getConflicting(), not(hasItem(anything())));
 
-		Comparison comparison = support.compare("master", "expected", "design.uml");
+		Comparison comparison = support.compare("master", "expected", "design.uml", TWO_WAY);
 
-		assertThat(comparison.getDifferences(), everyItem(
-				matches(Diff.class, "is pseudo-conflicted diff", hasDirectOrIndirectConflict(PSEUDO))));
+		// If the comparison is empty, then this is trivially ensured.
+		// FIXME: We should be able to get an empty comparison without the moves:
+		// merge seems to behave differently in Maven execution as in Eclipse execution
+		assertThat(comparison.getDifferences(), everyItem(matches(Diff.class, "is move in packagedElement",
+				and(ofKind(MOVE), onFeature(UMLPackage.Literals.PACKAGE__PACKAGED_ELEMENT)))));
 	}
 
 	@GitMerge(local = "master", remote = "b-side")
@@ -103,7 +108,6 @@ public class BasicMergeTests {
 		}
 	}
 
-	@Ignore("Merging references to new elements in remote results in unresolved proxies")
 	@GitMerge(local = "master", remote = "b-side")
 	@GitInput("data/add-finder-bothSides-uml-conflict.zip")
 	public void mergeConflictInUMLAcceptRemote(Status status, GitTestSupport support) throws Exception {

@@ -20,4 +20,5 @@ Import-Package: com.google.common.base;version="[15.0.0,22.0.0)",
  org.apache.log4j;version="1.2.15"
 Export-Package: org.eclipse.emf.compare.facade,
  org.eclipse.emf.compare.facade.internal;x-friends:="org.eclipse.emf.compare.facade.ui",
- org.eclipse.emf.compare.facade.internal.match;x-internal:=true
+ org.eclipse.emf.compare.facade.internal.match;x-internal:=true,
+ org.eclipse.emf.compare.facade.internal.merge;x-internal:=true

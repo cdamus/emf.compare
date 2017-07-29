@@ -17,4 +17,5 @@ Import-Package: com.google.common.base;version="[15.0.0,22.0.0)",
  com.google.common.primitives;version="[15.0.0,22.0.0)",
  org.apache.log4j;version="1.2.15"
 Export-Package: org.eclipse.emf.compare.uml2.facade,
- org.eclipse.emf.compare.uml2.facade.internal;x-internal:=true
+ org.eclipse.emf.compare.uml2.facade.internal;x-internal:=true,
+ org.eclipse.emf.compare.uml2.facade.merge

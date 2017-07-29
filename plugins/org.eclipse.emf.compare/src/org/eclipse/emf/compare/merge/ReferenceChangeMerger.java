@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 Obeo and others.
+ * Copyright (c) 2012, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *     Philip Langer - fixes for bug 413520
+ *     Christian W. Damus - integration of façade providers
  *******************************************************************************/
 package org.eclipse.emf.compare.merge;
 
@@ -34,9 +35,7 @@ import org.eclipse.emf.compare.utils.ReferenceUtil;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.ecore.xmi.XMIResource;
 
 /**
  * This specific implementation of {@link AbstractMerger} will be used to merge reference changes.
@@ -440,15 +439,32 @@ public class ReferenceChangeMerger extends AbstractMerger {
 
 		if (needXmiId) {
 			// Copy XMI ID when applicable.
-			final Resource initialResource = diff.getValue().eResource();
-			final Resource targetResource = expectedValue.eResource();
-			if (initialResource instanceof XMIResource && targetResource instanceof XMIResource) {
-				((XMIResource)targetResource).setID(expectedValue,
-						((XMIResource)initialResource).getID(diff.getValue()));
-			}
+			IXMIIDCopier idCopier = getXMIIDCopier(diff.getValue());
+
+			// There's always at least the default ID copier
+			idCopier.copyXMIIDs(diff.getValue(), expectedValue);
 		}
 
 		checkImpliedDiffsOrdering(diff, rightToLeft);
+	}
+
+	/**
+	 * Gets the most appropriate XMI ID copier available for an object that was merged, using a
+	 * {@linkplain IXMIIDCopier.Registry registry} provided in the {@linkplain #getMergeOptions() merge
+	 * options}, if any.
+	 * 
+	 * @param originalObject
+	 *            a merged object
+	 * @return the most appropriate XMI ID copier for it (never {@code null})
+	 */
+	protected IXMIIDCopier getXMIIDCopier(EObject originalObject) {
+		IXMIIDCopier.Registry registry = (IXMIIDCopier.Registry)getMergeOptions()
+				.get(IXMIIDCopier.OPTION_XMIID_COPIER_REGISTRY);
+		if (registry == null) {
+			registry = IXMIIDCopier.Registry.INSTANCE;
+		}
+
+		return registry.getXMIIDCopier(originalObject);
 	}
 
 	/**
