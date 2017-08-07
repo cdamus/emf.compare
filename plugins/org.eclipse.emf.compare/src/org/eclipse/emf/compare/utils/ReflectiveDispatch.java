@@ -14,6 +14,7 @@ package org.eclipse.emf.compare.utils;
 
 import static com.google.common.base.Predicates.and;
 import static com.google.common.collect.Iterables.filter;
+import static com.google.common.primitives.Primitives.wrap;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -241,7 +242,7 @@ public final class ReflectiveDispatch {
 		boolean result = parameterTypes.length == argumentTypes.length;
 
 		for (int i = 0; result && (i < parameterTypes.length); i++) {
-			if (!parameterTypes[i].isAssignableFrom(argumentTypes[i])) {
+			if (!wrap(parameterTypes[i]).isAssignableFrom(wrap(argumentTypes[i]))) {
 				result = false;
 			}
 		}
