@@ -770,6 +770,25 @@ public class FacadeAdapter implements Adapter.Internal {
 	}
 
 	/**
+	 * Obtains the object underlying the given object assumed to be a {@code facade} object.
+	 * 
+	 * @param facade
+	 *            a presumed façade object
+	 * @return the corresponding object from the underlying model, or {@code null} if the input is not an
+	 *         object of some façade with a {@link FacadeAdapter} attached to it
+	 */
+	public static EObject getUnderlyingObject(EObject facade) {
+		EObject result = null;
+
+		FacadeAdapter adapter = get(facade, FacadeAdapter.class);
+		if (adapter != null) {
+			result = adapter.getUnderlyingElement();
+		}
+
+		return result;
+	}
+
+	/**
 	 * A no-op.
 	 * 
 	 * @param adapter

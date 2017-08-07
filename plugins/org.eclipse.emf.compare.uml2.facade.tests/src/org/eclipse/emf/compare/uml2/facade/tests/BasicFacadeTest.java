@@ -80,7 +80,7 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		Bean thing = requireBean(package_, "Thing");
 
 		thing.setKind(BeanKind.MESSAGEDRIVEN);
-		assertThat(thing.getUnderlyingElement(), hasKind(BeanKind.MESSAGEDRIVEN));
+		assertThat(getUnderlyingObject(thing), hasKind(BeanKind.MESSAGEDRIVEN));
 	}
 
 	@Test
@@ -88,8 +88,8 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		Package package_ = requirePackage(input.getA1Left(), "a1");
 		Bean thing = requireBean(package_, "Thing");
 
-		setKind(thing.getUnderlyingElement(), BeanKind.MESSAGEDRIVEN);
-		assertThat(thing.getUnderlyingElement(), hasKind(BeanKind.MESSAGEDRIVEN));
+		setKind(getUnderlyingObject(thing), BeanKind.MESSAGEDRIVEN);
+		assertThat(getUnderlyingObject(thing), hasKind(BeanKind.MESSAGEDRIVEN));
 	}
 
 	@Test
@@ -97,7 +97,7 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		Package package_ = requirePackage(input.getA1Left(), "a1");
 		Bean newBean = package_.createBean("Doodad");
 
-		org.eclipse.uml2.uml.Class class_ = (org.eclipse.uml2.uml.Class)newBean.getUnderlyingElement();
+		org.eclipse.uml2.uml.Class class_ = (org.eclipse.uml2.uml.Class)getUnderlyingObject(newBean);
 		assertThat("No UML class", class_, notNullValue());
 		assertThat("Wrong class name", class_.getName(), is("Doodad"));
 		assertThat("Class not stereotyped as «Bean»", class_, hasStereotype("Bean"));
@@ -107,12 +107,12 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 	public void addBeanInUML() {
 		Package package_ = requirePackage(input.getA1Left(), "a1");
 
-		org.eclipse.uml2.uml.Package uml = (org.eclipse.uml2.uml.Package)package_.getUnderlyingElement();
+		org.eclipse.uml2.uml.Package uml = (org.eclipse.uml2.uml.Package)getUnderlyingObject(package_);
 		org.eclipse.uml2.uml.Class class_ = uml.createOwnedClass("Doodad", false);
 		applyStereotype(class_, "Bean");
 
 		Bean newBean = requireBean(package_, "Doodad");
-		assertThat(newBean.getUnderlyingElement(), is(class_));
+		assertThat(getUnderlyingObject(newBean), is(class_));
 	}
 
 	@Test
@@ -133,8 +133,8 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		Bean whatsit = requireBean(package_, "Whatsit");
 		thingHome.setBean(whatsit);
 
-		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)whatsit.getUnderlyingElement();
-		Interface thingHomeInterface = (Interface)thingHome.getUnderlyingElement();
+		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)getUnderlyingObject(whatsit);
+		Interface thingHomeInterface = (Interface)getUnderlyingObject(thingHome);
 
 		List<Usage> usages = thingHomeInterface.getClientDependencies().stream() //
 				.filter(Usage.class::isInstance).map(Usage.class::cast).collect(Collectors.toList());
@@ -148,8 +148,8 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		HomeInterface thingHome = requireHomeInterface(package_, "ThingHome");
 
 		Bean whatsit = requireBean(package_, "Whatsit");
-		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)whatsit.getUnderlyingElement();
-		Interface thingHomeInterface = (Interface)thingHome.getUnderlyingElement();
+		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)getUnderlyingObject(whatsit);
+		Interface thingHomeInterface = (Interface)getUnderlyingObject(thingHome);
 
 		List<Usage> usages = thingHomeInterface.getClientDependencies().stream() //
 				.filter(Usage.class::isInstance).map(Usage.class::cast).collect(Collectors.toList());
@@ -168,8 +168,8 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		HomeInterface thingHome = requireHomeInterface(package_, "ThingHome");
 
 		Bean whatsit = requireBean(package_, "Whatsit");
-		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)whatsit.getUnderlyingElement();
-		Interface thingHomeInterface = (Interface)thingHome.getUnderlyingElement();
+		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)getUnderlyingObject(whatsit);
+		Interface thingHomeInterface = (Interface)getUnderlyingObject(thingHome);
 
 		List<Usage> usages = thingHomeInterface.getClientDependencies().stream() //
 				.filter(Usage.class::isInstance).map(Usage.class::cast).collect(Collectors.toList());
@@ -201,8 +201,8 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		Bean whatsit = requireBean(package_, "Whatsit");
 		whatsit.getFinders().add(thingByName); // Tricky! Work from the opposite end
 
-		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)whatsit.getUnderlyingElement();
-		Interface thingByNameInterface = (Interface)thingByName.getUnderlyingElement();
+		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)getUnderlyingObject(whatsit);
+		Interface thingByNameInterface = (Interface)getUnderlyingObject(thingByName);
 
 		List<Usage> usages = thingByNameInterface.getClientDependencies().stream() //
 				.filter(Usage.class::isInstance).map(Usage.class::cast).collect(Collectors.toList());
@@ -216,8 +216,8 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		Finder thingByName = requireFinder(package_, "ThingByName");
 
 		Bean whatsit = requireBean(package_, "Whatsit");
-		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)whatsit.getUnderlyingElement();
-		Interface thingByNameInterface = (Interface)thingByName.getUnderlyingElement();
+		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)getUnderlyingObject(whatsit);
+		Interface thingByNameInterface = (Interface)getUnderlyingObject(thingByName);
 
 		List<Usage> usages = thingByNameInterface.getClientDependencies().stream() //
 				.filter(Usage.class::isInstance).map(Usage.class::cast).collect(Collectors.toList());
@@ -236,8 +236,8 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		Finder thingByName = requireFinder(package_, "ThingByName");
 
 		Bean whatsit = requireBean(package_, "Whatsit");
-		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)whatsit.getUnderlyingElement();
-		Interface thingByNameInterface = (Interface)thingByName.getUnderlyingElement();
+		org.eclipse.uml2.uml.Class whatsitClass = (org.eclipse.uml2.uml.Class)getUnderlyingObject(whatsit);
+		Interface thingByNameInterface = (Interface)getUnderlyingObject(thingByName);
 
 		List<Usage> usages = thingByNameInterface.getClientDependencies().stream() //
 				.filter(Usage.class::isInstance).map(Usage.class::cast).collect(Collectors.toList());
@@ -258,7 +258,7 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		HomeInterface newHome = package_.createHomeInterface("WhatsitHome");
 		newHome.setBean(whatsit);
 
-		Interface interface_ = (Interface)newHome.getUnderlyingElement();
+		Interface interface_ = (Interface)getUnderlyingObject(newHome);
 		assertThat("No UML interface", interface_, notNullValue());
 		assertThat("Wrong interface name", interface_.getName(), is("WhatsitHome"));
 		assertThat("Interface not stereotyped as «HomeInterface»", interface_,
@@ -267,20 +267,20 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		assertThat("Home interface should have exactly one dependency",
 				interface_.getClientDependencies().size(), is(1));
 		assertThat(interface_.getClientDependencies(),
-				everyItem(suppliedBy(is(whatsit.getUnderlyingElement()))));
+				everyItem(suppliedBy(is(getUnderlyingObject(whatsit)))));
 	}
 
 	@Test
 	public void addHomeInterfaceInUML() {
 		Package package_ = requirePackage(input.getA2Left(), "a2");
 
-		org.eclipse.uml2.uml.Package uml = (org.eclipse.uml2.uml.Package)package_.getUnderlyingElement();
+		org.eclipse.uml2.uml.Package uml = (org.eclipse.uml2.uml.Package)getUnderlyingObject(package_);
 		Interface interface_ = uml.createOwnedInterface("WhatsitHome");
 		applyStereotype(interface_, "HomeInterface");
 
 		interface_.createUsage(uml.getOwnedMember("Whatsit"));
 		HomeInterface newHome = requireHomeInterface(package_, "WhatsitHome");
-		assertThat(newHome.getUnderlyingElement(), is(interface_));
+		assertThat(getUnderlyingObject(newHome), is(interface_));
 		assertThat(newHome.getBean(), is(requireBean(package_, "Whatsit")));
 	}
 
@@ -292,7 +292,7 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		Finder newFinder = package_.createFinder("ThingByRandom");
 		newFinder.setBean(thing);
 
-		Interface interface_ = (Interface)newFinder.getUnderlyingElement();
+		Interface interface_ = (Interface)getUnderlyingObject(newFinder);
 		assertThat("No UML interface", interface_, notNullValue());
 		assertThat("Wrong interface name", interface_.getName(), is("ThingByRandom"));
 		assertThat("Interface not stereotyped as «Finder»", interface_, hasStereotype("Finder"));
@@ -300,15 +300,14 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		assertThat("Finder interface should have exactly one dependency",
 				interface_.getClientDependencies().size(), is(1));
 		assertThat(interface_.getClientDependencies(), everyItem(hasStereotype("Create")));
-		assertThat(interface_.getClientDependencies(),
-				everyItem(suppliedBy(is(thing.getUnderlyingElement()))));
+		assertThat(interface_.getClientDependencies(), everyItem(suppliedBy(is(getUnderlyingObject(thing)))));
 	}
 
 	@Test
 	public void addFinderInUML() {
 		Package package_ = requirePackage(input.getA3Left(), "a3");
 
-		org.eclipse.uml2.uml.Package uml = (org.eclipse.uml2.uml.Package)package_.getUnderlyingElement();
+		org.eclipse.uml2.uml.Package uml = (org.eclipse.uml2.uml.Package)getUnderlyingObject(package_);
 		Interface interface_ = uml.createOwnedInterface("WhatsitByID");
 		applyStereotype(interface_, "Finder");
 
@@ -316,7 +315,7 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 		applyStereotype(usage, "Create");
 
 		Finder newFinder = requireFinder(package_, "WhatsitByID");
-		assertThat(newFinder.getUnderlyingElement(), is(interface_));
+		assertThat(getUnderlyingObject(newFinder), is(interface_));
 		assertThat(requireBean(package_, "Whatsit").getFinders(), hasItem(newFinder));
 	}
 

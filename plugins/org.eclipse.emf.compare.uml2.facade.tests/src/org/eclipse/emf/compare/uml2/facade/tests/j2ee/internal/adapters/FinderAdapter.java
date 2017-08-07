@@ -167,7 +167,7 @@ public class FinderAdapter extends NamedElementAdapter {
 
 		org.eclipse.uml2.uml.Class newBeanClass = null;
 		if (bean != null) {
-			newBeanClass = (org.eclipse.uml2.uml.Class)bean.getUnderlyingElement();
+			newBeanClass = (org.eclipse.uml2.uml.Class)getUnderlyingObject(bean);
 		}
 
 		if (newBeanClass != oldBeanClass) {

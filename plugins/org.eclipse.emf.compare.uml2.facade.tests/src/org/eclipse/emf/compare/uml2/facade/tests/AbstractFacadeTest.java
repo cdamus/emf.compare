@@ -36,6 +36,7 @@ import org.eclipse.emf.compare.Conflict;
 import org.eclipse.emf.compare.ConflictKind;
 import org.eclipse.emf.compare.Diff;
 import org.eclipse.emf.compare.DifferenceSource;
+import org.eclipse.emf.compare.facade.FacadeAdapter;
 import org.eclipse.emf.compare.merge.BatchMerger;
 import org.eclipse.emf.compare.merge.IBatchMerger;
 import org.eclipse.emf.compare.scope.DefaultComparisonScope;
@@ -46,6 +47,7 @@ import org.eclipse.emf.compare.uml2.facade.tests.j2ee.util.J2EEResource;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.util.J2EEResourceFactoryImpl;
 import org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.J2EEProfilePackage;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLTest;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.URIConverter;
@@ -138,6 +140,17 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 		}
 
 		AbstractUMLTest.resetRegistries();
+	}
+
+	/**
+	 * Obtains the (real) model element underlying the given {@code facade} object.
+	 * 
+	 * @param facade
+	 *            a façade object
+	 * @return its (principal) underlying model element
+	 */
+	public static EObject getUnderlyingObject(EObject facade) {
+		return FacadeAdapter.getUnderlyingObject(facade);
 	}
 
 	protected Comparison preMerge(Notifier left, Notifier right, Notifier base) {
