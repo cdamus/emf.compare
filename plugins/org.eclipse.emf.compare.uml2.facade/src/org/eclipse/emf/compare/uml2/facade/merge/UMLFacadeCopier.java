@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.compare.facade.FacadeObject;
-import org.eclipse.emf.compare.facade.internal.merge.FacadeXMIIDCopier;
+import org.eclipse.emf.compare.facade.internal.merge.FacadeCopier;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.uml2.uml.Element;
@@ -33,12 +33,12 @@ import org.eclipse.uml2.uml.Stereotype;
 import org.eclipse.uml2.uml.util.UMLUtil;
 
 /**
- * An XMI ID copier for façades on UML elements.
+ * An EMF Compare copier for façades on UML elements.
  *
  * @author Christian W. Damus
  */
 @SuppressWarnings("restriction")
-public class UMLFacadeXMIIDCopier extends FacadeXMIIDCopier {
+public class UMLFacadeCopier extends FacadeCopier {
 
 	/**
 	 * The façade object whose XMI ID copying is currently being processed.
@@ -48,7 +48,7 @@ public class UMLFacadeXMIIDCopier extends FacadeXMIIDCopier {
 	/**
 	 * Initializes me.
 	 */
-	public UMLFacadeXMIIDCopier() {
+	public UMLFacadeCopier() {
 		super();
 	}
 
@@ -56,14 +56,12 @@ public class UMLFacadeXMIIDCopier extends FacadeXMIIDCopier {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void copyXMIIDs(EObject originalObject, EObject copy) {
+	protected void copyXMIIDs(FacadeObject originalObject, FacadeObject copy) {
 		// First, cover the principal underlying objects
 		super.copyXMIIDs(originalObject, copy);
 
-		FacadeObject originalFacade = (FacadeObject)originalObject;
-		FacadeObject copyFacade = (FacadeObject)copy;
-		EObject originalUnder = originalFacade.getUnderlyingElement();
-		EObject copyUnder = copyFacade.getUnderlyingElement();
+		EObject originalUnder = originalObject.getUnderlyingElement();
+		EObject copyUnder = copy.getUnderlyingElement();
 
 		if ((originalUnder instanceof Element) && (copyUnder instanceof Element)) {
 			Element originalElement = (Element)originalUnder;
@@ -313,8 +311,8 @@ public class UMLFacadeXMIIDCopier extends FacadeXMIIDCopier {
 		 * 
 		 * @return my owner
 		 */
-		UMLFacadeXMIIDCopier getXMIIDCopier() {
-			return UMLFacadeXMIIDCopier.this;
+		UMLFacadeCopier getXMIIDCopier() {
+			return UMLFacadeCopier.this;
 		}
 	}
 
@@ -388,7 +386,7 @@ public class UMLFacadeXMIIDCopier extends FacadeXMIIDCopier {
 			Element copyUML = (Element)((FacadeObject)copyContext.copy).getUnderlyingElement();
 
 			// Process deferrals
-			UMLFacadeXMIIDCopier copier = copyContext.getXMIIDCopier();
+			UMLFacadeCopier copier = copyContext.getXMIIDCopier();
 			Stream<Pair> related = copier.getRelatedElements(copyContext.original, originalUML,
 					copyContext.copy, copyUML);
 			related.filter(pair -> deferrals.remove(pair.original))

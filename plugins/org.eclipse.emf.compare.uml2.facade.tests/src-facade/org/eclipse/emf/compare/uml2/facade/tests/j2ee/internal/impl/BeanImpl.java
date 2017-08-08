@@ -23,7 +23,6 @@ import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Finder;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
@@ -191,7 +190,7 @@ public class BeanImpl extends NamedElementImpl implements Bean {
 	 */
 	@Override
 	public Bean getSuperclass() {
-		if (superclass != null && ((EObject)superclass).eIsProxy()) {
+		if (superclass != null && superclass.eIsProxy()) {
 			InternalEObject oldSuperclass = (InternalEObject)superclass;
 			superclass = (Bean)eResolveProxy(oldSuperclass);
 			if (superclass != oldSuperclass) {
@@ -233,7 +232,7 @@ public class BeanImpl extends NamedElementImpl implements Bean {
 	 */
 	@Override
 	public HomeInterface getHomeInterface() {
-		if (homeInterface != null && ((EObject)homeInterface).eIsProxy()) {
+		if (homeInterface != null && homeInterface.eIsProxy()) {
 			InternalEObject oldHomeInterface = (InternalEObject)homeInterface;
 			homeInterface = (HomeInterface)eResolveProxy(oldHomeInterface);
 			if (homeInterface != oldHomeInterface) {

@@ -13,8 +13,6 @@
 package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.impl;
 
 import org.eclipse.emf.common.notify.Notification;
-
-import org.eclipse.emf.compare.facade.FacadeObjectImpl;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement;
 
@@ -24,6 +22,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -41,7 +40,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  *
  * @generated
  */
-public abstract class NamedElementImpl extends FacadeObjectImpl implements NamedElement {
+public abstract class NamedElementImpl extends EObjectImpl implements NamedElement {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -134,7 +133,7 @@ public abstract class NamedElementImpl extends FacadeObjectImpl implements Named
 	@Override
 	public org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package getPackage() {
 		org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package package_ = basicGetPackage();
-		return package_ != null && ((EObject)package_).eIsProxy()
+		return package_ != null && package_.eIsProxy()
 				? (org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package)eResolveProxy(
 						(InternalEObject)package_)
 				: package_;

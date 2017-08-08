@@ -20,7 +20,6 @@ import org.eclipse.emf.compare.uml2.facade.tests.j2ee.HomeInterface;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage;
 
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
@@ -75,7 +74,7 @@ public class HomeInterfaceImpl extends NamedElementImpl implements HomeInterface
 	 */
 	@Override
 	public Bean getBean() {
-		if (bean != null && ((EObject)bean).eIsProxy()) {
+		if (bean != null && bean.eIsProxy()) {
 			InternalEObject oldBean = (InternalEObject)bean;
 			bean = (Bean)eResolveProxy(oldBean);
 			if (bean != oldBean) {

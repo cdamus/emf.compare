@@ -73,8 +73,8 @@ import org.eclipse.emf.compare.rcp.internal.extension.impl.ItemRegistry;
 import org.eclipse.emf.compare.rcp.internal.match.MatchEngineFactoryRegistryListener;
 import org.eclipse.emf.compare.rcp.internal.match.MatchEngineFactoryRegistryWrapper;
 import org.eclipse.emf.compare.rcp.internal.match.WeightProviderDescriptorRegistryListener;
+import org.eclipse.emf.compare.rcp.internal.merger.CopierExtensionRegistryListener;
 import org.eclipse.emf.compare.rcp.internal.merger.MergerExtensionRegistryListener;
-import org.eclipse.emf.compare.rcp.internal.merger.XMIIDCopierExtensionRegistryListener;
 import org.eclipse.emf.compare.rcp.internal.policy.LoadOnDemandPolicyRegistryImpl;
 import org.eclipse.emf.compare.rcp.internal.policy.LoadOnDemandPolicyRegistryListener;
 import org.eclipse.emf.compare.rcp.internal.postprocessor.PostProcessorFactoryRegistryListener;
@@ -125,8 +125,8 @@ public class EMFCompareRCPPlugin extends Plugin {
 	/** The id of the adapter factory extension point. */
 	public static final String FACTORY_PPID = "adapterFactory"; //$NON-NLS-1$
 
-	/** The ID of the XMI ID copier extension point. */
-	public static final String XMI_ID_COPIERS_PPID = "xmiidCopier"; //$NON-NLS-1$
+	/** The ID of the copier extension point. */
+	public static final String COPIERS_PPID = "copier"; //$NON-NLS-1$
 
 	/**
 	 * Log4j logger to use throughout EMFCompare for logging purposes.
@@ -211,8 +211,8 @@ public class EMFCompareRCPPlugin extends Plugin {
 	/** Will listen to preference changes and update log4j configuration accordingly. */
 	private LoggingPreferenceChangeListener preferenceChangeListener;
 
-	/** The registry listener for the XMI ID copiers extension point. */
-	private AbstractRegistryEventListener xmiidCopierRegistryListener;
+	/** The registry listener for the copiers extension point. */
+	private AbstractRegistryEventListener copierRegistryListener;
 
 	/**
 	 * Keep all resources graphs identified by their id.
@@ -250,7 +250,7 @@ public class EMFCompareRCPPlugin extends Plugin {
 
 		setUpConflictDetectorRegistry(registry);
 
-		setUpXMIIDCopierRegistry(registry);
+		setUpCopierRegistry(registry);
 
 		initLogging();
 	}
@@ -405,16 +405,15 @@ public class EMFCompareRCPPlugin extends Plugin {
 	}
 
 	/**
-	 * Set the XMI ID Copiers registry.
+	 * Set the Copiers registry.
 	 * 
 	 * @param registry
 	 *            {@link IExtensionRegistry} to listen in order to fill the registry
 	 */
-	private void setUpXMIIDCopierRegistry(final IExtensionRegistry registry) {
-		xmiidCopierRegistryListener = new XMIIDCopierExtensionRegistryListener(PLUGIN_ID, XMI_ID_COPIERS_PPID,
-				getLog());
-		registry.addListener(xmiidCopierRegistryListener, PLUGIN_ID + '.' + XMI_ID_COPIERS_PPID);
-		xmiidCopierRegistryListener.readRegistry(registry);
+	private void setUpCopierRegistry(final IExtensionRegistry registry) {
+		copierRegistryListener = new CopierExtensionRegistryListener(PLUGIN_ID, COPIERS_PPID, getLog());
+		registry.addListener(copierRegistryListener, PLUGIN_ID + '.' + COPIERS_PPID);
+		copierRegistryListener.readRegistry(registry);
 	}
 
 	/*

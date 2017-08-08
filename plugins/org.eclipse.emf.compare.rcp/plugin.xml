@@ -24,7 +24,7 @@
    <extension-point id="conflictsDetector" name="Conflicts Detector" schema="schema/conflictsDetector.exsd"/>
    <extension-point id="reqEngine" name="Requirements Engine" schema="schema/reqEngine.exsd"/>
    <extension-point id="weightProvider" name="Weight Provider" schema="schema/weightProvider.exsd"/>
-   <extension-point id="xmiidCopier" name="XMI ID Copiers" schema="schema/xmiidCopier.exsd"/>
+   <extension-point id="copier" name="EMF Compare Copiers" schema="schema/copier.exsd"/>
    
    <extension point="org.eclipse.emf.ecore.generated_package">
       <package

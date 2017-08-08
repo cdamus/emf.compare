@@ -2,16 +2,16 @@
 <!-- Schema file written by PDE -->
 <schema targetNamespace="org.eclipse.emf.compare.rcp" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appInfo>
-         <meta.schema plugin="org.eclipse.emf.compare.rcp" id="xmiidCopier" name="EMF Compare XMI ID Copiers"/>
-      </appInfo>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.emf.compare.rcp" id="copier" name="EMF Compare Copiers"/>
+      </appinfo>
       <documentation>
          &lt;p&gt;
-Registration of XMI ID copiers for synchronization of XMI IDs of objects copied from one side
-of a comparison to another in a merge operation.
+Registration of copiers for copying of model elements to create merge results and
+propagation of XMI IDs of objects copied from one side of a comparison to another in a merge operation.
 &lt;/p&gt;
 &lt;p&gt;
-Include an optional enablement expression to specify precisely the objects to which the XMI ID copier is applicable.  The default variable of the expression evaluation context is the merged element.  Additional variables include:
+Include an optional enablement expression to specify precisely the objects to which the copier is applicable.  The default variable of the expression evaluation context is the merged element.  Additional variables include:
 &lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;nsURI&lt;/strong&gt; the package namespace URI of the merged element&lt;/li&gt;
@@ -23,13 +23,13 @@ Include an optional enablement expression to specify precisely the objects to wh
 
    <element name="extension">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element />
-         </appInfo>
+         </appinfo>
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="xmiidCopier"/>
+            <element ref="copier"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -50,18 +50,18 @@ Include an optional enablement expression to specify precisely the objects to wh
                <documentation>
                   
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
-   <element name="xmiidCopier">
+   <element name="copier">
       <annotation>
          <documentation>
-            Registration of an XMI ID copier used in the merge operations that copy model elements from one side of a comparison to another.
+            Registration of an EMF Compare copier used in the merge operations that copy model elements from one side of a comparison to another.
          </documentation>
       </annotation>
       <complexType>
@@ -71,11 +71,11 @@ Include an optional enablement expression to specify precisely the objects to wh
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  A class implementing the XMI ID copier
+                  A class implementing the copier
                </documentation>
-               <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.emf.compare.merge.IXMIIDCopier"/>
-               </appInfo>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.emf.compare.merge.ICopier"/>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="ranking" type="string" use="required">
@@ -90,9 +90,9 @@ Include an optional enablement expression to specify precisely the objects to wh
                <documentation>
                   A user-presentable label for the XMI ID copier, such as might be used in the Preferences UI.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="description" type="string">
@@ -100,44 +100,44 @@ Include an optional enablement expression to specify precisely the objects to wh
                <documentation>
                   A user-presentable description of the XMI ID copier, such as might be used in the Preferences UI.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="since"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          3.6.0
       </documentation>
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="examples"/>
-      </appInfo>
+      </appinfo>
       <documentation>
-         From the EMF Compare Façade bundle, to copy the XMI IDs of the model elements underlying
-the copied façade object:
+         From the EMF Compare Façade bundle, to copy façade objects and the XMI IDs of the model elements underlying
+the copied façade objects:
 &lt;pre&gt;
    &lt;extension
-         point=&quot;org.eclipse.emf.compare.rcp.xmiidCopier&quot;&gt;
-      &lt;xmiidCopier
-            class=&quot;org.eclipse.emf.compare.facade.internal.merge.FacadeXMIIDCopier&quot;
+         point=&quot;org.eclipse.emf.compare.rcp.copier&quot;&gt;
+      &lt;copier
+            class=&quot;org.eclipse.emf.compare.facade.internal.merge.FacadeCopier&quot;
             ranking=&quot;1&quot;
-            label=&quot;Façade XMI ID copier&quot;
+            label=&quot;Façade copier&quot;
             description=&quot;Copies the XMI IDs of the model elements underlying a façade object that was copied by a merge operation.&quot;&gt;
          &lt;enablement&gt;
             &lt;instanceof
                   value=&quot;org.eclipse.emf.compare.facade.FacadeObject&quot;&gt;
             &lt;/instanceof&gt;
          &lt;/enablement&gt;
-      &lt;/xmiidCopier&gt;
+      &lt;/copier&gt;
    &lt;/extension&gt;
 &lt;/pre&gt;
       </documentation>
@@ -146,9 +146,9 @@ the copied façade object:
 
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="copyright"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          &lt;copyright&gt;
 Copyright (c) 2017 Christian W. Damus and others.&lt;br/&gt;

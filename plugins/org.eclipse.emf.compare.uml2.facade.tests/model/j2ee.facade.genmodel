@@ -5,7 +5,6 @@
     modelDirectory="/org.eclipse.emf.compare.uml2.facade.tests/src-facade" creationIcons="false"
     editDirectory="/org.eclipse.emf.compare.uml2.facade.tests.edit/src-facade" editorDirectory="/org.eclipse.emf.compare.uml2.facade.tests.editor/src-facade"
     modelPluginID="org.eclipse.emf.compare.uml2.facade.tests" modelName="J2EE" nonNLSMarkers="true"
-    rootExtendsInterface="org.eclipse.emf.compare.facade.FacadeObject" rootExtendsClass="org.eclipse.emf.compare.facade.FacadeObjectImpl"
     codeFormatting="true" testsDirectory="/org.eclipse.emf.compare.uml2.facade.tests.tests/src-facade"
     importerID="org.eclipse.uml2.uml.ecore.importer" complianceLevel="8.0" copyrightFields="false"
     usedGenPackages="../../org.eclipse.uml2.types/model/Types.genmodel#//types" operationReflection="true"

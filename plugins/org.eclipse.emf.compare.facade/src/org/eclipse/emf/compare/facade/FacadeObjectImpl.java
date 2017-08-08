@@ -22,7 +22,8 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
- * This is the {@code FacadeObjectImpl} type. Enjoy.
+ * An implementation of the {@link FacadeObject} protocol that is suitable to use as the root class for EMF
+ * model code generation.
  *
  * @author Christian W. Damus
  */
@@ -66,7 +67,9 @@ public class FacadeObjectImpl extends Container implements FacadeObject {
 	public Resource.Internal eDirectResource() {
 		Resource.Internal result = super.eDirectResource();
 
-		if (result == null) {
+		// Be careful not to return a fake direct resource if the façade is actually
+		// indirectly contained in a resource in the proper way
+		if ((result == null) && (super.eResource() == null)) {
 			EObject underlying = getUnderlyingElement();
 			if (underlying instanceof InternalEObject) {
 				result = ((InternalEObject)underlying).eDirectResource();

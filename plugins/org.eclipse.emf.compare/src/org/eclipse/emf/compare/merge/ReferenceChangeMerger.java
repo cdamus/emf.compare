@@ -439,32 +439,13 @@ public class ReferenceChangeMerger extends AbstractMerger {
 
 		if (needXmiId) {
 			// Copy XMI ID when applicable.
-			IXMIIDCopier idCopier = getXMIIDCopier(diff.getValue());
+			ICopier copier = getCopier(diff.getValue());
 
 			// There's always at least the default ID copier
-			idCopier.copyXMIIDs(diff.getValue(), expectedValue);
+			copier.copyXMIIDs(diff.getValue(), expectedValue);
 		}
 
 		checkImpliedDiffsOrdering(diff, rightToLeft);
-	}
-
-	/**
-	 * Gets the most appropriate XMI ID copier available for an object that was merged, using a
-	 * {@linkplain IXMIIDCopier.Registry registry} provided in the {@linkplain #getMergeOptions() merge
-	 * options}, if any.
-	 * 
-	 * @param originalObject
-	 *            a merged object
-	 * @return the most appropriate XMI ID copier for it (never {@code null})
-	 */
-	protected IXMIIDCopier getXMIIDCopier(EObject originalObject) {
-		IXMIIDCopier.Registry registry = (IXMIIDCopier.Registry)getMergeOptions()
-				.get(IXMIIDCopier.OPTION_XMIID_COPIER_REGISTRY);
-		if (registry == null) {
-			registry = IXMIIDCopier.Registry.INSTANCE;
-		}
-
-		return registry.getXMIIDCopier(originalObject);
 	}
 
 	/**

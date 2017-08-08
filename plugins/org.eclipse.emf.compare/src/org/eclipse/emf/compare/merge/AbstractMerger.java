@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 Obeo and others.
+ * Copyright (c) 2012, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Stefan Dirix - bugs 441172, 452147 and 454579
  *     Alexandra Buzila - Fixes for Bug 446252
  *     Martin Fleck - bug 507177
+ *     Christian W. Damus - integration of façade providers
  *******************************************************************************/
 package org.eclipse.emf.compare.merge;
 
@@ -61,7 +62,6 @@ import org.eclipse.emf.compare.utils.EMFComparePredicates;
 import org.eclipse.emf.compare.utils.ReferenceUtil;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -1156,8 +1156,26 @@ public abstract class AbstractMerger implements IMerger2, IMergeOptionAware, IMe
 		 * We can't simply use EcoreUtil.copy. References will have their own diffs and will thus be merged
 		 * later on.
 		 */
-		final EcoreUtil.Copier copier = new EMFCompareCopier();
-		return copier.copy(referenceObject);
+		return getCopier(referenceObject).copy(referenceObject);
+	}
+
+	/**
+	 * Gets the most appropriate copier available for an object that was merged, using a
+	 * {@linkplain ICopier.Registry registry} provided in the {@linkplain #getMergeOptions() merge options},
+	 * if any.
+	 * 
+	 * @param originalObject
+	 *            a merged object
+	 * @return the most appropriate copier for it (never {@code null})
+	 */
+	protected ICopier getCopier(EObject originalObject) {
+		ICopier.Registry copierRegistry = (ICopier.Registry)getMergeOptions()
+				.get(ICopier.OPTION_COPIER_REGISTRY);
+		if (copierRegistry == null) {
+			copierRegistry = ICopier.Registry.INSTANCE;
+		}
+
+		return copierRegistry.getCopier(originalObject);
 	}
 
 	/**

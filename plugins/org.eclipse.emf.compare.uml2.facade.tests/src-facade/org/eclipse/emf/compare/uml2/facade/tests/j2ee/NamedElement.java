@@ -12,7 +12,7 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests.j2ee;
 
-import org.eclipse.emf.compare.facade.FacadeObject;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * <!-- begin-user-doc -->
@@ -30,10 +30,9 @@ import org.eclipse.emf.compare.facade.FacadeObject;
  *
  * @see org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage#getNamedElement()
  * @model abstract="true"
- * @extends FacadeObject
  * @generated
  */
-public interface NamedElement extends FacadeObject {
+public interface NamedElement extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->

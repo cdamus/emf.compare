@@ -27,17 +27,17 @@ Contributors:
    </extension>
    
    <extension
-         point="org.eclipse.emf.compare.rcp.xmiidCopier">
-      <xmiidCopier
-            class="org.eclipse.emf.compare.facade.internal.merge.FacadeXMIIDCopier"
+         point="org.eclipse.emf.compare.rcp.copier">
+      <copier
+            class="org.eclipse.emf.compare.facade.internal.merge.FacadeCopier"
             ranking="1"
-            label="Façade XMI ID copier"
+            label="Façade copier"
             description="Copies the XMI IDs of the model elements underlying a façade object that was copied by a merge operation.">
          <enablement>
             <instanceof
                   value="org.eclipse.emf.compare.facade.FacadeObject">
             </instanceof>
          </enablement>
-      </xmiidCopier>
+      </copier>
    </extension>
 </plugin>

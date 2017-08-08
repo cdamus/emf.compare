@@ -80,9 +80,9 @@ Contributors:
    </extension>
    
    <extension
-         point="org.eclipse.emf.compare.rcp.xmiidCopier">
-      <xmiidCopier
-            class="org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EEXMIIDCopier"
+         point="org.eclipse.emf.compare.rcp.copier">
+      <copier
+            class="org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EECopier"
             ranking="10">
          <enablement>
             <with
@@ -92,6 +92,6 @@ Contributors:
                </equals>
             </with>
          </enablement>
-      </xmiidCopier>
+      </copier>
    </extension>
 </plugin>

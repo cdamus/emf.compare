@@ -43,7 +43,7 @@ public interface IFacadeProvider {
 	 * @return its façade, or {@code null} if the underlying object does not have a representation in the
 	 *         façade (in which case it is expected to be managed by some other façade object)
 	 */
-	EObject createFacade(EObject underlyingObject);
+	FacadeObject createFacade(EObject underlyingObject);
 
 	/**
 	 * Composes me with another façade provider to which I delegate when I cannot provider a façade for some
@@ -55,7 +55,7 @@ public interface IFacadeProvider {
 	 */
 	default IFacadeProvider compose(IFacadeProvider elseProvider) {
 		return underlyingObject -> {
-			EObject result = this.createFacade(underlyingObject);
+			FacadeObject result = this.createFacade(underlyingObject);
 
 			if (result == null) {
 				result = elseProvider.createFacade(underlyingObject);

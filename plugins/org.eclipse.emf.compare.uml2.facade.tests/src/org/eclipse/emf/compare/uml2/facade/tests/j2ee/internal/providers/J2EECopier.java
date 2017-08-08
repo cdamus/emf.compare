@@ -14,7 +14,7 @@ package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers;
 
 import java.util.stream.Stream;
 
-import org.eclipse.emf.compare.uml2.facade.merge.UMLFacadeXMIIDCopier;
+import org.eclipse.emf.compare.uml2.facade.merge.UMLFacadeCopier;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters.FinderAdapter;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters.HomeInterfaceAdapter;
@@ -23,17 +23,17 @@ import org.eclipse.uml2.uml.Element;
 import org.eclipse.uml2.uml.Interface;
 
 /**
- * XMI ID copier for the J2EE façade that accounts for additional related objects just as the home and finder
+ * Copier for the J2EE façade that accounts for additional related objects just as the home and finder
  * interfaces' usages of their bean classes.
  *
  * @author Christian W. Damus
  */
-public class J2EEXMIIDCopier extends UMLFacadeXMIIDCopier {
+public class J2EECopier extends UMLFacadeCopier {
 
 	/**
 	 * Initializes me.
 	 */
-	public J2EEXMIIDCopier() {
+	public J2EECopier() {
 		super();
 	}
 

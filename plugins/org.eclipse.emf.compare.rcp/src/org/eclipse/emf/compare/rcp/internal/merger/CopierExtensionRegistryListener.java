@@ -23,20 +23,20 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.emf.compare.merge.IXMIIDCopier;
+import org.eclipse.emf.compare.merge.ICopier;
 import org.eclipse.emf.compare.rcp.extension.AbstractRegistryEventListener;
 import org.eclipse.emf.compare.rcp.internal.EMFCompareRCPMessages;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * Listener for changes on the <em>XMI ID Copiers</em> extension point.
+ * Listener for changes on the <em>Copiers</em> extension point.
  * 
  * @author Christian W. Damus
  */
-public class XMIIDCopierExtensionRegistryListener extends AbstractRegistryEventListener {
+public class CopierExtensionRegistryListener extends AbstractRegistryEventListener {
 
-	/** The XMI ID copier XML element name. */
-	private static final String XMIID_COPIER = "xmiidCopier"; //$NON-NLS-1$
+	/** The copier XML element name. */
+	private static final String COPIER = "copier"; //$NON-NLS-1$
 
 	/** The class XML attribute name. */
 	private static final String CLASS = "class"; //$NON-NLS-1$
@@ -54,7 +54,7 @@ public class XMIIDCopierExtensionRegistryListener extends AbstractRegistryEventL
 	private final ILog log;
 
 	/** Descriptors registered on the extension point. */
-	private final Map<String, IXMIIDCopier.Descriptor> descriptors = Maps.newConcurrentMap();
+	private final Map<String, ICopier.Descriptor> descriptors = Maps.newConcurrentMap();
 
 	/**
 	 * Initializes me.
@@ -66,7 +66,7 @@ public class XMIIDCopierExtensionRegistryListener extends AbstractRegistryEventL
 	 * @param log
 	 *            a log in which to report problems with the extensions
 	 */
-	public XMIIDCopierExtensionRegistryListener(String pluginID, String extensionPointID, ILog log) {
+	public CopierExtensionRegistryListener(String pluginID, String extensionPointID, ILog log) {
 		super(pluginID, extensionPointID, log);
 
 		this.log = log;
@@ -81,7 +81,7 @@ public class XMIIDCopierExtensionRegistryListener extends AbstractRegistryEventL
 	protected boolean validateExtensionElement(IConfigurationElement element) {
 		boolean result;
 
-		if (XMIID_COPIER.equals(element.getName())) {
+		if (COPIER.equals(element.getName())) {
 			if (element.getAttribute(CLASS) == null) {
 				logMissingAttribute(element, CLASS);
 				result = false;
@@ -113,20 +113,20 @@ public class XMIIDCopierExtensionRegistryListener extends AbstractRegistryEventL
 	 */
 	@Override
 	protected boolean addedValid(IConfigurationElement element) {
-		if (element.getName().equals(XMIID_COPIER)) {
+		if (element.getName().equals(COPIER)) {
 			String className = element.getAttribute(CLASS);
 			int ranking = Integer.parseInt(element.getAttribute(RANKING));
 
-			IXMIIDCopier.Descriptor newDescriptor = new DescriptorImpl(element, ranking);
+			ICopier.Descriptor newDescriptor = new DescriptorImpl(element, ranking);
 
-			IXMIIDCopier.Descriptor oldDescriptor = descriptors.put(className, newDescriptor);
+			ICopier.Descriptor oldDescriptor = descriptors.put(className, newDescriptor);
 			if (oldDescriptor != null) {
-				IXMIIDCopier.Registry.INSTANCE.remove(oldDescriptor);
+				ICopier.Registry.INSTANCE.remove(oldDescriptor);
 				log(IStatus.WARNING, element,
 						EMFCompareRCPMessages.getString("duplicate.extension", className)); //$NON-NLS-1$
 			}
 
-			IXMIIDCopier.Registry.INSTANCE.add(newDescriptor);
+			ICopier.Registry.INSTANCE.add(newDescriptor);
 		}
 
 		return true;
@@ -137,12 +137,12 @@ public class XMIIDCopierExtensionRegistryListener extends AbstractRegistryEventL
 	 */
 	@Override
 	protected boolean removedValid(IConfigurationElement element) {
-		if (element.getName().equals(XMIID_COPIER)) {
+		if (element.getName().equals(COPIER)) {
 			// We can trust the validation step
 			String className = element.getAttribute(CLASS);
-			IXMIIDCopier.Descriptor oldDescriptor = descriptors.remove(className);
+			ICopier.Descriptor oldDescriptor = descriptors.remove(className);
 			if (oldDescriptor != null) {
-				IXMIIDCopier.Registry.INSTANCE.remove(oldDescriptor);
+				ICopier.Registry.INSTANCE.remove(oldDescriptor);
 			}
 		}
 
@@ -158,7 +158,7 @@ public class XMIIDCopierExtensionRegistryListener extends AbstractRegistryEventL
 	 *
 	 * @author Christian W. Damus
 	 */
-	private class DescriptorImpl implements IXMIIDCopier.Descriptor {
+	private class DescriptorImpl implements ICopier.Descriptor {
 		/** The extension element. */
 		private final IConfigurationElement config;
 
@@ -169,7 +169,7 @@ public class XMIIDCopierExtensionRegistryListener extends AbstractRegistryEventL
 		private Expression enablement;
 
 		/** The XMI ID copier, once it has been created. */
-		private IXMIIDCopier copierInstance;
+		private ICopier copierInstance;
 
 		/**
 		 * Initializes me.
@@ -246,16 +246,16 @@ public class XMIIDCopierExtensionRegistryListener extends AbstractRegistryEventL
 		/**
 		 * {@inheritDoc}
 		 */
-		public IXMIIDCopier getXMIIDCopier() {
+		public ICopier getCopier() {
 			if (copierInstance == null) {
 				try {
-					copierInstance = (IXMIIDCopier)config.createExecutableExtension(CLASS);
+					copierInstance = (ICopier)config.createExecutableExtension(CLASS);
 				} catch (CoreException e) {
 					log.log(e.getStatus());
-					copierInstance = IXMIIDCopier.DEFAULT;
+					copierInstance = ICopier.DEFAULT;
 				} catch (ClassCastException e) {
-					log(config, "XMI ID copier extension does not implement IXMIIDCopier interface", e); //$NON-NLS-1$
-					copierInstance = IXMIIDCopier.DEFAULT;
+					log(config, "Compare/merge copier extension does not implement ICopier interface", e); //$NON-NLS-1$
+					copierInstance = ICopier.DEFAULT;
 				}
 			}
 

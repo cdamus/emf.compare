@@ -13,6 +13,8 @@
 package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers;
 
 import org.eclipse.emf.common.notify.Notifier;
+import org.eclipse.emf.compare.facade.FacadeObject;
+import org.eclipse.emf.compare.facade.FacadeProxy;
 import org.eclipse.emf.compare.facade.IFacadeProvider;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters.J2EEFacadeFactory;
 import org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.J2EEProfilePackage;
@@ -38,8 +40,8 @@ public class J2EEFacadeProvider implements IFacadeProvider {
 	/**
 	 * {@inheritDoc}
 	 */
-	public EObject createFacade(EObject underlyingObject) {
-		return facadeFactory.doSwitch(underlyingObject);
+	public FacadeObject createFacade(EObject underlyingObject) {
+		return FacadeProxy.createProxy(facadeFactory.doSwitch(underlyingObject));
 	}
 
 	//

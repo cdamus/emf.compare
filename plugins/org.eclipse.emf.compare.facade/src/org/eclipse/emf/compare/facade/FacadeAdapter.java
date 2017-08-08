@@ -755,6 +755,17 @@ public class FacadeAdapter implements Adapter.Internal {
 	}
 
 	/**
+	 * Obtains the existing facade adapter attached to a {@code notifier}.
+	 * 
+	 * @param notifier
+	 *            an object, either a facade or an underlying model element
+	 * @return the existing adapter instance, or {@code null} if none
+	 */
+	public static FacadeAdapter getInstance(Notifier notifier) {
+		return get(notifier, FacadeAdapter.class);
+	}
+
+	/**
 	 * Obtains the existing facade adapter of the given {@code type} attached to a {@code notifier}.
 	 * 
 	 * @param notifier
