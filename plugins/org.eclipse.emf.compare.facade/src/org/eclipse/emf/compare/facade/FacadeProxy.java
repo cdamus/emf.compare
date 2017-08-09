@@ -289,6 +289,9 @@ public final class FacadeProxy {
 					case "getFacadeAdapter": //$NON-NLS-1$
 						result = FacadeAdapter.get(object, FacadeAdapter.class);
 						break;
+					case "eResource": //$NON-NLS-1$
+						result = eResource(object);
+						break;
 					default:
 						throw new NoSuchMethodError(method.toString());
 				}

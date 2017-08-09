@@ -26,6 +26,7 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.compare.facade.FacadeObject;
 import org.eclipse.emf.compare.facade.internal.merge.FacadeCopier;
+import org.eclipse.emf.compare.utils.ReflectiveDispatch;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.uml2.uml.Element;
@@ -138,27 +139,59 @@ public class UMLFacadeCopier extends FacadeCopier {
 	 *            the copy façade's underlying UML element
 	 * @return pairs of related elements
 	 */
+	@SuppressWarnings("resource") // The entire point is to return the stream
 	protected Stream<Pair> getRelatedElements(EObject original, Element originalUML, EObject copy,
 			Element copyUML) {
 
-		return Stream.empty();
+		// Note that we don't have to worry about this calling ourselves in an endless loop
+		// because
+		// 1. the ReflectiveDispatch utility only invokes public methods, and
+		// 2. if the subclass declares this same signature as a public override then we
+		// won't be running this code anyways
+		@SuppressWarnings("unchecked")
+		Stream<Pair> result = (Stream<Pair>)ReflectiveDispatch.safeInvoke(this, "getRelatedElements", //$NON-NLS-1$
+				original, originalUML, copy, copyUML);
+
+		if (result == null) {
+			// Usually because the subclass does not define an applicable method signature
+			result = Stream.empty();
+		}
+
+		return result;
 	}
 
 	/**
-	 * Creates a pair.
+	 * Creates a pair. If the {@code copy} is {@code null}, then the {@code original} is enqueued for a
+	 * deferred XMI ID copy when the copy eventually is created indirectly by further merging of features of
+	 * the façade corresponding to the {@code original}. If the {@code original} is {@code null}, then there
+	 * is not nor ever will be any need to copy XMI IDs, so in this case nothing is posted for deferred
+	 * processing.
 	 * 
 	 * @param original
 	 *            the original
 	 * @param copy
 	 *            the copy
-	 * @return the pair
+	 * @return the pair, or {@code null} if either of the proposed pair is {@code null}
 	 */
 	protected final Pair pair(EObject original, EObject copy) {
+		if (original == null) {
+			return null;
+		}
+
+		if (copy == null) {
+			deferXMIIDCopy(original);
+			return null;
+		}
+
 		return new Pair(original, copy);
 	}
 
 	/**
-	 * Optionally creates a pair.
+	 * Optionally creates a pair. If the {@code copy} is {@linkplain Optional#isPresent() absent}, then the
+	 * {@code original} is enqueued for a deferred XMI ID copy when the copy eventually is created indirectly
+	 * by further merging of features of the façade corresponding to the {@code original}. If the
+	 * {@code original} is absent, then there is not nor ever will be any need to copy XMI IDs, so in this
+	 * case nothing is posted for deferred processing.
 	 * 
 	 * @param original
 	 *            an optional original

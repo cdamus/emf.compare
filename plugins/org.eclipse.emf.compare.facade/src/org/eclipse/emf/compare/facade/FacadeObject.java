@@ -13,6 +13,8 @@
 package org.eclipse.emf.compare.facade;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -37,4 +39,25 @@ public interface FacadeObject extends EObject {
 	default FacadeAdapter getFacadeAdapter() {
 		return (FacadeAdapter)EcoreUtil.getExistingAdapter(this, FacadeObject.class);
 	}
+
+	/**
+	 * <p>
+	 * Obtains the resource in which the receiver is contained (directly or indirectly) or, if it is not in a
+	 * resourcesas is commonly expected with façades, the resource in which its
+	 * {@linkplain #getUnderlyingElement() underlying element} is contained. This ensures that the EMF Compare
+	 * framework can trace the façade object to the appropriate resource in the comparison input for the
+	 * purposes of grouping by resource and other resource-based calculations.
+	 * </p>
+	 * <p>
+	 * Similar delegation to the underlying model is expected for implementation of the
+	 * {@link InternalEObject#eDirectResource()} API. In this case it is even more important because this is
+	 * used throughout the EMF Compare framework to determine whether an object is logically the root of a
+	 * resource.
+	 * </p>
+	 * 
+	 * @return the receiver's own actual containing resource or else the resource containing its
+	 *         {@linkplain #getUnderlyingElement() underlying element}
+	 * @see #getUnderlyingElement()
+	 */
+	Resource eResource();
 }
