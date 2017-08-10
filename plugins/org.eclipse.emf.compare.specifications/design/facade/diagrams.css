@@ -1,0 +1,31 @@
+* {
+	fontName: "Source Sans Pro";
+	fontHeight: 12pt;
+}
+
+.foreign {
+	fillColor: lightgrey;
+	gradient: white vertical;
+	qualifiedNameDepth: 3;
+}
+
+Shape[type=Text] {
+	fontName: "Source Sans Pro";
+	fontHeight: 12pt;
+}
+
+Comment.plainText {
+	transparency: 100;
+	fillColor: white;
+	displayBorder: false;
+	shapeStyle: none;
+}
+
+Component Port {
+	/* Visibility, type, derivation, and modifiers are not applicable to these. */
+	maskLabel: name multiplicity;
+}
+
+Component[appliedStereotypes~=TestComponent], Component[appliedStereotypes~=TestComponent] * {
+	fillColor: #e1973f;
+}

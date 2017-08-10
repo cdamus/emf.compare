@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:standard="http://www.eclipse.org/uml2/5.0.0/UML/Profile/Standard" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmlns:utp="http://www.omg.org/spec/UTP/20120801/utp.xmi">
+  <uml:Model xmi:id="_5NqDAHxrEee0ioDwg-czug" name="facade">
+    <packagedElement xmi:type="uml:Package" xmi:id="_BzzZcHxsEee0ioDwg-czug" name="Use Cases">
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_HGYtYHxsEee0ioDwg-czug" name="UC1 Define façade"/>
+      <packagedElement xmi:type="uml:Actor" xmi:id="_eESMgHxsEee0ioDwg-czug" name="Developer"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_gc_JQHxsEee0ioDwg-czug" name="UC2 Compare DSL model">
+        <extensionPoint xmi:type="uml:ExtensionPoint" xmi:id="_0ib0kHxsEee0ioDwg-czug" name="ExtensionPoint1"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_xhCgIHxsEee0ioDwg-czug" name="UC 2.1 Compare model without façade">
+        <extend xmi:type="uml:Extend" xmi:id="_0iamcHxsEee0ioDwg-czug" extendedCase="_gc_JQHxsEee0ioDwg-czug" extensionLocation="_0ib0kHxsEee0ioDwg-czug"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Actor" xmi:id="_11wdoHxsEee0ioDwg-czug" name="User"/>
+      <packagedElement xmi:type="uml:Association" xmi:id="_3T858HxsEee0ioDwg-czug" memberEnd="_3T_9QHxsEee0ioDwg-czug _3T_9QXxsEee0ioDwg-czug">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3T-vIHxsEee0ioDwg-czug" source="org.eclipse.papyrus">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3T-vIXxsEee0ioDwg-czug" key="nature" value="UML_Nature"/>
+        </eAnnotations>
+        <ownedEnd xmi:type="uml:Property" xmi:id="_3T_9QHxsEee0ioDwg-czug" name="developer" type="_eESMgHxsEee0ioDwg-czug" association="_3T858HxsEee0ioDwg-czug"/>
+        <ownedEnd xmi:type="uml:Property" xmi:id="_3T_9QXxsEee0ioDwg-czug" name="uc1 define façade" type="_HGYtYHxsEee0ioDwg-czug" association="_3T858HxsEee0ioDwg-czug"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="_bMoQoHxxEee0ioDwg-czug" memberEnd="_bMo3snxxEee0ioDwg-czug _bMo3s3xxEee0ioDwg-czug">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bMo3sHxxEee0ioDwg-czug" source="org.eclipse.papyrus">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bMo3sXxxEee0ioDwg-czug" key="nature" value="UML_Nature"/>
+        </eAnnotations>
+        <ownedEnd xmi:type="uml:Property" xmi:id="_bMo3snxxEee0ioDwg-czug" name="user" type="_11wdoHxsEee0ioDwg-czug" association="_bMoQoHxxEee0ioDwg-czug"/>
+        <ownedEnd xmi:type="uml:Property" xmi:id="_bMo3s3xxEee0ioDwg-czug" name="uc2 compare dsl model" type="_gc_JQHxsEee0ioDwg-czug" association="_bMoQoHxxEee0ioDwg-czug"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Association" xmi:id="_b7vZYHxxEee0ioDwg-czug" memberEnd="_b7wAcHxxEee0ioDwg-czug _b7wAcXxxEee0ioDwg-czug">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_b7vZYXxxEee0ioDwg-czug" source="org.eclipse.papyrus">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_b7vZYnxxEee0ioDwg-czug" key="nature" value="UML_Nature"/>
+        </eAnnotations>
+        <ownedEnd xmi:type="uml:Property" xmi:id="_b7wAcHxxEee0ioDwg-czug" name="user" type="_11wdoHxsEee0ioDwg-czug" association="_b7vZYHxxEee0ioDwg-czug"/>
+        <ownedEnd xmi:type="uml:Property" xmi:id="_b7wAcXxxEee0ioDwg-czug" name="uc 2.1 compare model without façade" type="_xhCgIHxsEee0ioDwg-czug" association="_b7vZYHxxEee0ioDwg-czug"/>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_7s420HxxEee0ioDwg-czug" name="Logical">
+      <packagedElement xmi:type="uml:Collaboration" xmi:id="_Fs2f4HxyEee0ioDwg-czug" name="Define Façade"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Realization" xmi:id="_TNI1EHxyEee0ioDwg-czug" client="_Fs2f4HxyEee0ioDwg-czug" supplier="_HGYtYHxsEee0ioDwg-czug"/>
+    <packagedElement xmi:type="uml:Package" xmi:id="_il02UHxyEee0ioDwg-czug" name="Design">
+      <packagedElement xmi:type="uml:Component" xmi:id="_kY9n4HxyEee0ioDwg-czug" name="oeec.facade">
+        <ownedAttribute xmi:type="uml:Port" xmi:id="_654ZoHx-Eee6BItyZCN4VA" name="facadeProvider" type="_IvWUoHx_Eee6BItyZCN4VA" aggregation="composite">
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_S6-bIHx_Eee6BItyZCN4VA"/>
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_S7Fv4Hx_Eee6BItyZCN4VA" value="*"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Port" xmi:id="_0xHi0H0GEee6BItyZCN4VA" name="facadeCopier" type="_F9CcQH0HEee6BItyZCN4VA" aggregation="composite"/>
+        <ownedAttribute xmi:type="uml:Port" xmi:id="_qk-d8H0REee6BItyZCN4VA" name="facadeMatchEngine" type="_mMKqoH0REee6BItyZCN4VA" aggregation="composite"/>
+        <nestedClassifier xmi:type="uml:Class" xmi:id="_IvWUoHx_Eee6BItyZCN4VA" name="FacadeProviderPortType" visibility="private"/>
+        <packagedElement xmi:type="uml:Package" xmi:id="_CxWioHxzEee0ioDwg-czug" name="oeec.facade">
+          <packagedElement xmi:type="uml:Interface" xmi:id="_I2WyAHxzEee0ioDwg-czug" name="FacadeObject">
+            <generalization xmi:type="uml:Generalization" xmi:id="_QPUHIHx0Eee0ioDwg-czug" general="_VTUhoXx2Eee0ioDwg-czug"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Class" xmi:id="_hcQ7UHx0Eee0ioDwg-czug" name="FacadeAdapter">
+            <ownedAttribute xmi:type="uml:Property" xmi:id="_r2tPAHx2Eee0ioDwg-czug" name="underlyingObject" type="_VTUhoXx2Eee0ioDwg-czug" association="_r2sA4Hx2Eee0ioDwg-czug">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_r2udIHx2Eee0ioDwg-czug" value="1"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_r2xgcHx2Eee0ioDwg-czug" value="1"/>
+            </ownedAttribute>
+            <ownedAttribute xmi:type="uml:Property" xmi:id="_5knwg3x2Eee0ioDwg-czug" name="facade" type="_VTUhoXx2Eee0ioDwg-czug" subsettedProperty="_ieuL8Hx2Eee0ioDwg-czug" association="_5knwgHx2Eee0ioDwg-czug">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_5koXkHx2Eee0ioDwg-czug" value="1"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_5koXkXx2Eee0ioDwg-czug" value="1"/>
+            </ownedAttribute>
+            <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_4RVOkHx0Eee0ioDwg-czug" client="_hcQ7UHx0Eee0ioDwg-czug" supplier="_0yz5QHx0Eee0ioDwg-czug" contract="_0yz5QHx0Eee0ioDwg-czug"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Interface" xmi:id="_3OxI4Hx1Eee0ioDwg-czug" name="IFacadeProvider"/>
+          <packagedElement xmi:type="uml:Class" xmi:id="_47iMsHx1Eee0ioDwg-czug" name="FacadeProxy">
+            <ownedAttribute xmi:type="uml:Property" xmi:id="__ni4EHx9Eee6BItyZCN4VA" name="facade" type="_VTUhoXx2Eee0ioDwg-czug" association="__nf0wHx9Eee6BItyZCN4VA">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="__njfIHx9Eee6BItyZCN4VA" value="1"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="__njfIXx9Eee6BItyZCN4VA" value="1"/>
+            </ownedAttribute>
+            <ownedAttribute xmi:type="uml:Property" xmi:id="_J5b-onx-Eee6BItyZCN4VA" name="proxy" type="_I2WyAHxzEee0ioDwg-czug" association="_J5bXkHx-Eee6BItyZCN4VA">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_J5clsHx-Eee6BItyZCN4VA" value="1"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_J5clsXx-Eee6BItyZCN4VA" value="1"/>
+            </ownedAttribute>
+            <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_IeHFkHx9Eee6BItyZCN4VA" client="_47iMsHx1Eee0ioDwg-czug" supplier="_0yz5QHx0Eee0ioDwg-czug" contract="_0yz5QHx0Eee0ioDwg-czug"/>
+            <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_wGvcoHx9Eee6BItyZCN4VA" client="_47iMsHx1Eee0ioDwg-czug" supplier="_NUpWsHx9Eee6BItyZCN4VA" contract="_NUpWsHx9Eee6BItyZCN4VA"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Association" xmi:id="_iesWwHx2Eee0ioDwg-czug" memberEnd="_ies90nx2Eee0ioDwg-czug _ieuL8Hx2Eee0ioDwg-czug">
+            <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ies90Hx2Eee0ioDwg-czug" source="org.eclipse.papyrus">
+              <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ies90Xx2Eee0ioDwg-czug" key="nature" value="UML_Nature"/>
+            </eAnnotations>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Association" xmi:id="_r2sA4Hx2Eee0ioDwg-czug" memberEnd="_r2tPAHx2Eee0ioDwg-czug _r2z8sHx2Eee0ioDwg-czug">
+            <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_r2sn8Hx2Eee0ioDwg-czug" source="org.eclipse.papyrus">
+              <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r2sn8Xx2Eee0ioDwg-czug" key="nature" value="UML_Nature"/>
+            </eAnnotations>
+            <ownedEnd xmi:type="uml:Property" xmi:id="_r2z8sHx2Eee0ioDwg-czug" name="underlyingAdapter" type="_hcQ7UHx0Eee0ioDwg-czug" association="_r2sA4Hx2Eee0ioDwg-czug">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_vrfvQHx2Eee0ioDwg-czug"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_vrjZoHx2Eee0ioDwg-czug" value="1"/>
+            </ownedEnd>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Association" xmi:id="_5knwgHx2Eee0ioDwg-czug" memberEnd="_5knwg3x2Eee0ioDwg-czug _5koXknx2Eee0ioDwg-czug">
+            <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_5knwgXx2Eee0ioDwg-czug" source="org.eclipse.papyrus">
+              <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5knwgnx2Eee0ioDwg-czug" key="nature" value="UML_Nature"/>
+            </eAnnotations>
+            <ownedEnd xmi:type="uml:Property" xmi:id="_5koXknx2Eee0ioDwg-czug" name="facadeAdapter" type="_hcQ7UHx0Eee0ioDwg-czug" subsettedProperty="_ies90nx2Eee0ioDwg-czug" association="_5knwgHx2Eee0ioDwg-czug">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_pNcfAHx8Eee6BItyZCN4VA"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_pNlB4Hx8Eee6BItyZCN4VA" value="1"/>
+            </ownedEnd>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Usage" xmi:id="_58IC0Hx8Eee6BItyZCN4VA" client="_3OxI4Hx1Eee0ioDwg-czug" supplier="_I2WyAHxzEee0ioDwg-czug"/>
+          <packagedElement xmi:type="uml:Association" xmi:id="__nf0wHx9Eee6BItyZCN4VA" memberEnd="__ni4EHx9Eee6BItyZCN4VA __nkGMHx9Eee6BItyZCN4VA">
+            <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__nhp8Hx9Eee6BItyZCN4VA" source="org.eclipse.papyrus">
+              <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__nhp8Xx9Eee6BItyZCN4VA" key="nature" value="UML_Nature"/>
+            </eAnnotations>
+            <ownedEnd xmi:type="uml:Property" xmi:id="__nkGMHx9Eee6BItyZCN4VA" name="facadeProxy" type="_47iMsHx1Eee0ioDwg-czug" association="__nf0wHx9Eee6BItyZCN4VA">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_GHG8gHx-Eee6BItyZCN4VA"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_GHIxsHx-Eee6BItyZCN4VA" value="1"/>
+            </ownedEnd>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Association" xmi:id="_J5bXkHx-Eee6BItyZCN4VA" memberEnd="_J5b-onx-Eee6BItyZCN4VA _J5clsnx-Eee6BItyZCN4VA">
+            <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_J5b-oHx-Eee6BItyZCN4VA" source="org.eclipse.papyrus">
+              <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_J5b-oXx-Eee6BItyZCN4VA" key="nature" value="UML_Nature"/>
+            </eAnnotations>
+            <ownedEnd xmi:type="uml:Property" xmi:id="_J5clsnx-Eee6BItyZCN4VA" name="facadeProxy" type="_47iMsHx1Eee0ioDwg-czug" association="_J5bXkHx-Eee6BItyZCN4VA">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_Lya5gHx-Eee6BItyZCN4VA"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_LycusHx-Eee6BItyZCN4VA" value="1"/>
+            </ownedEnd>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Package" xmi:id="_kcxJkH0REee6BItyZCN4VA" name="oeec.facade.internal.match">
+            <packagedElement xmi:type="uml:Class" xmi:id="_mMKqoH0REee6BItyZCN4VA" name="FacadeMatchEngine">
+              <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_oyrZ4H0REee6BItyZCN4VA" client="_mMKqoH0REee6BItyZCN4VA" supplier="_DePTAH0REee6BItyZCN4VA" contract="_DePTAH0REee6BItyZCN4VA"/>
+            </packagedElement>
+          </packagedElement>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Usage" xmi:id="_aU52EHx_Eee6BItyZCN4VA" client="_IvWUoHx_Eee6BItyZCN4VA" supplier="_3OxI4Hx1Eee0ioDwg-czug"/>
+        <packagedElement xmi:type="uml:Package" xmi:id="_RuJIQH0GEee6BItyZCN4VA" name="oeec.facade.internal.merge">
+          <packagedElement xmi:type="uml:Class" xmi:id="_UOMqMH0GEee6BItyZCN4VA" name="FacadeMerger">
+            <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_Z2UJQH0GEee6BItyZCN4VA" client="_UOMqMH0GEee6BItyZCN4VA" supplier="_A9frAH0FEee6BItyZCN4VA" contract="_A9frAH0FEee6BItyZCN4VA"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Class" xmi:id="_F9CcQH0HEee6BItyZCN4VA" name="FacadeCopier">
+            <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_JB24IH0HEee6BItyZCN4VA" client="_F9CcQH0HEee6BItyZCN4VA" supplier="_ABWL0H0FEee6BItyZCN4VA" contract="_ABWL0H0FEee6BItyZCN4VA"/>
+          </packagedElement>
+        </packagedElement>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Component" xmi:id="_66qTMHxyEee0ioDwg-czug" name="oeec.uml2.facade">
+        <ownedAttribute xmi:type="uml:Port" xmi:id="_qnsmUH0HEee6BItyZCN4VA" name="umlFacadeCopier" type="_l0ShsH0HEee6BItyZCN4VA" aggregation="composite"/>
+        <packagedElement xmi:type="uml:Package" xmi:id="_jMsNUH0HEee6BItyZCN4VA" name="oeec.uml2.facade.merge">
+          <packagedElement xmi:type="uml:Class" xmi:id="_l0ShsH0HEee6BItyZCN4VA" name="UMLFacadeCopier">
+            <generalization xmi:type="uml:Generalization" xmi:id="_ppNk0H0HEee6BItyZCN4VA" general="_F9CcQH0HEee6BItyZCN4VA"/>
+          </packagedElement>
+        </packagedElement>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Component" xmi:id="_lPbq8Hx0Eee0ioDwg-czug" name="java">
+        <packagedElement xmi:type="uml:Package" xmi:id="_p3urwHx0Eee0ioDwg-czug" name="java.lang.proxy">
+          <packagedElement xmi:type="uml:Interface" xmi:id="_NUpWsHx9Eee6BItyZCN4VA" name="InvocationHandler"/>
+        </packagedElement>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Component" xmi:id="_rr8bYHx0Eee0ioDwg-czug" name="EMF">
+        <packagedElement xmi:type="uml:Package" xmi:id="_rr8bYXx0Eee0ioDwg-czug" name="org.eclipse.emf.common.notify">
+          <packagedElement xmi:type="uml:Interface" xmi:id="_0yz5QHx0Eee0ioDwg-czug" name="Adapter">
+            <ownedAttribute xmi:type="uml:Property" xmi:id="_ieuL8Hx2Eee0ioDwg-czug" name="target" type="_GUApsHx2Eee0ioDwg-czug" association="_iesWwHx2Eee0ioDwg-czug">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_okAIIHx2Eee0ioDwg-czug"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_okEZkHx2Eee0ioDwg-czug" value="1"/>
+            </ownedAttribute>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Interface" xmi:id="_GUApsHx2Eee0ioDwg-czug" name="Notifier">
+            <ownedAttribute xmi:type="uml:Property" xmi:id="_ies90nx2Eee0ioDwg-czug" name="eAdapter" type="_0yz5QHx0Eee0ioDwg-czug" association="_iesWwHx2Eee0ioDwg-czug">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_m5zQIHx2Eee0ioDwg-czug"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_m55WwHx2Eee0ioDwg-czug" value="*"/>
+            </ownedAttribute>
+          </packagedElement>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Package" xmi:id="_VTUhoHx2Eee0ioDwg-czug" name="org.eclipse.emf.ecore">
+          <packagedElement xmi:type="uml:Interface" xmi:id="_VTUhoXx2Eee0ioDwg-czug" name="EObject">
+            <generalization xmi:type="uml:Generalization" xmi:id="_fDQxsHx2Eee0ioDwg-czug" general="_GUApsHx2Eee0ioDwg-czug"/>
+          </packagedElement>
+        </packagedElement>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Component" xmi:id="_203qoH0DEee6BItyZCN4VA" name="org.eclipse.emf.compare">
+        <ownedAttribute xmi:type="uml:Port" xmi:id="_9MWKEH0DEee6BItyZCN4VA" name="copier" visibility="public" type="_Rrfu0H0EEee6BItyZCN4VA" aggregation="composite">
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_B2OfQH0EEee6BItyZCN4VA"/>
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_B2T-0H0EEee6BItyZCN4VA" value="*"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Port" xmi:id="_GNGjcH0FEee6BItyZCN4VA" name="merger" visibility="public" type="_U7VScH0FEee6BItyZCN4VA" aggregation="composite">
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_IAM4wH0FEee6BItyZCN4VA"/>
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_IATmcH0FEee6BItyZCN4VA" value="*"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Port" xmi:id="_wu6tIH0QEee6BItyZCN4VA" name="matchEngine" type="_7SwfUH0QEee6BItyZCN4VA" aggregation="composite">
+          <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_zpdysH0QEee6BItyZCN4VA"/>
+          <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_zpjSQH0QEee6BItyZCN4VA" value="*"/>
+        </ownedAttribute>
+        <nestedClassifier xmi:type="uml:Class" xmi:id="_Rrfu0H0EEee6BItyZCN4VA" name="CopierPortType" visibility="private"/>
+        <nestedClassifier xmi:type="uml:Class" xmi:id="_U7VScH0FEee6BItyZCN4VA" name="MergerPortType" visibility="private"/>
+        <nestedClassifier xmi:type="uml:Class" xmi:id="_7SwfUH0QEee6BItyZCN4VA" name="MatcherPortType" visibility="private"/>
+        <packagedElement xmi:type="uml:Package" xmi:id="_6vIrUH0EEee6BItyZCN4VA" name="oeec.merge">
+          <packagedElement xmi:type="uml:Interface" xmi:id="_ABWL0H0FEee6BItyZCN4VA" name="ICopier"/>
+          <packagedElement xmi:type="uml:Interface" xmi:id="_A9frAH0FEee6BItyZCN4VA" name="IMerger"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Usage" xmi:id="_X3b3MH0FEee6BItyZCN4VA" client="_Rrfu0H0EEee6BItyZCN4VA" supplier="_ABWL0H0FEee6BItyZCN4VA"/>
+        <packagedElement xmi:type="uml:Usage" xmi:id="_b02vAH0FEee6BItyZCN4VA" client="_U7VScH0FEee6BItyZCN4VA" supplier="_A9frAH0FEee6BItyZCN4VA"/>
+        <packagedElement xmi:type="uml:Package" xmi:id="_AjsNcH0REee6BItyZCN4VA" name="oeec.match">
+          <packagedElement xmi:type="uml:Interface" xmi:id="_DePTAH0REee6BItyZCN4VA" name="IMatchEngine"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Usage" xmi:id="_L6RrMH0REee6BItyZCN4VA" client="_7SwfUH0QEee6BItyZCN4VA" supplier="_DePTAH0REee6BItyZCN4VA"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Component" xmi:id="_2oHEMH0HEee6BItyZCN4VA" name="oeec.uml2.facade.tests">
+        <ownedAttribute xmi:type="uml:Port" xmi:id="_w0NrkH0KEee6BItyZCN4VA" name="j2eeFacadeProvider" type="_H1ZvQH0LEee6BItyZCN4VA" aggregation="composite"/>
+        <ownedAttribute xmi:type="uml:Port" xmi:id="_ZdDicH0LEee6BItyZCN4VA" name="j2eeCopier" type="_GEz7YH0LEee6BItyZCN4VA" aggregation="composite"/>
+        <packagedElement xmi:type="uml:Package" xmi:id="_C8SrQH0LEee6BItyZCN4VA" name="oeec.uml2.facade.tests.j2ee.providers">
+          <packagedElement xmi:type="uml:Class" xmi:id="_GEz7YH0LEee6BItyZCN4VA" name="J2EECopier">
+            <generalization xmi:type="uml:Generalization" xmi:id="_LgLX4H0LEee6BItyZCN4VA" general="_l0ShsH0HEee6BItyZCN4VA"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Class" xmi:id="_H1ZvQH0LEee6BItyZCN4VA" name="J2EEFacadeProvider">
+            <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_Td9GwH0LEee6BItyZCN4VA" client="_H1ZvQH0LEee6BItyZCN4VA" supplier="_3OxI4Hx1Eee0ioDwg-czug" contract="_3OxI4Hx1Eee0ioDwg-czug"/>
+          </packagedElement>
+        </packagedElement>
+      </packagedElement>
+    </packagedElement>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_5cyEIHxrEee0ioDwg-czug">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_5c1HcHxrEee0ioDwg-czug" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/uml2/5.0.0/UML/Profile/Standard#/"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://UML_PROFILES/Standard.profile.uml#_0"/>
+    </profileApplication>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="__GvdYH0HEee6BItyZCN4VA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__Gx5oH0HEee6BItyZCN4VA" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="http://www.omg.org/spec/UTP/20120801/utp.xmi#/"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://UTP/utp.profile.uml#_iCl4wOVMEeG84fBOY39c0g"/>
+    </profileApplication>
+  </uml:Model>
+  <standard:Utility xmi:id="_8FauwHx1Eee0ioDwg-czug" base_Class="_47iMsHx1Eee0ioDwg-czug"/>
+  <standard:Create xmi:id="_73MBUHx8Eee6BItyZCN4VA" base_Usage="_58IC0Hx8Eee6BItyZCN4VA"/>
+  <utp:TestComponent xmi:id="_AtfYwH0IEee6BItyZCN4VA" base_Class="_2oHEMH0HEee6BItyZCN4VA"/>
+</xmi:XMI>
