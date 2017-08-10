@@ -25,6 +25,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.emf.common.EMFPlugin;
 import org.eclipse.emf.common.notify.Notifier;
@@ -46,6 +47,9 @@ import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.util.J2EEResource;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.util.J2EEResourceFactoryImpl;
 import org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.J2EEProfilePackage;
+import org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.OpaqexprPackage;
+import org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.util.OpaqexprResource;
+import org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.util.OpaqexprResourceFactoryImpl;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLTest;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -79,9 +83,11 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 		if (!EMFPlugin.IS_ECLIPSE_RUNNING) {
 			EPackage.Registry.INSTANCE.put(J2EEPackage.eNS_URI, J2EEPackage.eINSTANCE);
 			EPackage.Registry.INSTANCE.put(J2EEProfilePackage.eNS_URI, J2EEProfilePackage.eINSTANCE);
+			EPackage.Registry.INSTANCE.put(OpaqexprPackage.eNS_URI, OpaqexprPackage.eINSTANCE);
 
-			Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put(J2EEResource.FILE_EXTENSION,
-					new J2EEResourceFactoryImpl());
+			Map<String, Object> factories = Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap();
+			factories.put(J2EEResource.FILE_EXTENSION, new J2EEResourceFactoryImpl());
+			factories.put(OpaqexprResource.FILE_EXTENSION, new OpaqexprResourceFactoryImpl());
 
 			UMLPlugin.getEPackageNsURIToProfileLocationMap().put(J2EEProfilePackage.eNS_URI,
 					URI.createURI("pathmap://UML2_FACADE_TESTS/j2ee.profile.uml#_0"));
@@ -133,8 +139,11 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 
 			UMLPlugin.getEPackageNsURIToProfileLocationMap().remove(J2EEProfilePackage.eNS_URI);
 
-			Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().remove(J2EEResource.FILE_EXTENSION);
+			Map<String, Object> factories = Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap();
+			factories.remove(J2EEResource.FILE_EXTENSION);
+			factories.remove(OpaqexprResource.FILE_EXTENSION);
 
+			EPackage.Registry.INSTANCE.remove(OpaqexprPackage.eNS_URI);
 			EPackage.Registry.INSTANCE.remove(J2EEProfilePackage.eNS_URI);
 			EPackage.Registry.INSTANCE.remove(J2EEPackage.eNS_URI);
 		}

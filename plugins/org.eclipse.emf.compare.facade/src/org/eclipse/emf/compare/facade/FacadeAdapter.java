@@ -24,9 +24,11 @@ import com.google.common.cache.LoadingCache;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.ObjIntConsumer;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
@@ -201,6 +203,135 @@ public class FacadeAdapter implements Adapter.Internal {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Synchronizes a feature according to the details of the given {@code notification}.
+	 * 
+	 * @param from
+	 *            the source of the {@code notification}
+	 * @param to
+	 *            the object to which the change is to be synchronized
+	 * @param notification
+	 *            the description of the change to be synchronized
+	 * @param valueType
+	 *            the type of value in the feature to be synchronized
+	 * @param onValueAdded
+	 *            handler for a value added to the feature, or {@code null} if not needed
+	 * @param onValueRemoved
+	 *            handler for a value removed from the feature, or {@code null} if not needed
+	 * @param <E>
+	 *            the type of value in the feature
+	 */
+	protected <E> void syncFeature(EObject from, EObject to, Notification notification, Class<E> valueType,
+			FeatureHandler<? super E> onValueAdded, FeatureHandler<? super E> onValueRemoved) {
+
+		switch (notification.getEventType()) {
+			case Notification.ADD:
+				E singleAdded = valueType.cast(notification.getNewValue());
+				onValueAdded.handleFeatureValue(from, to, singleAdded, notification.getPosition());
+				break;
+			case Notification.ADD_MANY:
+				Iterator<?> manyAdded = ((Collection<?>)notification.getNewValue()).iterator();
+				for (int i = notification.getPosition(); manyAdded.hasNext(); i++) {
+					E next = valueType.cast(manyAdded.next());
+					onValueAdded.handleFeatureValue(from, to, next, i);
+				}
+				break;
+			case Notification.REMOVE:
+				E singleRemoved = valueType.cast(notification.getOldValue());
+				onValueRemoved.handleFeatureValue(from, to, singleRemoved, notification.getPosition());
+				break;
+			case Notification.REMOVE_MANY:
+				Iterator<?> manyRemoved = ((Collection<?>)notification.getOldValue()).iterator();
+				int[] oldPositions = (int[])notification.getNewValue();
+				for (int i = 0; manyRemoved.hasNext(); i++) {
+					E next = valueType.cast(manyRemoved.next());
+					int index;
+					if (oldPositions == null) {
+						index = Notification.NO_INDEX; // As in clear of the list
+					} else {
+						index = oldPositions[i];
+					}
+					onValueRemoved.handleFeatureValue(from, to, next, index);
+				}
+				break;
+			case Notification.SET:
+			case Notification.UNSET:
+			case Notification.RESOLVE:
+				E oldValue = valueType.cast(notification.getOldValue());
+				if (oldValue != null) {
+					onValueRemoved.handleFeatureValue(from, to, oldValue, notification.getPosition());
+				}
+				E newValue = valueType.cast(notification.getNewValue());
+				if (newValue != null) {
+					onValueAdded.handleFeatureValue(from, to, newValue, notification.getPosition());
+				}
+				break;
+			case Notification.MOVE:
+				E movedValue = valueType.cast(notification.getNewValue());
+				// Cannot use getOldIntValue() because that is for int-valued features
+				int oldPosition = ((Integer)notification.getOldValue()).intValue();
+				onValueRemoved.handleFeatureValue(from, to, movedValue, oldPosition);
+				onValueAdded.handleFeatureValue(from, to, movedValue, notification.getPosition());
+				break;
+			default:
+				// Pass
+				break;
+		}
+	}
+
+	/**
+	 * Synchronizes a feature according to the details of the given {@code notification}.
+	 * 
+	 * @param from
+	 *            the source of the {@code notification}
+	 * @param to
+	 *            the object to which the change is to be synchronized
+	 * @param notification
+	 *            the description of the change to be synchronized
+	 * @param valueType
+	 *            the type of value in the feature to be synchronized
+	 * @param onValueAdded
+	 *            handler for a value added to the feature, or {@code null} if not needed
+	 * @param onValueRemoved
+	 *            handler for a value removed from the feature, or {@code null} if not needed
+	 * @param <E>
+	 *            the type of value in the feature
+	 */
+	protected <E> void syncFeature(EObject from, EObject to, Notification notification, Class<E> valueType,
+			ObjIntConsumer<? super E> onValueAdded, ObjIntConsumer<? super E> onValueRemoved) {
+
+		FeatureHandler<? super E> addedHandler;
+		if (onValueAdded != null) {
+			addedHandler = (fromIgnored, toIgnored, value, position) -> onValueAdded.accept(value, position);
+		} else {
+			addedHandler = FeatureHandler.PASS;
+		}
+
+		FeatureHandler<? super E> removedHandler;
+		if (onValueRemoved != null) {
+			removedHandler = (fromIgnored, toIgnored, value, position) -> onValueRemoved.accept(value,
+					position);
+		} else {
+			removedHandler = FeatureHandler.PASS;
+		}
+
+		syncFeature(from, to, notification, valueType, addedHandler, removedHandler);
+	}
+
+	/**
+	 * Useful method to reference as a no-op handler for the
+	 * {@link #handleNotification(Notification, Class, ObjIntConsumer, ObjIntConsumer)} API.
+	 * 
+	 * @param value
+	 *            ignored
+	 * @param position
+	 *            ignored
+	 * @see #handleNotification(Notification, Class, ObjIntConsumer, ObjIntConsumer)
+	 */
+	protected final void pass(Object value, int position) {
+		// Pass
 	}
 
 	/**
@@ -815,6 +946,22 @@ public class FacadeAdapter implements Adapter.Internal {
 		// Pass
 	}
 
+	/**
+	 * A no-op.
+	 * 
+	 * @param from
+	 *            ignored
+	 * @param to
+	 *            ignored
+	 * @param value
+	 *            ignored
+	 * @param position
+	 *            ignored
+	 */
+	private static void featureHandlerNoop(EObject from, EObject to, Object value, int position) {
+		// Pass
+	}
+
 	//
 	// Nested types
 	//
@@ -851,7 +998,7 @@ public class FacadeAdapter implements Adapter.Internal {
 		 * 
 		 * @param next
 		 *            a synchronizer to chain
-		 * @return the chained synchronizer. myself and then the {@code next}
+		 * @return the chained synchronizer, myself and then the {@code next}
 		 */
 		default Synchronizer andThen(Synchronizer next) {
 			return (adapter, from, to, msg) -> {
@@ -976,5 +1123,48 @@ public class FacadeAdapter implements Adapter.Internal {
 		}
 		// CHECKSTYLE:ON
 
+	}
+
+	/**
+	 * Protocol for call-backs that handle addition or removal of an object in a feature being synchronized.
+	 *
+	 * @param <E>
+	 *            the type of value(s) in the feature
+	 * @author Christian W. Damus
+	 */
+	@FunctionalInterface
+	public interface FeatureHandler<E> {
+		/** A no-op handler, doing nothing. */
+		FeatureHandler<Object> PASS = FacadeAdapter::featureHandlerNoop;
+
+		/**
+		 * Handles addition or removal of a {@code value} at some {@code position} in the feature.
+		 * 
+		 * @param from
+		 *            an object, in the underlying model or the façade, that has changed
+		 * @param to
+		 *            the counterpart of the changed object, in the façade or the underlying model,
+		 *            respectively
+		 * @param value
+		 *            the value that was added to or removed from the feature
+		 * @param position
+		 *            the position of the change in the feature, or {@link Notification#NO_INDEX} if the
+		 *            change has no position (scalar feature or list cleared)
+		 */
+		void handleFeatureValue(EObject from, EObject to, E value, int position);
+
+		/**
+		 * Chains another feature handler to be invoked after me with the same arguments.
+		 * 
+		 * @param next
+		 *            a handler to chain
+		 * @return the chained handler, myself and then the {@code next}
+		 */
+		default FeatureHandler<E> andThen(FeatureHandler<? super E> next) {
+			return (from, to, value, position) -> {
+				handleFeatureValue(from, to, value, position);
+				next.handleFeatureValue(from, to, value, position);
+			};
+		}
 	}
 }

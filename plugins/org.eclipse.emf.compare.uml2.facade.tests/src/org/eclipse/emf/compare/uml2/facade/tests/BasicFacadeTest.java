@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.eclipse.emf.compare.facade.FacadeAdapter;
 import org.eclipse.emf.compare.uml2.facade.tests.data.BasicFacadeInputData;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.BeanKind;
@@ -50,7 +51,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * This is the {@code BasicFacadeTest} type. Enjoy.
+ * Basic tests of the simple use cases of the {@link FacadeAdapter} framework.
  *
  * @author Christian W. Damus
  */

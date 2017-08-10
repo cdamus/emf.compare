@@ -73,3 +73,14 @@ in which
 * the base model has a class with an attribute of some primitive type
 * the left model changes the attribute's type to some other primitive type
 * the right model changes that attribute's type to some third type
+
+## Partial Façade Use Cases
+
+These are a suite of use cases for a partial façade, covering only the opaque expressions
+of the UML metamodel.
+
+### Use case o1
+
+Two-way comparison of a very simple model containing an opaque expression:
+
+* the left side adds a matched (language, body) pair to the opaque expression from the right side

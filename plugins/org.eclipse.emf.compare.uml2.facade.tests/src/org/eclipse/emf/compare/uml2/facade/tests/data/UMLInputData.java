@@ -12,12 +12,16 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests.data;
 
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.uml2.uml.UMLPackage;
+
 /**
  * This is the {@code UMLInputData} type. Enjoy.
  *
  * @author Christian W. Damus
  */
-@Input({"a1", "m1", "m2", "u1" }) // Generate resource accessors
+@Input({"a1", "m1", "m2", "o1", "u1" }) // Generate resource accessors
 public class UMLInputData extends UMLInputDataGen {
 
 	/**
@@ -25,6 +29,18 @@ public class UMLInputData extends UMLInputDataGen {
 	 */
 	public UMLInputData() {
 		super();
+	}
+
+	/**
+	 * Obtains the UML package contained in a {@code resource}.
+	 * 
+	 * @param resource
+	 *            a resource
+	 * @return its UML package, or {@code null} if none
+	 */
+	public org.eclipse.uml2.uml.Package getPackage(Resource resource) {
+		return (org.eclipse.uml2.uml.Package)EcoreUtil.getObjectByType(resource.getContents(),
+				UMLPackage.Literals.PACKAGE);
 	}
 
 }
