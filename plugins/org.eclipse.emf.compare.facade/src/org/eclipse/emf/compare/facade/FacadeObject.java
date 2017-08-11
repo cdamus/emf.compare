@@ -13,6 +13,7 @@
 package org.eclipse.emf.compare.facade;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -23,6 +24,20 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Christian W. Damus
  */
 public interface FacadeObject extends EObject {
+
+	/**
+	 * <p>
+	 * A literal null façade object, to be returned by a {@linkplain IFacadeProvider provider} that needs to
+	 * assert that an object is in its domain but is not represented directly by a façade object. This
+	 * prevents other façade providers from getting a chance to provide a façade for the object or even
+	 * provide it as is.
+	 * </p>
+	 * <p>
+	 * <strong>Note</strong> that this object is not a proper façade object: it has no adapter nor underlying
+	 * object, so attempts to interact with it must account for this.
+	 * </p>
+	 */
+	FacadeObject NULL = FacadeProxy.createProxy(EcoreFactory.eINSTANCE.createEObject());
 
 	/**
 	 * Obtains the model element underlying this façade, with which it is synchronized.

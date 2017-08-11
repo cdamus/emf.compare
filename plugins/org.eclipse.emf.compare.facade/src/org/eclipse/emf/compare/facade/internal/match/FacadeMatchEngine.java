@@ -22,7 +22,10 @@ import org.eclipse.emf.compare.match.DefaultEqualityHelperFactory;
 import org.eclipse.emf.compare.match.DefaultMatchEngine;
 import org.eclipse.emf.compare.match.IComparisonFactory;
 import org.eclipse.emf.compare.match.IMatchEngine;
+import org.eclipse.emf.compare.match.eobject.CachingDistance;
+import org.eclipse.emf.compare.match.eobject.EditionDistance;
 import org.eclipse.emf.compare.match.eobject.IEObjectMatcher;
+import org.eclipse.emf.compare.match.eobject.ProximityEObjectMatcher;
 import org.eclipse.emf.compare.match.eobject.WeightProvider;
 import org.eclipse.emf.compare.match.eobject.WeightProviderDescriptorRegistryImpl;
 import org.eclipse.emf.compare.match.resource.IResourceMatcher;
@@ -78,6 +81,42 @@ public class FacadeMatchEngine extends DefaultMatchEngine {
 		super(eObjectMatcher, resourceMatcher, comparisonFactory);
 
 		this.facadeProviderRegistry = facadeProviderRegistry;
+	}
+
+	/**
+	 * Creates and configures an {@link IEObjectMatcher} with the strategy given by {@code useIDs}.
+	 * 
+	 * @param useIDs
+	 *            strategy for whether and when to rely on IDs for matching
+	 * @param weightProviderRegistry
+	 *            registry of {@link WeightProvider}s to use in case of structural matching
+	 * @return a new IEObjectMatcher.
+	 */
+	public static IEObjectMatcher createDefaultEObjectMatcher(UseIdentifiers useIDs,
+			WeightProvider.Descriptor.Registry weightProviderRegistry) {
+
+		IEObjectMatcher result;
+		EditionDistance editionDistance = new EditionDistance(weightProviderRegistry);
+		CachingDistance cachedDistance = new CachingDistance(editionDistance);
+
+		switch (useIDs) {
+			case NEVER:
+				result = new ProximityEObjectMatcher(cachedDistance);
+				break;
+			case ONLY:
+				result = new FacadeIdentifierEObjectMatcher();
+				break;
+			case WHEN_AVAILABLE:
+				// fall through to default
+			default:
+				// Use an ID matcher, delegating to proximity when no ID is available
+				IEObjectMatcher contentMatcher = new ProximityEObjectMatcher(cachedDistance);
+				result = new FacadeIdentifierEObjectMatcher(contentMatcher);
+				break;
+
+		}
+
+		return result;
 	}
 
 	/**

@@ -43,11 +43,13 @@ public interface IFacadeProvider {
 	 * @return its façade, or {@code null} if the underlying object does not have a representation in the
 	 *         façade (in which case it is expected to be managed by some other façade object)
 	 */
-	FacadeObject createFacade(EObject underlyingObject);
+	EObject createFacade(EObject underlyingObject);
 
 	/**
 	 * Composes me with another façade provider to which I delegate when I cannot provider a façade for some
-	 * underlying object.
+	 * underlying object. <strong>Note</strong> that if any provider in such a composite chain returns the
+	 * {@linkplain FacadeObject#NULL null façade}, then that is taken as the result and subsequent providers
+	 * in the chain are not consulted for a façade.
 	 * 
 	 * @param elseProvider
 	 *            the provider to delegate to when I provide no façade
@@ -55,7 +57,7 @@ public interface IFacadeProvider {
 	 */
 	default IFacadeProvider compose(IFacadeProvider elseProvider) {
 		return underlyingObject -> {
-			FacadeObject result = this.createFacade(underlyingObject);
+			EObject result = this.createFacade(underlyingObject);
 
 			if (result == null) {
 				result = elseProvider.createFacade(underlyingObject);
@@ -340,12 +342,17 @@ public interface IFacadeProvider {
 			 * Obtains a factory that creates a façade provider suitable for the given comparison
 			 * {@code scope}, which is a ranked delegation chain over
 			 * {@linkplain #getFacadeProviderFactories(IComparisonScope) all applicable providers}.
+			 * <strong>Note</strong> that the delegation chain always stops at the first non-{@code null}
+			 * façade that is provided, so a provider can assert ownership over an object and force it to be
+			 * ommitted from the comparison (because it is indirectly covered by some other façade) by
+			 * returning the {@linkplain FacadeObject#NULL null façade}.
 			 * 
 			 * @param scope
 			 *            a comparison scope
 			 * @return the factory, never {@code null} but possibly the
 			 *         {@linkplain IFacadeProvider.Factory#NULL_FACTORY null factory}
 			 * @see #getFacadeProviderFactories(IComparisonScope)
+			 * @see IFacadeProvider#compose(IFacadeProvider)
 			 */
 			default IFacadeProvider.Factory getFacadeProviderFactory(IComparisonScope scope) {
 				return getFacadeProviderFactories(scope).stream() //

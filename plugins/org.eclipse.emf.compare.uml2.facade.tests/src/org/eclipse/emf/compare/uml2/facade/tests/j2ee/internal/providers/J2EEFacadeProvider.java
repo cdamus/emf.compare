@@ -12,6 +12,10 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers;
 
+import com.google.common.collect.Sets;
+
+import java.util.Set;
+
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.compare.facade.FacadeObject;
 import org.eclipse.emf.compare.facade.FacadeProxy;
@@ -21,6 +25,8 @@ import org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.J2EEProfilePackage;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.uml2.uml.Element;
+import org.eclipse.uml2.uml.util.UMLUtil;
 
 /**
  * The façade provider for J2EE in UML.
@@ -29,6 +35,9 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
  */
 public class J2EEFacadeProvider implements IFacadeProvider {
 	private final J2EEFacadeFactory facadeFactory = new J2EEFacadeFactory();
+
+	/** J2EE packages encountered by this façade provider. */
+	private final Set<org.eclipse.uml2.uml.Package> j2eePackages = Sets.newHashSet();
 
 	/**
 	 * Initializes me.
@@ -40,8 +49,53 @@ public class J2EEFacadeProvider implements IFacadeProvider {
 	/**
 	 * {@inheritDoc}
 	 */
-	public FacadeObject createFacade(EObject underlyingObject) {
-		return FacadeProxy.createProxy(facadeFactory.doSwitch(underlyingObject));
+	public EObject createFacade(EObject underlyingObject) {
+		EObject result = FacadeProxy.createProxy(facadeFactory.doSwitch(underlyingObject));
+
+		// If the object is an application of a J2EE stereotype, it is in our domain
+		// but has no façade of its own. So, block other providers
+		if ((result == null) && isStereotypeApplicationInJ2EEPackage(underlyingObject)) {
+			result = FacadeObject.NULL;
+		} else if (underlyingObject instanceof org.eclipse.uml2.uml.Package) {
+			// It's a J2EE package
+			j2eePackages.add((org.eclipse.uml2.uml.Package)underlyingObject);
+		}
+
+		return result;
+	}
+
+	protected boolean isStereotypeApplicationInJ2EEPackage(EObject object) {
+		// Easy case when it is a J2EE stereotype application
+		boolean result = (object.eClass().getEPackage() == J2EEProfilePackage.eINSTANCE);
+
+		if (!result && !(object instanceof Element)) {
+			Element base = UMLUtil.getBaseElement(object);
+			result = (base != null) && isInJ2EEPackage(base);
+		}
+
+		return result;
+	}
+
+	protected boolean isInJ2EEPackage(Element element) {
+		org.eclipse.uml2.uml.Package package_ = element.getNearestPackage();
+
+		return (package_ != null) && isJ2EEPackage(package_);
+	}
+
+	protected boolean isJ2EEPackage(org.eclipse.uml2.uml.Package package_) {
+		boolean result = j2eePackages.contains(package_);
+
+		if (!result) {
+			// Maybe a containing package is. Be careful to account for Components
+			// in the containment tree
+			Element owner = package_.getOwner();
+			if (owner != null) {
+				org.eclipse.uml2.uml.Package nesting = owner.getNearestPackage();
+				result = isJ2EEPackage(nesting) && j2eePackages.add(package_); // Cache result
+			}
+		}
+
+		return result;
 	}
 
 	//
@@ -76,8 +130,7 @@ public class J2EEFacadeProvider implements IFacadeProvider {
 
 		protected boolean isJ2EEPackage(EObject object) {
 			return (object instanceof org.eclipse.uml2.uml.Package)
-					&& ((org.eclipse.uml2.uml.Package)object).getAllAppliedProfiles().stream()
-							.anyMatch(p -> J2EEProfilePackage.eNS_URI.equals(p.getURI()));
+					&& J2EEFacadeFactory.isJ2EEPackage((org.eclipse.uml2.uml.Package)object);
 		}
 	}
 }

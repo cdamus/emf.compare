@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Obeo.
+ * Copyright (c) 2012, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *     Eike Stepper - (390845) Make the URIInitializingIterator a little more extensible
+ *     Christian W. Damus - integration of façade providers
  *******************************************************************************/
 package org.eclipse.emf.compare.scope;
 
@@ -21,6 +22,8 @@ import com.google.common.collect.Iterators;
 import java.util.Iterator;
 
 import org.eclipse.emf.common.notify.Notifier;
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.compare.utils.TreeIterators;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -98,15 +101,16 @@ public class FilterComparisonScope extends AbstractComparisonScope {
 	 */
 	public Iterator<? extends EObject> getCoveredEObjects(Resource resource) {
 		if (resource == null) {
-			return emptyIterator();
+			return TreeIterators.emptyIterator();
 		}
 
-		final Iterator<EObject> properContent = EcoreUtil.getAllProperContents(resource, false);
-		final Iterator<EObject> filter = Iterators.filter(properContent, resourceContentFilter);
+		final TreeIterator<EObject> properContent = EcoreUtil.getAllProperContents(resource, false);
+		final TreeIterator<EObject> filter = TreeIterators.filter(properContent, resourceContentFilter);
 
-		final Iterator<EObject> uriInitializingIt = new URIInitializingIterator<EObject>(resource, filter);
+		final TreeIterator<EObject> uriInitializingIt = new URIInitializingIterator<EObject>(resource,
+				filter);
 
-		return Iterators.unmodifiableIterator(uriInitializingIt);
+		return uriInitializingIt; // Filtering iterators already are unmodifiable
 	}
 
 	/**
@@ -123,12 +127,12 @@ public class FilterComparisonScope extends AbstractComparisonScope {
 			return emptyIterator();
 		}
 
-		final Iterator<EObject> properContent = EcoreUtil.getAllProperContents(eObject, false);
-		final Iterator<EObject> filter = Iterators.filter(properContent, eObjectContentFilter);
+		final TreeIterator<EObject> properContent = EcoreUtil.getAllProperContents(eObject, false);
+		final TreeIterator<EObject> filter = TreeIterators.filter(properContent, eObjectContentFilter);
 
-		final Iterator<EObject> uriInitializingIt = new URIInitializingIterator<EObject>(eObject, filter);
+		final TreeIterator<EObject> uriInitializingIt = new URIInitializingIterator<EObject>(eObject, filter);
 
-		return Iterators.unmodifiableIterator(uriInitializingIt);
+		return uriInitializingIt; // Filtering iterators already are unmodifiable
 	}
 
 	/**
@@ -216,7 +220,7 @@ public class FilterComparisonScope extends AbstractComparisonScope {
 	 * @param <T>
 	 *            The kind of object to iterate on.
 	 */
-	private class URIInitializingIterator<T> extends ForwardingIterator<T> {
+	private class URIInitializingIterator<T> extends ForwardingIterator<T> implements TreeIterator<T> {
 
 		/** The origin iterator. */
 		private Iterator<T> delegate;
@@ -277,6 +281,16 @@ public class FilterComparisonScope extends AbstractComparisonScope {
 			T obj = super.next();
 			addUri(obj);
 			return obj;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public void prune() {
+			// If the delegate isn't a tree iterator, then there's no subtree to prune anyways
+			if (delegate instanceof TreeIterator<?>) {
+				((TreeIterator<?>)delegate).prune();
+			}
 		}
 	}
 }

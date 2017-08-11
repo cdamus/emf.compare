@@ -17,6 +17,7 @@ import org.eclipse.emf.compare.uml2.facade.UMLFacadeAdapter;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEFactory;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.NamedElement;
+import org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.J2EEProfilePackage;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Interface;
@@ -52,8 +53,10 @@ public class J2EEFacadeFactory extends UMLSwitch<EObject> {
 
 		PackageAdapter adapter = PackageAdapter.get(package_);
 		if (adapter == null) {
-			result = J2EEFactory.eINSTANCE.createPackage();
-			PackageAdapter.connect(result, package_).initialSync(SyncDirectionKind.TO_FACADE);
+			if (isJ2EEPackage(package_)) {
+				result = J2EEFactory.eINSTANCE.createPackage();
+				PackageAdapter.connect(result, package_).initialSync(SyncDirectionKind.TO_FACADE);
+			}
 		} else {
 			result = adapter.getFacade();
 		}
@@ -127,6 +130,19 @@ public class J2EEFacadeFactory extends UMLSwitch<EObject> {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Queries whether a package is a J2EE package.
+	 * 
+	 * @param package_
+	 *            an UML package
+	 * @return {@code true} if the package has the J2EE profile applied (directly or to a containing package);
+	 *         {@code false}, otherwise
+	 */
+	public static boolean isJ2EEPackage(org.eclipse.uml2.uml.Package package_) {
+		return package_.getAllAppliedProfiles().stream()
+				.anyMatch(p -> J2EEProfilePackage.eNS_URI.equals(p.getURI()));
 	}
 
 	/**
