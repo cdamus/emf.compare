@@ -55,7 +55,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * This is the {@code BasicFacadeTest} type. Enjoy.
+ * Basic façade-based comparison scenarios with the J2EE façade.
  *
  * @author Christian W. Damus
  */

@@ -22,6 +22,7 @@ Export-Package: org.eclipse.emf.compare.uml2.facade.tests,
  org.eclipse.emf.compare.uml2.facade.tests.opaqexpr,
  org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.internal.adapters;x-internal:=true,
  org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.internal.impl;x-internal:=true,
+ org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.internal.providers;x-internal:=true,
  org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.util,
  org.eclipse.emf.compare.uml2.facade.tests.suite
 Require-Bundle: org.eclipse.core.runtime,

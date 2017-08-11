@@ -68,7 +68,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Test cases for comparison based on pluggable façade model providers.
+ * Test cases for comparison based on pluggable façade model providers with the J2EE façade.
  *
  * @author Christian W. Damus
  */

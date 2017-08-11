@@ -69,32 +69,6 @@ Contributors:
       </mapping>
    </extension>
    
-   <extension
-         point="org.eclipse.emf.compare.facade.facadeProvider">
-      <facadeProviderFactory
-            class="org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EEFacadeProvider$Factory"
-            ranking="10"
-            label="J2EE Profile for UML"
-            description="Facade model for J2EE models in UML with the J2EE Profile">
-      </facadeProviderFactory>
-   </extension>
-   
-   <extension
-         point="org.eclipse.emf.compare.rcp.copier">
-      <copier
-            class="org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EECopier"
-            ranking="10">
-         <enablement>
-            <with
-                  variable="nsURI">
-               <equals
-                     value="http://www.eclipse.org/emf-compare/2017/test/j2ee">
-               </equals>
-            </with>
-         </enablement>
-      </copier>
-   </extension>
-   
    <extension point="org.eclipse.emf.ecore.generated_package">
       <!-- @generated opaqexpr.facade -->
       <package
@@ -121,5 +95,37 @@ Contributors:
             <parameter name="kind" value="xmi"/>
          </describer>
       </content-type>
+   </extension>
+   
+   <extension
+         point="org.eclipse.emf.compare.facade.facadeProvider">
+      <facadeProviderFactory
+            class="org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EEFacadeProvider$Factory"
+            ranking="10"
+            label="J2EE Profile for UML"
+            description="Facade model for J2EE models in UML with the J2EE Profile">
+      </facadeProviderFactory>
+      <facadeProviderFactory
+            class="org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.internal.providers.OpaqexprFacadeProvider$Factory"
+            ranking="1"
+            label="Opaque Expressions in UML"
+            description="Facade model for opaque expressions in UML">
+      </facadeProviderFactory>
+   </extension>
+   
+   <extension
+         point="org.eclipse.emf.compare.rcp.copier">
+      <copier
+            class="org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EECopier"
+            ranking="10">
+         <enablement>
+            <with
+                  variable="nsURI">
+               <equals
+                     value="http://www.eclipse.org/emf-compare/2017/test/j2ee">
+               </equals>
+            </with>
+         </enablement>
+      </copier>
    </extension>
 </plugin>
