@@ -2,8 +2,8 @@
 Title: Façade-based Compare/Merge  
 Author: Christian W. Damus  
 Affiliation: Eclipse.org  
-Version: 1.0  
-Date: 9 August, 2017  
+Version: 1.1  
+Date: 11 August, 2017  
 Copyright: Copyright © 2017 Christian W. Damus and others.  
            All rights reserved.  
            This program and the accompanying materials  
@@ -107,9 +107,14 @@ a few OSGi bundles as shown in the diagram below:
   for façade-model synchronization
 * `org.eclipse.emf.compare.uml2.facade` — extends the core façade copier for UML
   semantics.  Likewise the core façade-model synchronization framework
-* `org.eclipse.emf.compare.uml2.facade.tests` — provides J2EE Profile for UML and a
-  J2EE Ecore model as a façade, with concrete façade provider and copier for J2EE,
-  used in the definition of all of the UML façade test cases
+* `org.eclipse.emf.compare.uml2.facade.tests` — provides two façade customizations:
+    + a J2EE Profile for UML with a J2EE Ecore model as a façade, with concrete façade
+      provider and copier for J2EE, used in the definition of many of the UML façade test
+      cases
+    + a partial façade for *opaque expressions* in UML, implementing a façade for the
+      `OpaqueExpression` metaclass with a single property that is a list of `BodyEntry`
+      elements that are integrated (language,&nbsp;body) pairs where the UML metamodel
+      has them as parallel sequences with a one-to-one correspondence
 
 ![Façade-related Components](Fa_ade_Bundles.SVG)
 
@@ -286,6 +291,8 @@ descending ranking order until one provides a façade.
 
 #### Package oecc.facade.internal.match [facadematcher]
 
+![Facade Match Engine and Supporting Classes](Fa_ade_Match_Phase.SVG)
+
 The `FacadeMatchEngine` class is the primary hook for injection of façades into a
 compare/merge operation.  It wraps the default match engine and, for the incoming
 `ComparisonScope`:
@@ -297,25 +304,57 @@ compare/merge operation.  It wraps the default match engine and, for the incomin
 	  be no façades anyways
     
 The `FacadeComparisonScope` is where façades are actually injected into the matching
-process (and from thence to the rest of the compare/merge operation):
+process (and from thence to the rest of the compare/merge operation).  This is a wrapper
+for a scope delegate (usually the `DefaultComparisonScope` that provides, with some
+filtering, the raw contents of the models to be compared.  Further to this, the
+`FacadeComparisonScope` applies transformations to inject façades:
 
 * for resource sets, there is no such thing as a "façade resource", so it just discovers
   resources as per the wrapped scope
-* for the children of an `EObject`, it is assumed that the input is already a façade if
-  it needs to be, so this also is just forwarded to the wrapped scope
 * for resources, if no façade provider provides façades for its contents, then it is
   just forwarded to the wrapped scope.  Otherwise, the available façade providers are
   used to get façades for the contents of the resource.  Any contained object for which
   there is no façade is ignored on the assumption that it is just related to some object
   that does have a façade.  For partial façades, then, it is required that the provider
   return the original input objects as though they were façades when necessary.  The
-  façades thus computed are then extrapolated to their proper content trees in the
-  usual way
+  façades thus computed are then extrapolated to their proper content trees as per the
+  next item.
+* for `EObject`s, the proper content tree is iterated (and filtered by the scope delegate)
+  and transformed where possible to façade objects.  If a façade is obtained for some
+  object in the tree, then that façade is further descended to fill out the tree.
+  Otherwise, the raw model object is retained as is and the matching process descends
+  into that
   
 Because the façade providers found for a given comparison scope are composed in rank
 order, it is normal and expected that multiple different façades could be found within
 a single resource, possibly even mixed with original (non-façade) content.  This extends
 also to mixing of façades and original content amongst disparate resources in the scope.
+This leads to a problem for objects that should not be presented to the matching process
+because they are implicitly covered by façades even though they do not, themselves, map
+to any façade object.  Such is the case for UML stereotype applications, for example,
+that distinguish the domain-specific concepts that are modeled by the façade and
+implemented by the extended "base" element.  So, the façade provider for the domain needs
+to be able to return an explicit null façade token that indicates to the match engine
+that there is no object to match, without the next provider in line getting a chance to
+provide a façade for it.  This token is the `FacadeObject::NULL` instance.
+
+Another problem for the matching process is that it is typically based on object identity.
+This works well for UML models created with the Eclipse UML2 implementation because that
+uses unique generated XMI IDs.  However, these XMI IDs are tracked by resources and the
+façade objects are not properly contained in resources.  Moreover, they pretend to the
+EMF Compare framework that they are in the original input resources to provide
+traceability to resources for grouping and dependency analysis.  To ensure a sensible
+identifier-based matching of façade objects, then, the `FacadeMatchEngine` employs a
+specialized `IEObjectMatcher`, the `FacadeIdentifierEObjectMatcher`, which for any façade 
+object that doesn't have its own identifier infers one from the underlying model element
+according to the usual algorithm.  In the case that this object matcher falls back on
+structural comparison for matching when the underlying model does not use IDs, that
+structural algorithm works the same on façades as it does on anything else because the
+façades fully support the Ecore reflection that it requires.
+
+In addition to this, the `FacadeIdentifierEObjectMatcher` infers containment for façades
+that don't have any also from the underlying model, to ensure that they are integrated
+at the correct point in the match tree and do not end up as top-level matches.
 
 #### Package oecc.facade.internal.merge [facadecopier]
 

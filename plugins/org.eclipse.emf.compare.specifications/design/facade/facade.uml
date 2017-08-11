@@ -131,6 +131,41 @@
             <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_JB24IH0HEee6BItyZCN4VA" client="_F9CcQH0HEee6BItyZCN4VA" supplier="_ABWL0H0FEee6BItyZCN4VA" contract="_ABWL0H0FEee6BItyZCN4VA"/>
           </packagedElement>
         </packagedElement>
+        <packagedElement xmi:type="uml:Package" xmi:id="_dafCkH7SEeerMdvhkXACcg" name="oeec.facade.internal.match">
+          <packagedElement xmi:type="uml:Class" xmi:id="_hMn3cH7SEeerMdvhkXACcg" name="FacadeMatchEngine">
+            <generalization xmi:type="uml:Generalization" xmi:id="_VJi1MH7UEeerMdvhkXACcg" general="_8UXEUH7TEeerMdvhkXACcg"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Class" xmi:id="_iu14IH7SEeerMdvhkXACcg" name="FacadeIdentifierEObjectMatcher">
+            <generalization xmi:type="uml:Generalization" xmi:id="_eQCVEH7TEeerMdvhkXACcg" general="_9fGOkH7SEeerMdvhkXACcg"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Class" xmi:id="_knrpEH7SEeerMdvhkXACcg" name="FacadeComparisonScope">
+            <ownedAttribute xmi:type="uml:Property" xmi:id="_aQpR4n7UEeerMdvhkXACcg" name="delegate" type="_r77SwH7SEeerMdvhkXACcg" association="_aQoDwH7UEeerMdvhkXACcg">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_aQpR437UEeerMdvhkXACcg" value="1"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_aQp48H7UEeerMdvhkXACcg" value="1"/>
+            </ownedAttribute>
+            <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_j53rYH7TEeerMdvhkXACcg" client="_knrpEH7SEeerMdvhkXACcg" supplier="_r77SwH7SEeerMdvhkXACcg" contract="_r77SwH7SEeerMdvhkXACcg"/>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Association" xmi:id="_CVsUoH7UEeerMdvhkXACcg" memberEnd="_CVv_AH7UEeerMdvhkXACcg _CV5wAH7UEeerMdvhkXACcg">
+            <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_CVuJ0H7UEeerMdvhkXACcg" source="org.eclipse.papyrus">
+              <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_CVuJ0X7UEeerMdvhkXACcg" key="nature" value="UML_Nature"/>
+            </eAnnotations>
+            <ownedEnd xmi:type="uml:Property" xmi:id="_CV5wAH7UEeerMdvhkXACcg" type="_8UXEUH7TEeerMdvhkXACcg" association="_CVsUoH7UEeerMdvhkXACcg">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_K8d9MH7UEeerMdvhkXACcg"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_K8iOoH7UEeerMdvhkXACcg" value="*"/>
+            </ownedEnd>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Usage" xmi:id="_TlrOsH7UEeerMdvhkXACcg" client="_hMn3cH7SEeerMdvhkXACcg" supplier="_iu14IH7SEeerMdvhkXACcg"/>
+          <packagedElement xmi:type="uml:Association" xmi:id="_aQoDwH7UEeerMdvhkXACcg" memberEnd="_aQpR4n7UEeerMdvhkXACcg _aQp48X7UEeerMdvhkXACcg">
+            <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_aQpR4H7UEeerMdvhkXACcg" source="org.eclipse.papyrus">
+              <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aQpR4X7UEeerMdvhkXACcg" key="nature" value="UML_Nature"/>
+            </eAnnotations>
+            <ownedEnd xmi:type="uml:Property" xmi:id="_aQp48X7UEeerMdvhkXACcg" type="_knrpEH7SEeerMdvhkXACcg" association="_aQoDwH7UEeerMdvhkXACcg">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_dE_BwH7UEeerMdvhkXACcg"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_dFCsIH7UEeerMdvhkXACcg" value="*"/>
+            </ownedEnd>
+          </packagedElement>
+          <packagedElement xmi:type="uml:Usage" xmi:id="_mIebgH7UEeerMdvhkXACcg" client="_hMn3cH7SEeerMdvhkXACcg" supplier="_knrpEH7SEeerMdvhkXACcg"/>
+        </packagedElement>
       </packagedElement>
       <packagedElement xmi:type="uml:Component" xmi:id="_66qTMHxyEee0ioDwg-czug" name="oeec.uml2.facade">
         <ownedAttribute xmi:type="uml:Port" xmi:id="_qnsmUH0HEee6BItyZCN4VA" name="umlFacadeCopier" type="_l0ShsH0HEee6BItyZCN4VA" aggregation="composite"/>
@@ -190,18 +225,39 @@
         <packagedElement xmi:type="uml:Usage" xmi:id="_b02vAH0FEee6BItyZCN4VA" client="_U7VScH0FEee6BItyZCN4VA" supplier="_A9frAH0FEee6BItyZCN4VA"/>
         <packagedElement xmi:type="uml:Package" xmi:id="_AjsNcH0REee6BItyZCN4VA" name="oeec.match">
           <packagedElement xmi:type="uml:Interface" xmi:id="_DePTAH0REee6BItyZCN4VA" name="IMatchEngine"/>
+          <packagedElement xmi:type="uml:Class" xmi:id="_8UXEUH7TEeerMdvhkXACcg" name="DefaultMatchEngine">
+            <ownedAttribute xmi:type="uml:Property" xmi:id="_CVv_AH7UEeerMdvhkXACcg" name="eObjectMatcher" type="_4prXwH7SEeerMdvhkXACcg" association="_CVsUoH7UEeerMdvhkXACcg">
+              <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_CVzCUH7UEeerMdvhkXACcg" value="1"/>
+              <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_CV2FoH7UEeerMdvhkXACcg" value="1"/>
+            </ownedAttribute>
+          </packagedElement>
         </packagedElement>
         <packagedElement xmi:type="uml:Usage" xmi:id="_L6RrMH0REee6BItyZCN4VA" client="_7SwfUH0QEee6BItyZCN4VA" supplier="_DePTAH0REee6BItyZCN4VA"/>
+        <packagedElement xmi:type="uml:Package" xmi:id="_2pzKsH7SEeerMdvhkXACcg" name="oeec.match.eobject">
+          <packagedElement xmi:type="uml:Interface" xmi:id="_4prXwH7SEeerMdvhkXACcg" name="IEObjectMatcher"/>
+          <packagedElement xmi:type="uml:Class" xmi:id="_9fGOkH7SEeerMdvhkXACcg" name="IdentifierEObjectMatcher">
+            <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_dGt8kH7TEeerMdvhkXACcg" client="_9fGOkH7SEeerMdvhkXACcg" supplier="_4prXwH7SEeerMdvhkXACcg" contract="_4prXwH7SEeerMdvhkXACcg"/>
+          </packagedElement>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Package" xmi:id="_C5bJQH7TEeerMdvhkXACcg" name="oeec.scope">
+          <packagedElement xmi:type="uml:Interface" xmi:id="_r77SwH7SEeerMdvhkXACcg" name="IComparisonScope"/>
+        </packagedElement>
       </packagedElement>
       <packagedElement xmi:type="uml:Component" xmi:id="_2oHEMH0HEee6BItyZCN4VA" name="oeec.uml2.facade.tests">
         <ownedAttribute xmi:type="uml:Port" xmi:id="_w0NrkH0KEee6BItyZCN4VA" name="j2eeFacadeProvider" type="_H1ZvQH0LEee6BItyZCN4VA" aggregation="composite"/>
         <ownedAttribute xmi:type="uml:Port" xmi:id="_ZdDicH0LEee6BItyZCN4VA" name="j2eeCopier" type="_GEz7YH0LEee6BItyZCN4VA" aggregation="composite"/>
+        <ownedAttribute xmi:type="uml:Port" xmi:id="_8W9XQH7REeerMdvhkXACcg" name="opaqexprFacadeProvider" type="_zMWB037REeerMdvhkXACcg" aggregation="composite"/>
         <packagedElement xmi:type="uml:Package" xmi:id="_C8SrQH0LEee6BItyZCN4VA" name="oeec.uml2.facade.tests.j2ee.providers">
           <packagedElement xmi:type="uml:Class" xmi:id="_GEz7YH0LEee6BItyZCN4VA" name="J2EECopier">
             <generalization xmi:type="uml:Generalization" xmi:id="_LgLX4H0LEee6BItyZCN4VA" general="_l0ShsH0HEee6BItyZCN4VA"/>
           </packagedElement>
           <packagedElement xmi:type="uml:Class" xmi:id="_H1ZvQH0LEee6BItyZCN4VA" name="J2EEFacadeProvider">
             <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_Td9GwH0LEee6BItyZCN4VA" client="_H1ZvQH0LEee6BItyZCN4VA" supplier="_3OxI4Hx1Eee0ioDwg-czug" contract="_3OxI4Hx1Eee0ioDwg-czug"/>
+          </packagedElement>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Package" xmi:id="_zMWB0H7REeerMdvhkXACcg" name="oeec.uml2.facade.tests.opaqexpr.providers">
+          <packagedElement xmi:type="uml:Class" xmi:id="_zMWB037REeerMdvhkXACcg" name="OpaqexprFacadeProvider">
+            <interfaceRealization xmi:type="uml:InterfaceRealization" xmi:id="_zMWB1H7REeerMdvhkXACcg" client="_zMWB037REeerMdvhkXACcg" supplier="_3OxI4Hx1Eee0ioDwg-czug" contract="_3OxI4Hx1Eee0ioDwg-czug"/>
           </packagedElement>
         </packagedElement>
       </packagedElement>
@@ -222,4 +278,5 @@
   <standard:Utility xmi:id="_8FauwHx1Eee0ioDwg-czug" base_Class="_47iMsHx1Eee0ioDwg-czug"/>
   <standard:Create xmi:id="_73MBUHx8Eee6BItyZCN4VA" base_Usage="_58IC0Hx8Eee6BItyZCN4VA"/>
   <utp:TestComponent xmi:id="_AtfYwH0IEee6BItyZCN4VA" base_Class="_2oHEMH0HEee6BItyZCN4VA"/>
+  <standard:Create xmi:id="_pV6n4H7UEeerMdvhkXACcg" base_Usage="_mIebgH7UEeerMdvhkXACcg"/>
 </xmi:XMI>
