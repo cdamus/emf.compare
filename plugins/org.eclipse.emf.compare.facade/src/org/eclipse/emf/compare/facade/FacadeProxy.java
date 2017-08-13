@@ -18,19 +18,31 @@ import com.google.common.base.Predicates;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
+import com.google.common.reflect.TypeToken;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.compare.utils.TreeIterators;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreEList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -204,6 +216,40 @@ public final class FacadeProxy {
 		}
 	}
 
+	/**
+	 * Unwraps a dynamic façade proxy to get at the core object.
+	 * 
+	 * @param possibleProxy
+	 *            a possible façade proxy
+	 * @return the unwrapped proxy, or itself if not a proxy
+	 * @param <T>
+	 *            the model interface to unwrap
+	 */
+	@SuppressWarnings("unchecked")
+	static <T extends EObject> T unwrap(T possibleProxy) {
+		T result = possibleProxy;
+
+		if ((result instanceof FacadeObject) && (result instanceof Proxy)) {
+			// Unwrap it
+			result = (T)((Impl)Proxy.getInvocationHandler(result)).object;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Unwraps a collection of dynamic façade proxy to get at the core objects.
+	 * 
+	 * @param possibleProxies
+	 *            possible façade proxies
+	 * @return the unwrapped proxies, or the originals if not proxies
+	 * @param <T>
+	 *            the model interface to unwrap
+	 */
+	static <T extends EObject> Collection<T> unwrap(Collection<T> possibleProxies) {
+		return Collections2.transform(possibleProxies, FacadeProxy::unwrap);
+	}
+
 	//
 	// Nested types
 	//
@@ -214,7 +260,11 @@ public final class FacadeProxy {
 	 *
 	 * @author Christian W. Damus
 	 */
-	private static final class Impl extends AdapterImpl implements InvocationHandler {
+	static final class Impl extends AdapterImpl implements InvocationHandler {
+		/** Generic type parameter of the {@link List} class that represents the element type. */
+		@SuppressWarnings("rawtypes")
+		private static final TypeVariable<Class<List>> LIST_ELEMENT_TYPE = List.class.getTypeParameters()[0];
+
 		/** The façade object that I adapt to the {@link FacadeObject} protocol. */
 		private final EObject object;
 
@@ -275,7 +325,8 @@ public final class FacadeProxy {
 						result = Integer.valueOf(System.identityHashCode(proxy));
 						break;
 					case "toString": //$NON-NLS-1$
-						result = object.toString();
+						String toString = object.toString();
+						result = toString.replaceFirst("@[0-9a-f]+", "$0\\$Proxy"); //$NON-NLS-1$//$NON-NLS-2$
 						break;
 					default:
 						// Other Object methods are not proxied
@@ -297,23 +348,216 @@ public final class FacadeProxy {
 				}
 			} else if (method.getDeclaringClass() == InternalEObject.class) {
 				switch (method.getName()) {
+					case "eGet": //$NON-NLS-1$
+						result = method.invoke(object, args);
+						if (isReflectiveAPIReferenceArgument(args[0])) {
+							result = wrapEObjects(result);
+						}
+						break;
+					case "eSet": //$NON-NLS-1$
+						Object[] actualArgs = args;
+						if (isReflectiveAPIReferenceArgument(args[0])) {
+							actualArgs = unwrapEObjects(args);
+						}
+						result = method.invoke(object, actualArgs);
+						break;
+					case "eInternalContainer": //$NON-NLS-1$
+						result = wrapEObjects(((InternalEObject)object).eInternalContainer());
+						break;
 					case "eDirectResource": //$NON-NLS-1$
 						result = eDirectResource((InternalEObject)object);
 						break;
 					default:
 						result = method.invoke(object, args);
+						break;
 				}
 			} else if (method.getDeclaringClass() == EObject.class) {
 				switch (method.getName()) {
+					case "eGet": //$NON-NLS-1$
+						result = method.invoke(object, args);
+						if (isReflectiveAPIReferenceArgument(args[0])) {
+							result = wrapEObjects(result);
+						}
+						break;
+					case "eSet": //$NON-NLS-1$
+						Object[] actualArgs = args;
+						if (isReflectiveAPIReferenceArgument(args[0])) {
+							actualArgs = unwrapEObjects(args);
+						}
+						result = method.invoke(object, actualArgs);
+						break;
 					case "eResource": //$NON-NLS-1$
 						result = eResource(object);
 						break;
+					case "eContainer": //$NON-NLS-1$
+						result = wrapEObjects(object.eContainer());
+						break;
+					case "eContents": //$NON-NLS-1$
+						// Needs the feature-iterator protocol?
+						result = wrapEObjects(object.eContents());
+						break;
+					case "eAllContents": //$NON-NLS-1$
+						result = TreeIterators.transform(object.eAllContents(), this::wrapEObjects);
+						break;
 					default:
 						result = method.invoke(object, args);
+						break;
+				}
+			} else if (method.getDeclaringClass() == Notifier.class) {
+				switch (method.getName()) {
+					case "eAdapters": //$NON-NLS-1$
+						result = new ProxyAdapterList(this, object.eAdapters());
+						break;
+					default:
+						result = method.invoke(object, args);
+						break;
 				}
 			} else {
 				// Delegate the rest
-				result = method.invoke(object, args);
+
+				Object[] actualArgs = args;
+				if (hasEReferenceTypeParameter(method)) {
+					// Unwrap arguments for internal consistency
+					actualArgs = unwrapEObjects(args);
+				}
+
+				result = method.invoke(object, actualArgs);
+
+				if (isEReferenceType(method)) {
+					result = wrapEObjects(result);
+				}
+
+				return result;
+			}
+
+			return result;
+		}
+
+		/**
+		 * Queries whether an argument passed to a refective {@code eGet} or {@code eSet} API call indicates
+		 * an {@link EReference}, possibly by {@link Integer} ID.
+		 * 
+		 * @param arg
+		 *            the first argument of a reflective feature access/mutator call
+		 * @return {@code true} if it indicates a reference; {@code false} otherwise
+		 */
+		protected boolean isReflectiveAPIReferenceArgument(Object arg) {
+			Object feature = arg;
+
+			if (arg instanceof Integer) {
+				feature = object.eClass().getEStructuralFeature(((Integer)arg).intValue());
+			}
+
+			return feature instanceof EReference;
+		}
+
+		/**
+		 * Queries whether the return result of a {@code method} is of an {@link EReference} type.
+		 * 
+		 * @param method
+		 *            a method
+		 * @return whether its result is some kind of {@link EObject} type or a {@link List} of some kind of
+		 *         {@link EObject} type
+		 */
+		protected boolean isEReferenceType(Method method) {
+			TypeToken<?> type = TypeToken.of(method.getGenericReturnType());
+
+			boolean result = type.isSubtypeOf(EObject.class);
+			if (!result && type.isSubtypeOf(List.class)) {
+				result = type.resolveType(LIST_ELEMENT_TYPE).isSubtypeOf(EObject.class);
+			}
+
+			return result;
+		}
+
+		/**
+		 * Wraps an {@link EObject} or {@link List} of {@link EObject}s as façade proxies, if necessary.
+		 * 
+		 * @param value
+		 *            an {@link EObject} value (scalar or vector) to wrap
+		 * @return the wrapped {@code value}
+		 */
+		protected Object wrapEObjects(Object value) {
+			Object result = value;
+
+			if (value instanceof EObject) {
+				// Easy case
+				EObject eObject = (EObject)value;
+				if (eObject.eClass().getEPackage() == this.object.eClass().getEPackage()) {
+					// Wrap it
+					result = FacadeProxy.createProxy(eObject);
+				}
+			} else if (value instanceof EList<?>) {
+				// It's some kind of an EList. Does it implement a feature, requiring
+				// notifications?
+				if (value instanceof EcoreEList<?>) {
+					@SuppressWarnings("unchecked")
+					EcoreEList<EObject> eList = (EcoreEList<EObject>)value;
+					result = new ProxyEcoreEList<>(eList);
+				} else {
+					// It's not a feature but an operation result or parameter
+					@SuppressWarnings("unchecked")
+					EList<EObject> eList = (EList<EObject>)value;
+					result = new ProxyEList<>(eList);
+				}
+			} else if (value instanceof Collection<?>) {
+				// It's some other kind of collection, in a notification
+				@SuppressWarnings("unchecked")
+				Collection<EObject> collection = (Collection<EObject>)value;
+				result = Collections2.transform(collection, (EObject eObject) -> {
+					EObject transformed = eObject;
+					if (eObject.eClass().getEPackage() == this.object.eClass().getEPackage()) {
+						// Wrap it
+						transformed = FacadeProxy.createProxy(eObject);
+					}
+					return transformed;
+				});
+			}
+
+			return result;
+		}
+
+		/**
+		 * Queries whether any parameter of a {@code method} is of an {@link EReference} type.
+		 * 
+		 * @param method
+		 *            a method
+		 * @return whether any parameter is some kind of {@link EObject} type or a {@link List} of some kind
+		 *         of {@link EObject} type
+		 */
+		protected boolean hasEReferenceTypeParameter(Method method) {
+			boolean result = false;
+
+			Type[] paramTypes = method.getGenericParameterTypes();
+			for (int i = 0; (i < paramTypes.length) && !result; i++) {
+				TypeToken<?> type = TypeToken.of(paramTypes[i]);
+
+				result = type.isSubtypeOf(EObject.class);
+				if (!result && type.isSubtypeOf(List.class)) {
+					result = type.resolveType(LIST_ELEMENT_TYPE).isSubtypeOf(EObject.class);
+				}
+			}
+
+			return result;
+		}
+
+		/**
+		 * Unwraps any {@code objects} that are dynamic façade proxies to get the core objects.
+		 * 
+		 * @param objects
+		 *            objects to unwrap
+		 * @return the unwrapped {@code objects}
+		 */
+		protected Object[] unwrapEObjects(Object[] objects) {
+			Object[] result = Arrays.copyOf(objects, objects.length);
+
+			for (int i = 0; i < result.length; i++) {
+				Object next = result[i];
+
+				if (next instanceof EObject) {
+					// Replace it
+					result[i] = unwrap((EObject)next);
+				}
 			}
 
 			return result;

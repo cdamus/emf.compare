@@ -12,6 +12,7 @@
  */
 package org.eclipse.emf.compare.utils;
 
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.AbstractIterator;
@@ -70,6 +71,29 @@ public final class TreeIterators {
 		Preconditions.checkNotNull(filter, "filter"); //$NON-NLS-1$
 
 		return new Filtering<>(iterator, filter);
+	}
+
+	/**
+	 * Obtains an immutable transforming view of a tree {@code iterator}.
+	 * 
+	 * @param iterator
+	 *            the iterator to filter
+	 * @param transformation
+	 *            the transformation function
+	 * @return the transformation tree iterator
+	 * @throws NullPointerException
+	 *             if either argument is {@code null}
+	 * @param <F>
+	 *            the iterator element type
+	 * @param <R>
+	 *            the transformation result type
+	 */
+	public static <F, R> TreeIterator<R> transform(TreeIterator<F> iterator,
+			Function<? super F, ? extends R> transformation) {
+		Preconditions.checkNotNull(iterator, "iterator"); //$NON-NLS-1$
+		Preconditions.checkNotNull(transformation, "transformation"); //$NON-NLS-1$
+
+		return new Transforming<>(iterator, transformation);
 	}
 
 	//
@@ -164,6 +188,60 @@ public final class TreeIterators {
 				} while (delegate.hasNext());
 
 				result = endOfData();
+			} else {
+				result = endOfData();
+			}
+
+			return result;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public void prune() {
+			delegate.prune();
+		}
+	}
+
+	/**
+	 * An immutable transforming view of a tree {@code iterator}.
+	 * 
+	 * @param <E>
+	 *            the iterator element type
+	 * @param <T>
+	 *            the transformation result type
+	 */
+	private static final class Transforming<E, T> extends AbstractIterator<T> implements TreeIterator<T> {
+		/** The backing iterator. */
+		private final TreeIterator<E> delegate;
+
+		/** The transformation function. */
+		private final Function<? super E, ? extends T> transformation;
+
+		/**
+		 * Initializes me.
+		 * 
+		 * @param iterator
+		 *            the iterator to transform
+		 * @param transformation
+		 *            the transformation
+		 */
+		Transforming(TreeIterator<E> iterator, Function<? super E, ? extends T> transformation) {
+			super();
+
+			this.delegate = iterator;
+			this.transformation = transformation;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected T computeNext() {
+			T result;
+
+			if (delegate.hasNext()) {
+				result = transformation.apply(delegate.next());
 			} else {
 				result = endOfData();
 			}

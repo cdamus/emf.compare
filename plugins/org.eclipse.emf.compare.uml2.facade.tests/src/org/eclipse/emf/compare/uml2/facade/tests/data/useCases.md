@@ -41,6 +41,11 @@ and
 * the right model adds a home interface of the same name
 but for the Whatsit bean (**conflict**)
 
+### Use case f1
+
+Simple models where the left side has a complete set of J2EE elements for
+testing the *Façade Dynamic Proxy* API.
+
 ### Use case m1
 
 Two-way comparison of mixed-mode models, with a UML design model that references a J2EE model.  The left-side models

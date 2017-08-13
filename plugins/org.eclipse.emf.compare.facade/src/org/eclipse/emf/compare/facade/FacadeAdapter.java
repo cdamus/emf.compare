@@ -908,7 +908,29 @@ public class FacadeAdapter implements Adapter.Internal {
 	 *            the adapter type
 	 */
 	protected static <A extends FacadeAdapter> A get(Notifier notifier, Class<A> type) {
-		return type.cast(EcoreUtil.getExistingAdapter(notifier, type));
+		A result = null;
+
+		if (type != FacadeAdapter.class) {
+			// We're going for a specific adapter type, so it should be reliable
+			result = type.cast(EcoreUtil.getExistingAdapter(notifier, type));
+		} else {
+			for (Adapter next : notifier.eAdapters()) {
+				if (next.isAdapterForType(type) && type.isInstance(next)) {
+					// Strong candidate
+					result = type.cast(next);
+
+					// But only if it's actually this notifier's façade adapter (the
+					// adapters of related elements could also be observing it)
+					if ((result.getFacade() == notifier) || (result.getUnderlyingElement() == notifier)) {
+						break; // Got it
+					} else {
+						result = null; // Try again
+					}
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**
