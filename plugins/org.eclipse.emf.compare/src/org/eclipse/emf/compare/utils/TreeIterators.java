@@ -28,6 +28,7 @@ import org.eclipse.emf.common.util.TreeIterator;
  * {@link Iterators} API.
  *
  * @author Christian W. Damus
+ * @since 3.6
  */
 public final class TreeIterators {
 
@@ -67,10 +68,36 @@ public final class TreeIterators {
 	 *            the iterator element type
 	 */
 	public static <E> TreeIterator<E> filter(TreeIterator<E> iterator, Predicate<? super E> filter) {
+		// CHECKSTYLE:OFF
 		Preconditions.checkNotNull(iterator, "iterator"); //$NON-NLS-1$
 		Preconditions.checkNotNull(filter, "filter"); //$NON-NLS-1$
+		// CHECKSTYLE:ON
 
 		return new Filtering<>(iterator, filter);
+	}
+
+	/**
+	 * Obtains an immutable filtering view of a tree {@code iterator} for elements of the given {@code type}.
+	 * 
+	 * @param iterator
+	 *            the iterator to filter
+	 * @param type
+	 *            the type of elements to filter out of the tree iterator
+	 * @return the filtering tree iterator
+	 * @throws NullPointerException
+	 *             if either argument is {@code null}
+	 * @param <E>
+	 *            the iterator element type
+	 * @param <T>
+	 *            the filtered type
+	 */
+	public static <E, T extends E> TreeIterator<T> filter(TreeIterator<E> iterator, Class<? extends T> type) {
+		// CHECKSTYLE:OFF
+		Preconditions.checkNotNull(iterator, "iterator"); //$NON-NLS-1$
+		Preconditions.checkNotNull(type, "type"); //$NON-NLS-1$
+		// CHECKSTYLE:ON
+
+		return new TypeFiltering<>(iterator, type);
 	}
 
 	/**
@@ -90,8 +117,11 @@ public final class TreeIterators {
 	 */
 	public static <F, R> TreeIterator<R> transform(TreeIterator<F> iterator,
 			Function<? super F, ? extends R> transformation) {
+
+		// CHECKSTYLE:OFF
 		Preconditions.checkNotNull(iterator, "iterator"); //$NON-NLS-1$
 		Preconditions.checkNotNull(transformation, "transformation"); //$NON-NLS-1$
+		// CHECKSTYLE:ON
 
 		return new Transforming<>(iterator, transformation);
 	}
@@ -183,6 +213,69 @@ public final class TreeIterators {
 					// Be optimistic about this
 					result = delegate.next();
 					if (filter.apply(result)) {
+						break out;
+					}
+				} while (delegate.hasNext());
+
+				result = endOfData();
+			} else {
+				result = endOfData();
+			}
+
+			return result;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public void prune() {
+			delegate.prune();
+		}
+	}
+
+	/**
+	 * An immutable type-filtering view of a tree {@code iterator}.
+	 * 
+	 * @param <E>
+	 *            the iterator element type
+	 * @param <T>
+	 *            the type filter
+	 */
+	private static final class TypeFiltering<E, T extends E> extends AbstractIterator<T> implements TreeIterator<T> {
+		/** The backing iterator. */
+		private final TreeIterator<E> delegate;
+
+		/** The type filter. */
+		private final Class<? extends T> type;
+
+		/**
+		 * Initializes me.
+		 * 
+		 * @param iterator
+		 *            the iterator to filter
+		 * @param type
+		 *            the type filter
+		 */
+		TypeFiltering(TreeIterator<E> iterator, Class<? extends T> type) {
+			super();
+
+			this.delegate = iterator;
+			this.type = type;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected T computeNext() {
+			T result;
+
+			out: if (delegate.hasNext()) {
+				do {
+					// Be optimistic about this
+					E resultE = delegate.next();
+					if (type.isInstance(resultE)) {
+						result = type.cast(resultE);
 						break out;
 					}
 				} while (delegate.hasNext());

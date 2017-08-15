@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013 Obeo.
+ * Copyright (c) 2013, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Christian W. Damus - façade providers integration
  */
 package org.eclipse.emf.compare.uml2.tests;
 
@@ -25,6 +26,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.URIConverter;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.uml2.uml.UMLPackage;
 import org.eclipse.uml2.uml.resource.UMLResource;
 import org.eclipse.uml2.uml.resources.ResourcesPlugin;
 import org.eclipse.uml2.uml.resources.util.UMLResourcesUtil;
@@ -34,7 +36,8 @@ import org.eclipse.uml2.uml.resources.util.UMLResourcesUtil;
  * 
  * @author <a href="mailto:cedric.notot@obeo.fr">Cedric Notot</a>
  */
-public abstract class AbstractUMLInputData extends AbstractInputData {
+@SuppressWarnings("nls")
+public abstract class AbstractUMLInputData extends AbstractInputData implements AutoCloseable {
 	/** Store the set of the resource sets of the input data. */
 	private Set<ResourceSet> sets = new LinkedHashSet<ResourceSet>();
 
@@ -49,12 +52,28 @@ public abstract class AbstractUMLInputData extends AbstractInputData {
 		final InputStream str = fileURL.openStream();
 		final URI uri = URI.createURI(fileURL.toString());
 
-		ResourceSet resourceSet = new ResourceSetImpl();
-		getSets().add(resourceSet);
+		ResourceSet resourceSet = createResourceSet();
+
+		Resource resource = resourceSet.createResource(uri);
+		resource.load(str, Collections.emptyMap());
+		str.close();
+
+		return resource;
+	}
+
+	/**
+	 * Creates a resource set and adds it to the {@linkplain #getSets() resource sets} tracked for later
+	 * clean-up.
+	 * 
+	 * @return a new resource set suitable for working with UML models
+	 */
+	protected ResourceSet createResourceSet() {
+		ResourceSet result = new ResourceSetImpl();
+		getSets().add(result);
 
 		// Standalone
 		if (!EMFPlugin.IS_ECLIPSE_RUNNING) {
-			UMLResourcesUtil.init(resourceSet);
+			UMLResourcesUtil.init(result);
 
 			// override wrong pathmap mapping in UMLResourcesUtil
 			final URL UMLJarredFileLocation = ResourcesPlugin.class.getResource("ResourcesPlugin.class");
@@ -68,12 +87,28 @@ public abstract class AbstractUMLInputData extends AbstractInputData {
 					URI.createURI(UMLJarPath + "!/metamodels/"));
 			uriMap.put(URI.createURI(UMLResource.PROFILES_PATHMAP),
 					URI.createURI(UMLJarPath + "!/profiles/"));
+
+			// And add some missing registrations
+			@SuppressWarnings("restriction")
+			Resource.Factory resourceFactory = new org.eclipse.uml2.uml.internal.resource.UMLResourceFactoryImpl();
+			Resource.Factory.Registry resourceFactoryReg = result.getResourceFactoryRegistry();
+			resourceFactoryReg.getExtensionToFactoryMap().put(UMLResource.FILE_EXTENSION, resourceFactory);
+			resourceFactoryReg.getContentTypeToFactoryMap().put(UMLPackage.eCONTENT_TYPE, resourceFactory);
 		}
 
-		Resource resource = resourceSet.createResource(uri);
-		resource.load(str, Collections.emptyMap());
-		str.close();
+		return result;
+	}
 
-		return resource;
+	/**
+	 * {@inheritDoc}
+	 */
+	public void close() {
+		for (ResourceSet set : getSets()) {
+			for (Resource res : set.getResources()) {
+				res.unload();
+			}
+			set.getResources().clear();
+		}
+		getSets().clear();
 	}
 }

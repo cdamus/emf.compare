@@ -197,14 +197,7 @@ public abstract class AbstractUMLTest {
 
 	@After
 	public void cleanup() {
-		for (ResourceSet set : getInput().getSets()) {
-			for (Resource res : set.getResources()) {
-				res.unload();
-			}
-			set.getResources().clear();
-		}
-		getInput().getSets().clear();
-
+		getInput().close();
 	}
 
 	protected EMFCompare getCompare() {

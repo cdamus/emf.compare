@@ -15,6 +15,7 @@ package org.eclipse.emf.compare.uml2.facade.tests.suite;
 import org.eclipse.emf.compare.uml2.facade.tests.BasicFacadeComparisonTest;
 import org.eclipse.emf.compare.uml2.facade.tests.BasicFacadeTest;
 import org.eclipse.emf.compare.uml2.facade.tests.BasicOpaqexprFacadeTest;
+import org.eclipse.emf.compare.uml2.facade.tests.FacadeComparisonPerformanceTest;
 import org.eclipse.emf.compare.uml2.facade.tests.FacadeProviderComparisonTest;
 import org.eclipse.emf.compare.uml2.facade.tests.FacadeProxyTest;
 import org.eclipse.emf.compare.uml2.facade.tests.OpaqexprFacadeProviderComparisonTest;
@@ -39,6 +40,7 @@ import junit.textui.TestRunner;
 		FacadeProviderComparisonTest.class, //
 		BasicOpaqexprFacadeTest.class, //
 		OpaqexprFacadeProviderComparisonTest.class, //
+		FacadeComparisonPerformanceTest.class, //
 })
 
 public class AllTests {

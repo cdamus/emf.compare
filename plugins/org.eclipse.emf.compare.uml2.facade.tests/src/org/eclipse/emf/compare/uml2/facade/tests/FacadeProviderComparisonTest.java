@@ -39,6 +39,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.emf.common.EMFPlugin;
@@ -55,6 +56,7 @@ import org.eclipse.emf.compare.scope.IComparisonScope;
 import org.eclipse.emf.compare.uml2.facade.tests.data.UMLInputData;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.BeanKind;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EEFacadeProvider;
+import org.eclipse.emf.compare.uml2.facade.tests.util.DynamicProxiesRule;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
 import org.eclipse.emf.compare.uml2.tests.AdditionalResources;
 import org.eclipse.emf.compare.utils.UseIdentifiers;
@@ -65,7 +67,11 @@ import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.resource.UMLResource;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test cases for comparison based on pluggable façade model providers with the J2EE façade.
@@ -73,15 +79,22 @@ import org.junit.Test;
  * @author Christian W. Damus
  */
 @SuppressWarnings({"nls", "boxing", "restriction" })
+@RunWith(Parameterized.class)
 public class FacadeProviderComparisonTest extends AbstractFacadeTest {
+
+	@Rule
+	public final DynamicProxiesRule useDynamicProxies;
 
 	private UMLInputData input = new UMLInputData();
 
 	/**
 	 * Initializes me.
 	 */
-	public FacadeProviderComparisonTest() {
+	public FacadeProviderComparisonTest(boolean useDynamicProxies, @SuppressWarnings("unused") String label) {
+
 		super();
+
+		this.useDynamicProxies = new DynamicProxiesRule(useDynamicProxies);
 	}
 
 	@Test
@@ -325,6 +338,12 @@ public class FacadeProviderComparisonTest extends AbstractFacadeTest {
 	//
 	// Test framework
 	//
+
+	@Parameters(name = "{1}")
+	public static Iterable<Object[]> parameters() {
+		return Arrays.asList(
+				new Object[][] {{Boolean.TRUE, "dynamic proxy" }, {Boolean.FALSE, "plain façade" }, });
+	}
 
 	@BeforeClass
 	public static void setupClass() {

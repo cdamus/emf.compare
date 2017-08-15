@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 EclipseSource Services GmbH and others.
+ * Copyright (c) 2016, 2017 EclipseSource Services GmbH, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     Philip Langer - initial API and implementation
+ *     Christian W. Damus - façade providers integration
  *******************************************************************************/
 package org.eclipse.emf.compare.uml2.tests.merge.data;
 
@@ -51,7 +52,8 @@ public class InstanceSpecificationClassifiersMergeInputData extends AbstractUMLI
 		return loadFromClassLoader("instancespec4/right.uml", createResourceSet()); //$NON-NLS-1$
 	}
 
-	private ResourceSet createResourceSet() {
+	@Override
+	protected ResourceSet createResourceSet() {
 		final ResourceSet resourceSet = new ResourceSetImpl();
 		UMLResourcesUtil.init(resourceSet);
 		return resourceSet;

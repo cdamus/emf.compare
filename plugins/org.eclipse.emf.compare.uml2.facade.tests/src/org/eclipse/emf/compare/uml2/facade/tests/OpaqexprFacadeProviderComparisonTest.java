@@ -27,6 +27,7 @@ import static org.junit.Assert.fail;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.emf.common.EMFPlugin;
@@ -42,14 +43,21 @@ import org.eclipse.emf.compare.scope.IComparisonScope;
 import org.eclipse.emf.compare.uml2.facade.tests.data.UMLInputData;
 import org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.OpaqexprPackage;
 import org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.internal.providers.OpaqexprFacadeProvider;
+import org.eclipse.emf.compare.uml2.facade.tests.util.DynamicProxiesRule;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
 import org.eclipse.emf.compare.utils.UseIdentifiers;
 import org.eclipse.emf.ecore.EAttribute;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.uml2.uml.resource.UMLResource;
+import org.hamcrest.Matcher;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test cases for comparison based on pluggable façade model providers with the {@link OpaqexprPackage
@@ -58,15 +66,23 @@ import org.junit.Test;
  * @author Christian W. Damus
  */
 @SuppressWarnings({"nls", "boxing", "restriction" })
+@RunWith(Parameterized.class)
 public class OpaqexprFacadeProviderComparisonTest extends AbstractFacadeTest {
+
+	@Rule
+	public final DynamicProxiesRule useDynamicProxies;
 
 	private UMLInputData input = new UMLInputData();
 
 	/**
 	 * Initializes me.
 	 */
-	public OpaqexprFacadeProviderComparisonTest() {
+	public OpaqexprFacadeProviderComparisonTest(boolean useDynamicProxies,
+			@SuppressWarnings("unused") String label) {
+
 		super();
+
+		this.useDynamicProxies = new DynamicProxiesRule(useDynamicProxies);
 	}
 
 	@Test
@@ -105,12 +121,19 @@ public class OpaqexprFacadeProviderComparisonTest extends AbstractFacadeTest {
 		assertThat(addBodyEntry.getRequires(), not(hasItem(anything())));
 		assertThat(addBodyEntry.getRequiredBy(), not(hasItem(anything())));
 
-		// And we did, in fact, use the façade
-		assertThat(addBodyEntry.getMatch().getLeft(), instanceOf(FacadeObject.class));
-		FacadeObject left = (FacadeObject)addBodyEntry.getMatch().getLeft();
+		Matcher<EObject> proxyAssertion;
+		if (useDynamicProxies.getAsBoolean()) {
+			// And we did, in fact, use the façade
+			proxyAssertion = instanceOf(FacadeObject.class);
+		} else {
+			proxyAssertion = not(instanceOf(FacadeObject.class));
+		}
+
+		assertThat(addBodyEntry.getMatch().getLeft(), proxyAssertion);
+		EObject left = addBodyEntry.getMatch().getLeft();
 		assertThat(left.eClass(), is(OpaqexprPackage.Literals.OPAQUE_EXPRESSION));
-		assertThat(addBodyEntry.getMatch().getRight(), instanceOf(FacadeObject.class));
-		FacadeObject right = (FacadeObject)addBodyEntry.getMatch().getRight();
+		assertThat(addBodyEntry.getMatch().getRight(), proxyAssertion);
+		EObject right = addBodyEntry.getMatch().getRight();
 		assertThat(right.eClass(), is(OpaqexprPackage.Literals.OPAQUE_EXPRESSION));
 	}
 
@@ -143,6 +166,12 @@ public class OpaqexprFacadeProviderComparisonTest extends AbstractFacadeTest {
 	//
 	// Test framework
 	//
+
+	@Parameters(name = "{1}")
+	public static Iterable<Object[]> parameters() {
+		return Arrays.asList(
+				new Object[][] {{Boolean.TRUE, "dynamic proxy" }, {Boolean.FALSE, "plain façade" }, });
+	}
 
 	@BeforeClass
 	public static void setupClass() {
