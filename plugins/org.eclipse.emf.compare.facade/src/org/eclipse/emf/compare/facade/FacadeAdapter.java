@@ -920,8 +920,12 @@ public class FacadeAdapter implements Adapter.Internal {
 					result = type.cast(next);
 
 					// But only if it's actually this notifier's façade adapter (the
-					// adapters of related elements could also be observing it)
-					if ((result.getFacade() == notifier) || (result.getUnderlyingElement() == notifier)) {
+					// adapters of related elements could also be observing it). Be careful
+					// if the 'notifier' is a dynamic proxy façade for the real notifier,
+					// which is then what the adapter references
+					if ((result.getFacade() == notifier) || (result.getUnderlyingElement() == notifier)
+							|| (getRealNotifier(notifier) == result.getFacade())) {
+
 						break; // Got it
 					} else {
 						result = null; // Try again
@@ -931,6 +935,22 @@ public class FacadeAdapter implements Adapter.Internal {
 		}
 
 		return result;
+	}
+
+	/**
+	 * If a {@code notifier} is a {@linkplain FacadeProxy dynamic proxy} implementation of the
+	 * {@link FacadeObject} protocol, then obtain the real façade object that it wraps.
+	 * 
+	 * @param notifier
+	 *            a notifier
+	 * @return the real notifier, which may be the {@code notifier} itself, or else a wrapped instance
+	 */
+	private static Notifier getRealNotifier(Notifier notifier) {
+		if (notifier instanceof FacadeObject) {
+			return FacadeProxy.unwrap((FacadeObject)notifier);
+		} else {
+			return notifier;
+		}
 	}
 
 	/**

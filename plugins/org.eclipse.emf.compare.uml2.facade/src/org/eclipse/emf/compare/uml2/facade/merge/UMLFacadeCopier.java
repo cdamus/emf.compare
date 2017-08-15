@@ -13,6 +13,7 @@
 package org.eclipse.emf.compare.uml2.facade.merge;
 
 import static java.util.Objects.requireNonNull;
+import static org.eclipse.emf.compare.facade.FacadeAdapter.getUnderlyingObject;
 import static org.eclipse.emf.compare.utils.Optionals.ifAbsent;
 
 import com.google.common.base.Preconditions;
@@ -24,7 +25,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
-import org.eclipse.emf.compare.facade.FacadeObject;
+import org.eclipse.emf.compare.facade.FacadeAdapter;
 import org.eclipse.emf.compare.facade.internal.merge.FacadeCopier;
 import org.eclipse.emf.compare.utils.ReflectiveDispatch;
 import org.eclipse.emf.ecore.EObject;
@@ -57,11 +58,13 @@ public class UMLFacadeCopier extends FacadeCopier {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void copyXMIIDs(FacadeObject originalObject, FacadeObject copy) {
+	protected void copyXMIIDs(FacadeAdapter originalAdapter, FacadeAdapter copy) {
 		// First, cover the principal underlying objects
-		super.copyXMIIDs(originalObject, copy);
+		super.copyXMIIDs(originalAdapter, copy);
 
-		EObject originalUnder = originalObject.getUnderlyingElement();
+		EObject originalFacade = originalAdapter.getFacade();
+		EObject copyFacade = copy.getFacade();
+		EObject originalUnder = originalAdapter.getUnderlyingElement();
 		EObject copyUnder = copy.getUnderlyingElement();
 
 		if ((originalUnder instanceof Element) && (copyUnder instanceof Element)) {
@@ -71,13 +74,13 @@ public class UMLFacadeCopier extends FacadeCopier {
 			// Then, stereotype applications
 			handleStereotypeApplications(originalElement, copyElement);
 
-			final Pair oldContext = pushCopyContext(originalObject, copy);
+			final Pair oldContext = pushCopyContext(originalFacade, copyFacade);
 			try {
 				// And, finally, other related objects
-				getRelatedElements(originalObject, originalElement, copy, copyElement)
+				getRelatedElements(originalFacade, originalElement, copyFacade, copyElement)
 						.forEach(Pair::delegateCopy);
 			} finally {
-				popCopyContext(originalObject, oldContext);
+				popCopyContext(originalFacade, oldContext);
 			}
 		}
 	}
@@ -415,8 +418,8 @@ public class UMLFacadeCopier extends FacadeCopier {
 			// First, detach ourselves so that we do not react to further changes
 			getTarget().eAdapters().remove(this);
 
-			Element originalUML = (Element)((FacadeObject)copyContext.original).getUnderlyingElement();
-			Element copyUML = (Element)((FacadeObject)copyContext.copy).getUnderlyingElement();
+			Element originalUML = (Element)getUnderlyingObject(copyContext.original);
+			Element copyUML = (Element)getUnderlyingObject(copyContext.copy);
 
 			// Process deferrals
 			UMLFacadeCopier copier = copyContext.getXMIIDCopier();

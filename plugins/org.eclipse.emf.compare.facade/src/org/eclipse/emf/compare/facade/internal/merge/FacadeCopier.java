@@ -12,10 +12,7 @@
  */
 package org.eclipse.emf.compare.facade.internal.merge;
 
-import static org.eclipse.emf.compare.facade.FacadeProxy.createProxy;
-
 import org.eclipse.emf.compare.facade.FacadeAdapter;
-import org.eclipse.emf.compare.facade.FacadeObject;
 import org.eclipse.emf.compare.merge.ICopier;
 import org.eclipse.emf.ecore.EObject;
 
@@ -52,22 +49,19 @@ public class FacadeCopier implements ICopier {
 			return;
 		}
 
-		FacadeObject originalFacade = createProxy(originalAdapter.getFacade());
-		FacadeObject copyFacade = createProxy(copyAdapter.getFacade());
-
-		copyXMIIDs(originalFacade, copyFacade);
+		copyXMIIDs(originalAdapter, copyAdapter);
 	}
 
 	/**
 	 * Copies the XMI IDs of the objects underlying façades.
 	 * 
-	 * @param originalObject
-	 *            the original façade object
+	 * @param originalAdapter
+	 *            the original façade object's adapter
 	 * @param copy
-	 *            the copy of the original façade object
+	 *            the adapter of the copy of the original façade object
 	 */
-	protected void copyXMIIDs(FacadeObject originalObject, FacadeObject copy) {
-		delegateCopyXMIIDs(originalObject.getUnderlyingElement(), copy.getUnderlyingElement());
+	protected void copyXMIIDs(FacadeAdapter originalAdapter, FacadeAdapter copy) {
+		delegateCopyXMIIDs(originalAdapter.getUnderlyingElement(), copy.getUnderlyingElement());
 	}
 
 	/**
