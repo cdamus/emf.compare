@@ -12,6 +12,7 @@
  */
 package org.eclipse.emf.compare.facade.internal.match;
 
+import org.eclipse.emf.compare.facade.FacadeAdapter;
 import org.eclipse.emf.compare.facade.FacadeObject;
 import org.eclipse.emf.compare.match.eobject.IEObjectMatcher;
 import org.eclipse.emf.compare.match.eobject.IdentifierEObjectMatcher;
@@ -86,9 +87,13 @@ public class FacadeIdentifierEObjectMatcher extends IdentifierEObjectMatcher {
 		public String apply(EObject eObject) {
 			String result = super.apply(eObject);
 
-			if ((result == null) && (eObject instanceof FacadeObject)) {
-				// Get the ID of the underlying object
-				result = apply(((FacadeObject)eObject).getUnderlyingElement());
+			if (result == null) {
+				// Get the ID of the underlying object if it's a façade
+				if (eObject instanceof FacadeObject) {
+					result = apply(((FacadeObject)eObject).getUnderlyingElement());
+				} else if (FacadeAdapter.isFacade(eObject)) {
+					result = apply(FacadeAdapter.getUnderlyingObject(eObject));
+				}
 			}
 
 			return result;

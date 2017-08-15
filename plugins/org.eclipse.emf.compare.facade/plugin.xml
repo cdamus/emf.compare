@@ -17,6 +17,17 @@ Contributors:
    <extension-point id="facadeProvider" name="EMF Compare Façade Providers" schema="schema/facadeProvider.exsd"/>
 
    <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.emf.compare.facade.internal.expressions.FacadePropertyTester"
+            id="org.eclipse.emf.compare.facade.facadePropertyTester"
+            namespace="org.eclipse.emf.compare.facade"
+            properties="isFacade"
+            type="org.eclipse.emf.ecore.EObject">
+      </propertyTester>
+   </extension>
+
+   <extension
          point="org.eclipse.emf.compare.rcp.matchEngine">
       <engineFactory
             class="org.eclipse.emf.compare.facade.internal.match.FacadeMatchEngine$RCPFactory"
@@ -34,9 +45,9 @@ Contributors:
             label="Façade copier"
             description="Copies the XMI IDs of the model elements underlying a façade object that was copied by a merge operation.">
          <enablement>
-            <instanceof
-                  value="org.eclipse.emf.compare.facade.FacadeObject">
-            </instanceof>
+            <test
+                  property="org.eclipse.emf.compare.facade.isFacade">
+            </test>
          </enablement>
       </copier>
    </extension>

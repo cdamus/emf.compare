@@ -938,6 +938,29 @@ public class FacadeAdapter implements Adapter.Internal {
 	}
 
 	/**
+	 * Queries whether an {@code object} is or appears to be a façade.
+	 * 
+	 * @param object
+	 *            a model element
+	 * @return whether it is a façade, has a façade adapter, or is contained in an object that (recursively)
+	 *         is or appears to be a façade
+	 */
+	public static boolean isFacade(EObject object) {
+		boolean result = object instanceof FacadeObject; // Easiest
+
+		if (!result) {
+			for (EObject next = object; !result && (next != null); next = next.eContainer()) {
+				// Look for a façade adapter that has this object as the façade (not
+				// the underlying element)
+				FacadeAdapter adapter = getInstance(next);
+				result = (adapter != null) && (adapter.getUnderlyingElement() != next);
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * If a {@code notifier} is a {@linkplain FacadeProxy dynamic proxy} implementation of the
 	 * {@link FacadeObject} protocol, then obtain the real façade object that it wraps.
 	 * 

@@ -10,7 +10,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.13.0,4.0.0)",
  org.eclipse.emf.ecore;bundle-version="[2.13.0,3.0.0)";visibility:=reexport,
  org.eclipse.emf.compare;bundle-version="[3.5.0,4.0.0)";visibility:=reexport,
- org.eclipse.emf.compare.rcp;bundle-version="[2.5.0,3.0.0)"
+ org.eclipse.emf.compare.rcp;bundle-version="[2.5.0,3.0.0)",
+ org.eclipse.core.expressions;bundle-version="[3.6.0,4.0.0)"
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.emf.compare.facade.internal.EMFCompareFacadePlugin
 Import-Package: com.google.common.base;version="[15.0.0,22.0.0)",
@@ -21,5 +22,6 @@ Import-Package: com.google.common.base;version="[15.0.0,22.0.0)",
  org.apache.log4j;version="1.2.15"
 Export-Package: org.eclipse.emf.compare.facade,
  org.eclipse.emf.compare.facade.internal;x-friends:="org.eclipse.emf.compare.facade.ui",
+ org.eclipse.emf.compare.facade.internal.expressions,
  org.eclipse.emf.compare.facade.internal.match;x-internal:=true,
  org.eclipse.emf.compare.facade.internal.merge;x-internal:=true

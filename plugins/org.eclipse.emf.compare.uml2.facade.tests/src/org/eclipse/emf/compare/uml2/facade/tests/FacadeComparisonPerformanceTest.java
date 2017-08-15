@@ -161,8 +161,10 @@ public class FacadeComparisonPerformanceTest extends AbstractFacadeTest {
 
 	@Parameters(name = "{1}")
 	public static Iterable<Object[]> parameters() {
-		return Arrays.asList(
-				new Object[][] {{Boolean.TRUE, "dynamic proxy" }, {Boolean.FALSE, "plain façade" }, });
+		return Arrays.asList(new Object[][] { //
+				{Boolean.TRUE, "dynamic proxy" }, //
+				{Boolean.FALSE, "plain façade" }, //
+		});
 	}
 
 	@BeforeClass
