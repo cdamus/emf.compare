@@ -40,14 +40,17 @@ import org.eclipse.emf.compare.DifferenceSource;
 import org.eclipse.emf.compare.facade.FacadeAdapter;
 import org.eclipse.emf.compare.merge.BatchMerger;
 import org.eclipse.emf.compare.merge.IBatchMerger;
+import org.eclipse.emf.compare.merge.ICopier;
 import org.eclipse.emf.compare.scope.DefaultComparisonScope;
 import org.eclipse.emf.compare.scope.IComparisonScope;
 import org.eclipse.emf.compare.uml2.facade.tests.framework.MergeUtils;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage;
+import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EECopier;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.util.J2EEResource;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.util.J2EEResourceFactoryImpl;
 import org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.J2EEProfilePackage;
 import org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.OpaqexprPackage;
+import org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.internal.providers.OpaqexprCopier;
 import org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.util.OpaqexprResource;
 import org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.util.OpaqexprResourceFactoryImpl;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLTest;
@@ -95,6 +98,10 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 			// Map the base resource location
 			URI baseURI = getModelsBaseURI();
 			URIConverter.URI_MAP.put(URI.createURI("pathmap://UML2_FACADE_TESTS/"), baseURI);
+
+			ICopier.Registry.INSTANCE.add(new CopierDescriptor(J2EEPackage.eINSTANCE, new J2EECopier()));
+			ICopier.Registry.INSTANCE
+					.add(new CopierDescriptor(OpaqexprPackage.eINSTANCE, new OpaqexprCopier()));
 		}
 	}
 
@@ -135,6 +142,9 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 	 */
 	public static void resetRegistries() {
 		if (!EMFPlugin.IS_ECLIPSE_RUNNING) {
+			ICopier.Registry.INSTANCE.remove(new CopierDescriptor(OpaqexprPackage.eINSTANCE, null));
+			ICopier.Registry.INSTANCE.remove(new CopierDescriptor(J2EEPackage.eINSTANCE, null));
+
 			URIConverter.URI_MAP.remove(URI.createURI("pathmap://UML2_FACADE_TESTS/"));
 
 			UMLPlugin.getEPackageNsURIToProfileLocationMap().remove(J2EEProfilePackage.eNS_URI);
@@ -216,5 +226,74 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 			assertion = not(hasItem(anything()));
 		}
 		assertThat("No differences expected", differences, assertion);
+	}
+
+	//
+	// Nested types
+	//
+
+	/**
+	 * Descriptor for a statically provided copier in the registry.
+	 *
+	 * @author Christian W. Damus
+	 */
+	private static final class CopierDescriptor implements ICopier.Descriptor {
+		private final EPackage targetPackage;
+
+		private final ICopier copier;
+
+		/**
+		 * Initializes me with the {@code copier} to register for a given package.
+		 * 
+		 * @param targetPackage
+		 *            the target package. Must not be {@code null}
+		 * @param copier
+		 *            the copier to register. May be {@code null} if the descriptor exists only to remove a
+		 *            registration
+		 */
+		CopierDescriptor(EPackage targetPackage, ICopier copier) {
+			super();
+
+			this.targetPackage = targetPackage;
+			this.copier = copier;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public boolean isApplicableTo(EObject object) {
+			return object.eClass().getEPackage() == targetPackage;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public int getRank() {
+			return 50;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public ICopier getCopier() {
+			return copier;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return targetPackage.hashCode();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			return (obj instanceof CopierDescriptor)
+					&& (((CopierDescriptor)obj).targetPackage == this.targetPackage);
+		}
 	}
 }

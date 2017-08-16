@@ -13,6 +13,7 @@
 package org.eclipse.emf.compare.facade.internal.merge;
 
 import org.eclipse.emf.compare.facade.FacadeAdapter;
+import org.eclipse.emf.compare.facade.FacadeObject;
 import org.eclipse.emf.compare.merge.ICopier;
 import org.eclipse.emf.ecore.EObject;
 
@@ -79,5 +80,29 @@ public class FacadeCopier implements ICopier {
 	 */
 	protected void delegateCopyXMIIDs(EObject originalObject, EObject copy) {
 		ICopier.Registry.INSTANCE.getCopier(originalObject).copyXMIIDs(originalObject, copy);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getIdentifier(EObject object) {
+		String result = DEFAULT.getIdentifier(object);
+
+		if (result == null) {
+			// Maybe it's a façade? Access the underlying object
+			EObject underlyingObject;
+
+			if (object instanceof FacadeObject) {
+				underlyingObject = ((FacadeObject)object).getUnderlyingElement();
+			} else {
+				underlyingObject = FacadeAdapter.getUnderlyingObject(object);
+			}
+
+			// Delegate to the underlying model
+			ICopier delegate = ICopier.Registry.INSTANCE.getCopier(underlyingObject);
+			result = delegate.getIdentifier(underlyingObject);
+		}
+
+		return result;
 	}
 }

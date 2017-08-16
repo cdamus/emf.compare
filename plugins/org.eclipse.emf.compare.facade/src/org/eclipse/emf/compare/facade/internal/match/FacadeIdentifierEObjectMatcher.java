@@ -12,10 +12,10 @@
  */
 package org.eclipse.emf.compare.facade.internal.match;
 
-import org.eclipse.emf.compare.facade.FacadeAdapter;
 import org.eclipse.emf.compare.facade.FacadeObject;
 import org.eclipse.emf.compare.match.eobject.IEObjectMatcher;
 import org.eclipse.emf.compare.match.eobject.IdentifierEObjectMatcher;
+import org.eclipse.emf.compare.merge.ICopier;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -68,7 +68,8 @@ public class FacadeIdentifierEObjectMatcher extends IdentifierEObjectMatcher {
 
 	/**
 	 * An ID function that can extract the ID of the object underlying a façade in case the façade has no ID
-	 * of its own.
+	 * of its own. This is done simply by delegation to the most appropriate registered {@link ICopier} for
+	 * the façade.
 	 *
 	 * @author Christian W. Damus
 	 */
@@ -85,15 +86,13 @@ public class FacadeIdentifierEObjectMatcher extends IdentifierEObjectMatcher {
 		 */
 		@Override
 		public String apply(EObject eObject) {
-			String result = super.apply(eObject);
+			String result;
 
-			if (result == null) {
-				// Get the ID of the underlying object if it's a façade
-				if (eObject instanceof FacadeObject) {
-					result = apply(((FacadeObject)eObject).getUnderlyingElement());
-				} else if (FacadeAdapter.isFacade(eObject)) {
-					result = apply(FacadeAdapter.getUnderlyingObject(eObject));
-				}
+			if (eObject == null) {
+				result = null;
+			} else {
+				ICopier copier = ICopier.Registry.INSTANCE.getCopier(eObject);
+				result = copier.getIdentifier(eObject);
 			}
 
 			return result;

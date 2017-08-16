@@ -16,9 +16,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.emf.compare.utils.EMFCompareCopier;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMIResource;
+import org.eclipse.emf.ecore.xmi.XMLResource;
 
 /**
  * Protocol for an algorithm that copies objects (to create merge results) and propagates XMI IDs from objects
@@ -30,6 +32,7 @@ import org.eclipse.emf.ecore.xmi.XMIResource;
  *
  * @author Christian W. Damus
  * @see ICopier.Registry
+ * @since 3.6
  */
 public interface ICopier {
 	/**
@@ -64,6 +67,29 @@ public interface ICopier {
 						((XMIResource)sourceResource).getID(originalObject));
 			}
 		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public String getIdentifier(EObject object) {
+			String result;
+
+			if (object == null) {
+				result = null;
+			} else if (object.eIsProxy()) {
+				result = ((InternalEObject)object).eProxyURI().fragment();
+			} else {
+				Resource resource = object.eResource();
+				if (resource instanceof XMLResource) {
+					result = ((XMLResource)resource).getID(object);
+				} else {
+					result = EcoreUtil.getID(object);
+				}
+			}
+
+			return result;
+
+		}
 	};
 
 	/**
@@ -87,6 +113,17 @@ public interface ICopier {
 	 *            the copy of the original object, which effects the merge
 	 */
 	void copyXMIIDs(EObject originalObject, EObject copy);
+
+	/**
+	 * Obtains the unique identifier of an {@code object}, whether it be an
+	 * {@linkplain XMLResource#getID(EObject) XML ID} or an {@linkplain EcoreUtil#getID(EObject) intrinsic ID}
+	 * or something else such as may be computed for façade models, of an {@code object}.
+	 * 
+	 * @param object
+	 *            an object in one of the input models to the match phase of a comparison
+	 * @return the {@code object}'s identifier, or {@code null} if it has none
+	 */
+	String getIdentifier(EObject object);
 
 	//
 	// Nested types
@@ -206,9 +243,11 @@ public interface ICopier {
 			public ICopier getCopier(EObject originalObject) {
 				ICopier.Descriptor result = DEFAULT_DESCRIPTOR;
 
-				for (ICopier.Descriptor next : descriptors) {
-					if (next.isApplicableTo(originalObject) && (next.getRank() > result.getRank())) {
-						result = next;
+				if (originalObject != null) {
+					for (ICopier.Descriptor next : descriptors) {
+						if (next.isApplicableTo(originalObject) && (next.getRank() > result.getRank())) {
+							result = next;
+						}
 					}
 				}
 

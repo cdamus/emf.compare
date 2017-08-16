@@ -120,7 +120,7 @@ public class FacadeComparisonPerformanceTest extends AbstractFacadeTest {
 
 		printStats(rawStats, "Raw UML");
 
-		assertDelta(facadeStats, rawStats, 50L); // Not worse than a 5x factor
+		assertDelta(facadeStats, rawStats, 2L); // Not worse than a 2x factor
 	}
 
 	void runMerge(Supplier<? extends Resource> left, Supplier<? extends Resource> right, boolean rightToLeft,
@@ -152,7 +152,7 @@ public class FacadeComparisonPerformanceTest extends AbstractFacadeTest {
 
 		printStats(rawStats, "Raw UML");
 
-		assertDelta(facadeStats, rawStats, 50L); // Not worse than a 5x factor
+		assertDelta(facadeStats, rawStats, 2L); // Not worse than a 2x factor
 	}
 
 	//
