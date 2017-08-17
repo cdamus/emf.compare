@@ -12,11 +12,15 @@
  */
 package org.eclipse.emf.compare.facade;
 
+import static org.eclipse.emf.compare.facade.internal.DelegatingFacadeProviderFactory.ensuringFacadeObjects;
+
 import com.google.common.base.Supplier;
 
 import java.util.List;
 
 import org.eclipse.emf.common.notify.Notifier;
+import org.eclipse.emf.compare.facade.internal.CompositeFacadeProvider;
+import org.eclipse.emf.compare.facade.internal.CompositeFacadeProviderFactory;
 import org.eclipse.emf.compare.scope.IComparisonScope;
 import org.eclipse.emf.ecore.EObject;
 
@@ -56,15 +60,7 @@ public interface IFacadeProvider {
 	 * @return the composed façade provider
 	 */
 	default IFacadeProvider compose(IFacadeProvider elseProvider) {
-		return underlyingObject -> {
-			EObject result = this.createFacade(underlyingObject);
-
-			if (result == null) {
-				result = elseProvider.createFacade(underlyingObject);
-			}
-
-			return result;
-		};
+		return CompositeFacadeProvider.compose(this, elseProvider);
 	}
 
 	//
@@ -158,57 +154,7 @@ public interface IFacadeProvider {
 		 * @return the composite factory
 		 */
 		default IFacadeProvider.Factory compose(IFacadeProvider.Factory otherFactory) {
-			/**
-			 * Implementation of a composed façade provider factory.
-			 * 
-			 * @author Christian W. Damus
-			 */
-			final class Composite extends AbstractImpl {
-				private final IFacadeProvider.Factory higherDelegate;
-
-				private final IFacadeProvider.Factory lesserDelegate;
-
-				/**
-				 * Initializes me with my delegates, in ranking order.
-				 * 
-				 * @param higherDelegate
-				 *            the higher-ranked factory
-				 * @param lesserDelegate
-				 *            the lesser-ranked factory
-				 */
-				Composite(IFacadeProvider.Factory higherDelegate, IFacadeProvider.Factory lesserDelegate) {
-					super(higherDelegate.getRanking(), () -> higherDelegate.getFacadeProvider()
-							.compose(lesserDelegate.getFacadeProvider()));
-
-					this.higherDelegate = higherDelegate;
-					this.lesserDelegate = lesserDelegate;
-				}
-
-				/**
-				 * {@inheritDoc}
-				 */
-				public boolean isFacadeProviderFactoryFor(IComparisonScope scope) {
-					return higherDelegate.isFacadeProviderFactoryFor(scope)
-							|| lesserDelegate.isFacadeProviderFactoryFor(scope);
-				}
-
-				/**
-				 * {@inheritDoc}
-				 */
-				public boolean isFacadeProviderFactoryFor(Notifier notifier) {
-					return higherDelegate.isFacadeProviderFactoryFor(notifier)
-							|| lesserDelegate.isFacadeProviderFactoryFor(notifier);
-				}
-			}
-
-			int myRanking = getRanking();
-			int theirRanking = otherFactory.getRanking();
-
-			if (myRanking >= theirRanking) {
-				return new Composite(this, otherFactory);
-			} else {
-				return new Composite(otherFactory, this);
-			}
+			return CompositeFacadeProviderFactory.compose(this, otherFactory);
 		}
 
 		//
@@ -355,9 +301,9 @@ public interface IFacadeProvider {
 			 * @see IFacadeProvider#compose(IFacadeProvider)
 			 */
 			default IFacadeProvider.Factory getFacadeProviderFactory(IComparisonScope scope) {
-				return getFacadeProviderFactories(scope).stream() //
-						.reduce(IFacadeProvider.Factory::compose) //
-						.orElse(IFacadeProvider.Factory.NULL_FACTORY);
+				return ensuringFacadeObjects(getFacadeProviderFactories(scope).stream() //
+						.reduce(IFacadeProvider.Factory.NULL_FACTORY, //
+								IFacadeProvider.Factory::compose));
 			}
 
 			/**

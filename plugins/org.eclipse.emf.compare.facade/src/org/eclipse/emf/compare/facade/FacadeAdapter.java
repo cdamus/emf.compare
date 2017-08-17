@@ -948,7 +948,7 @@ public class FacadeAdapter implements Adapter.Internal {
 	public static boolean isFacade(EObject object) {
 		boolean result = object instanceof FacadeObject; // Easiest
 
-		if (!result) {
+		if (!result && (object != null)) {
 			for (EObject next = object; !result && (next != null); next = next.eContainer()) {
 				// Look for a façade adapter that has this object as the façade (not
 				// the underlying element)

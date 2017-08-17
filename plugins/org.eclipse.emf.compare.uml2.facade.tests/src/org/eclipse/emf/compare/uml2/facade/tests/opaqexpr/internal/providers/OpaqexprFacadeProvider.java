@@ -13,8 +13,6 @@
 package org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.internal.providers;
 
 import org.eclipse.emf.common.notify.Notifier;
-import org.eclipse.emf.compare.facade.FacadeObject;
-import org.eclipse.emf.compare.facade.FacadeProxy;
 import org.eclipse.emf.compare.facade.IFacadeProvider;
 import org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.OpaqexprPackage;
 import org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.internal.adapters.OpaqexprFacadeFactory;
@@ -31,7 +29,6 @@ import org.eclipse.uml2.uml.util.UMLUtil;
  * @author Christian W. Damus
  */
 public class OpaqexprFacadeProvider implements IFacadeProvider {
-	private static boolean useDynamicProxies = false;
 
 	private final OpaqexprFacadeFactory facadeFactory = new OpaqexprFacadeFactory();
 
@@ -53,8 +50,6 @@ public class OpaqexprFacadeProvider implements IFacadeProvider {
 				// Return any other UML content as though it were a façade for itself
 				result = underlyingObject;
 			}
-		} else if (useDynamicProxies) {
-			result = FacadeProxy.createProxy(result);
 		}
 
 		return result;
@@ -70,31 +65,6 @@ public class OpaqexprFacadeProvider implements IFacadeProvider {
 	 */
 	protected boolean isUMLObject(EObject object) {
 		return (object instanceof Element) || (UMLUtil.getStereotype(object) != null);
-	}
-
-	/**
-	 * Sets whether the provider should create dynamic proxies implementing the {@link FacadeObject} protocol.
-	 * 
-	 * @param useDynamicProxies
-	 *            whether to provide dynamic proxies
-	 * @see #getUseDynamicProxies()
-	 * @see FacadeObject
-	 * @see FacadeProxy
-	 */
-	public static void setUseDynamicProxies(boolean useDynamicProxies) {
-		OpaqexprFacadeProvider.useDynamicProxies = useDynamicProxies;
-	}
-
-	/**
-	 * Queries whether the provider creates dynamic proxies implementing the {@link FacadeObject} protocol.
-	 * 
-	 * @return whether dynamic proxies are provided
-	 * @see #setUseDynamicProxies(boolean)
-	 * @see FacadeObject
-	 * @see FacadeProxy
-	 */
-	public static boolean getUseDynamicProxies() {
-		return useDynamicProxies;
 	}
 
 	//

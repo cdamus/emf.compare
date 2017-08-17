@@ -18,7 +18,6 @@ import java.util.Set;
 
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.compare.facade.FacadeObject;
-import org.eclipse.emf.compare.facade.FacadeProxy;
 import org.eclipse.emf.compare.facade.IFacadeProvider;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters.J2EEFacadeFactory;
 import org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.J2EEProfilePackage;
@@ -36,8 +35,6 @@ import org.eclipse.uml2.uml.util.UMLUtil;
 public class J2EEFacadeProvider implements IFacadeProvider {
 	private final J2EEFacadeFactory facadeFactory = new J2EEFacadeFactory();
 
-	private static boolean useDynamicProxies = false;
-
 	/** J2EE packages encountered by this façade provider. */
 	private final Set<org.eclipse.uml2.uml.Package> j2eePackages = Sets.newHashSet();
 
@@ -54,10 +51,6 @@ public class J2EEFacadeProvider implements IFacadeProvider {
 	public EObject createFacade(EObject underlyingObject) {
 		EObject result = facadeFactory.doSwitch(underlyingObject);
 
-		if (useDynamicProxies) {
-			result = FacadeProxy.createProxy(result);
-		}
-
 		// If the object is an application of a J2EE stereotype, it is in our domain
 		// but has no façade of its own. So, block other providers
 		if ((result == null) && isStereotypeApplicationInJ2EEPackage(underlyingObject)) {
@@ -68,31 +61,6 @@ public class J2EEFacadeProvider implements IFacadeProvider {
 		}
 
 		return result;
-	}
-
-	/**
-	 * Sets whether the provider should create dynamic proxies implementing the {@link FacadeObject} protocol.
-	 * 
-	 * @param useDynamicProxies
-	 *            whether to provide dynamic proxies
-	 * @see #getUseDynamicProxies()
-	 * @see FacadeObject
-	 * @see FacadeProxy
-	 */
-	public static void setUseDynamicProxies(boolean useDynamicProxies) {
-		J2EEFacadeProvider.useDynamicProxies = useDynamicProxies;
-	}
-
-	/**
-	 * Queries whether the provider creates dynamic proxies implementing the {@link FacadeObject} protocol.
-	 * 
-	 * @return whether dynamic proxies are provided
-	 * @see #setUseDynamicProxies(boolean)
-	 * @see FacadeObject
-	 * @see FacadeProxy
-	 */
-	public static boolean getUseDynamicProxies() {
-		return useDynamicProxies;
 	}
 
 	protected boolean isStereotypeApplicationInJ2EEPackage(EObject object) {

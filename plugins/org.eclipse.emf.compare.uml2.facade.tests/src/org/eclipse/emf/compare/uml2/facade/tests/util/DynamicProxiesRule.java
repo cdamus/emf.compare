@@ -12,20 +12,9 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests.util;
 
-import static org.junit.Assert.fail;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
-
-import java.lang.reflect.Modifier;
-import java.util.List;
-import java.util.Set;
 import java.util.function.BooleanSupplier;
-import java.util.stream.Stream;
 
-import org.eclipse.emf.compare.facade.IFacadeProvider;
-import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EEFacadeProvider;
-import org.eclipse.emf.compare.uml2.facade.tests.opaqexpr.internal.providers.OpaqexprFacadeProvider;
+import org.eclipse.emf.compare.facade.internal.EMFCompareFacadePlugin;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
@@ -34,15 +23,12 @@ import org.junit.runner.Description;
  *
  * @author Christian W. Damus
  */
-@SuppressWarnings("boxing")
+@SuppressWarnings("restriction")
 public final class DynamicProxiesRule extends TestWatcher implements BooleanSupplier {
-
-	private static final List<Class<? extends IFacadeProvider>> FACADE_PROVIDER_CLASSES = ImmutableList
-			.of(J2EEFacadeProvider.class, OpaqexprFacadeProvider.class);
 
 	private final boolean useDynamicProxies;
 
-	private Set<Class<? extends IFacadeProvider>> wasUseDynamicProxies = Sets.newIdentityHashSet();
+	private boolean wasUseDynamicProxies;
 
 	/**
 	 * Initializes me.
@@ -70,15 +56,8 @@ public final class DynamicProxiesRule extends TestWatcher implements BooleanSupp
 	 */
 	@Override
 	protected void starting(Description description) {
-		// Record which providers were using dynamic proxies
-		wasUseDynamicProxies.clear();
-		FACADE_PROVIDER_CLASSES.stream() //
-				.filter(cl -> safeInvokeStatic(cl, "getUseDynamicProxies")) //$NON-NLS-1$
-				.forEach(wasUseDynamicProxies::add);
-
-		// Set them all
-		FACADE_PROVIDER_CLASSES
-				.forEach(cl -> safeInvokeStatic(cl, "setUseDynamicProxies", useDynamicProxies)); //$NON-NLS-1$
+		wasUseDynamicProxies = EMFCompareFacadePlugin.isUseDynamicProxies();
+		EMFCompareFacadePlugin.setUseDynamicProxies(useDynamicProxies);
 	}
 
 	/**
@@ -86,25 +65,6 @@ public final class DynamicProxiesRule extends TestWatcher implements BooleanSupp
 	 */
 	@Override
 	protected void finished(Description description) {
-		FACADE_PROVIDER_CLASSES.forEach(
-				cl -> safeInvokeStatic(cl, "setUseDynamicProxies", wasUseDynamicProxies.contains(cl))); //$NON-NLS-1$
-		wasUseDynamicProxies.clear();
-	}
-
-	@SuppressWarnings("unchecked")
-	<T> T safeInvokeStatic(Class<?> owner, String methodName, Object... arg) {
-		return (T)Stream.of(owner.getDeclaredMethods())
-				.filter(m -> methodName.equals(m.getName()) && (m.getParameterCount() == arg.length)
-						&& Modifier.isStatic(m.getModifiers()))
-				.findFirst() //
-				.map(method -> {
-					try {
-						return method.invoke(null, arg);
-					} catch (Exception e) {
-						e.printStackTrace();
-						fail(String.format("Failed to invoke %s: %s", method, e.getMessage())); //$NON-NLS-1$
-						return null;
-					}
-				}).orElse(null);
+		EMFCompareFacadePlugin.setUseDynamicProxies(wasUseDynamicProxies);
 	}
 }

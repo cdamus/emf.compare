@@ -72,18 +72,22 @@ public interface ICopier {
 		 * {@inheritDoc}
 		 */
 		public String getIdentifier(EObject object) {
-			String result;
+			String result = null;
 
-			if (object == null) {
-				result = null;
-			} else if (object.eIsProxy()) {
-				result = ((InternalEObject)object).eProxyURI().fragment();
-			} else {
-				Resource resource = object.eResource();
-				if (resource instanceof XMLResource) {
-					result = ((XMLResource)resource).getID(object);
+			if (object != null) {
+				if (object.eIsProxy()) {
+					result = ((InternalEObject)object).eProxyURI().fragment();
 				} else {
-					result = EcoreUtil.getID(object);
+					Resource resource = object.eResource();
+					if (resource instanceof XMLResource) {
+						result = ((XMLResource)resource).getID(object);
+					}
+
+					if (result == null) {
+						// Even if we got a resource, it may have been from a
+						// a façade, in which case it wouldn't have an ID for it
+						result = EcoreUtil.getID(object);
+					}
 				}
 			}
 

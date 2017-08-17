@@ -12,7 +12,7 @@
  */
 package org.eclipse.emf.compare.facade.internal.match;
 
-import org.eclipse.emf.compare.facade.FacadeObject;
+import org.eclipse.emf.compare.facade.FacadeAdapter;
 import org.eclipse.emf.compare.match.eobject.IEObjectMatcher;
 import org.eclipse.emf.compare.match.eobject.IdentifierEObjectMatcher;
 import org.eclipse.emf.compare.merge.ICopier;
@@ -49,11 +49,11 @@ public class FacadeIdentifierEObjectMatcher extends IdentifierEObjectMatcher {
 	protected EObject getParentEObject(EObject eObject) {
 		EObject result = super.getParentEObject(eObject);
 
-		if ((result == null) && (eObject instanceof FacadeObject)) {
+		if ((result == null) && FacadeAdapter.isFacade(eObject)) {
 			// If it's a façade for an object that has a parent, then that
 			// parent should be the façade's parent for the purposes of
 			// organizing the match hierarchy
-			EObject underlying = ((FacadeObject)eObject).getUnderlyingElement();
+			EObject underlying = FacadeAdapter.getUnderlyingObject(eObject);
 			if (underlying != null) {
 				result = getParentEObject(underlying);
 			}

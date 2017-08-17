@@ -36,6 +36,9 @@ public class EMFCompareFacadePlugin extends Plugin {
 	/** This plug-in's shared instance. */
 	private static EMFCompareFacadePlugin plugin;
 
+	/** Whether to use dynamic proxies, which by default is {@code true}. */
+	private static boolean useDynamicProxies = true;
+
 	/** The registry that keeps references to façade provider factories. */
 	private IItemRegistry<IFacadeProvider.Factory> facadeProviderRegistry;
 
@@ -107,5 +110,26 @@ public class EMFCompareFacadePlugin extends Plugin {
 		facadeProviderRegistryListener = null;
 		facadeProviderRegistry = null;
 		facadeProviderRegistryWrapper = null;
+	}
+
+	/**
+	 * Queries whether dynamic proxies are supplied for façade models that do not implement the
+	 * {@code FacadeObject} interface.
+	 * 
+	 * @return whether dynamic proxies are provided on behalf of {@link IFacadeProvider}s
+	 */
+	public static boolean isUseDynamicProxies() {
+		return useDynamicProxies;
+	}
+
+	/**
+	 * Sets whether dynamic proxies are supplied for façade models that do not implement the
+	 * {@code FacadeObject} interface.
+	 * 
+	 * @param useDynamicProxies
+	 *            whether dynamic proxies are provided on behalf of {@link IFacadeProvider}s
+	 */
+	public static void setUseDynamicProxies(boolean useDynamicProxies) {
+		EMFCompareFacadePlugin.useDynamicProxies = useDynamicProxies;
 	}
 }
