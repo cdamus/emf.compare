@@ -56,7 +56,7 @@ public class PerformanceInputData extends AbstractUMLInputData {
 		model.setName("p1");
 		result.getContents().add(model);
 
-		generateOpaqueExpressions(model, 19, 2);
+		generateOpaqueExpressions(model, 29, 2);
 		setSerialEObjectIds(result);
 
 		return result;

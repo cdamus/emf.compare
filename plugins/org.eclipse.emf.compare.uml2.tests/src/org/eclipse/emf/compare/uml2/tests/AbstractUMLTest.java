@@ -157,22 +157,32 @@ public abstract class AbstractUMLTest {
 		registerPostProcessors(postProcessorRegistry);
 		builder.setPostProcessorRegistry(postProcessorRegistry);
 		mergerRegistry = IMerger.RegistryImpl.createStandaloneInstance();
-		final IMerger umlMerger = new UMLMerger();
-		final IMerger umlReferenceChangeMerger = new UMLReferenceChangeMerger();
-		final IMerger opaqueElementBodyChangeMerger = new OpaqueElementBodyChangeMerger();
-		umlMerger.setRanking(20);
-		umlReferenceChangeMerger.setRanking(25);
-		opaqueElementBodyChangeMerger.setRanking(25);
-		mergerRegistry.add(umlMerger);
-		mergerRegistry.add(umlReferenceChangeMerger);
-		mergerRegistry.add(opaqueElementBodyChangeMerger);
-
+		fillMergerRegistry(mergerRegistry);
 		IMatchEngine.Factory.Registry matchEngineFactoryRegistry = MatchEngineFactoryRegistryImpl
 				.createStandaloneInstance();
 		fillMatchEngineFactoryRegistry(matchEngineFactoryRegistry);
 		builder.setMatchEngineFactoryRegistry(matchEngineFactoryRegistry);
 
 		emfCompare = builder.build();
+	}
+
+	/**
+	 * Register the mergers required by the test. The default implementation registers the {@link UMLMerger},
+	 * {@link UMLReferenceChangeMerger}, and {@link OpaqueElementBodyChangeMerger}.
+	 * 
+	 * @param registry
+	 *            the merger registry to poplate
+	 */
+	protected void fillMergerRegistry(IMerger.Registry registry) {
+		final IMerger umlMerger = new UMLMerger();
+		final IMerger umlReferenceChangeMerger = new UMLReferenceChangeMerger();
+		final IMerger opaqueElementBodyChangeMerger = new OpaqueElementBodyChangeMerger();
+		umlMerger.setRanking(20);
+		umlReferenceChangeMerger.setRanking(25);
+		opaqueElementBodyChangeMerger.setRanking(25);
+		registry.add(umlMerger);
+		registry.add(umlReferenceChangeMerger);
+		registry.add(opaqueElementBodyChangeMerger);
 	}
 
 	/**

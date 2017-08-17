@@ -32,6 +32,8 @@ import org.eclipse.emf.compare.facade.internal.EMFCompareFacadePlugin;
 import org.eclipse.emf.compare.facade.internal.FacadeProviderRegistryImpl;
 import org.eclipse.emf.compare.facade.internal.match.FacadeMatchEngine;
 import org.eclipse.emf.compare.match.IMatchEngine;
+import org.eclipse.emf.compare.merge.IMerger;
+import org.eclipse.emf.compare.postprocessor.IPostProcessor;
 import org.eclipse.emf.compare.rcp.EMFCompareRCPPlugin;
 import org.eclipse.emf.compare.uml2.facade.tests.data.PerformanceInputData;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.providers.J2EEFacadeProvider;
@@ -85,6 +87,8 @@ public class FacadeComparisonPerformanceTest extends AbstractFacadeTest {
 	@Rule
 	public final DynamicProxiesRule useDynamicProxies;
 
+	private final boolean umlPost;
+
 	/** Value of the disabled façade providers preference to restore. */
 	private String disabledFacadeProvidersPreference;
 
@@ -100,11 +104,13 @@ public class FacadeComparisonPerformanceTest extends AbstractFacadeTest {
 	 * Initializes me.
 	 */
 	public FacadeComparisonPerformanceTest(boolean useDynamicProxies,
-			@SuppressWarnings("unused") String label) {
+			@SuppressWarnings("unused") String label1, boolean umlPost,
+			@SuppressWarnings("unused") String label2) {
 
 		super();
 
 		this.useDynamicProxies = new DynamicProxiesRule(useDynamicProxies);
+		this.umlPost = umlPost;
 	}
 
 	@Test
@@ -120,7 +126,13 @@ public class FacadeComparisonPerformanceTest extends AbstractFacadeTest {
 
 		printStats(rawStats, "Raw UML");
 
-		assertDelta(facadeStats, rawStats, 2L); // Not worse than a 2x factor
+		double factor;
+		if (umlPost) {
+			factor = 2.0; // Not worse than a 2x factor
+		} else {
+			factor = 2.5; // Not worse than a 2.5x factor
+		}
+		assertDelta(facadeStats, rawStats, factor);
 	}
 
 	void runMerge(Supplier<? extends Resource> left, Supplier<? extends Resource> right, boolean rightToLeft,
@@ -152,18 +164,26 @@ public class FacadeComparisonPerformanceTest extends AbstractFacadeTest {
 
 		printStats(rawStats, "Raw UML");
 
-		assertDelta(facadeStats, rawStats, 2L); // Not worse than a 2x factor
+		double factor;
+		if (umlPost) {
+			factor = 2.0; // Not worse than a 2x factor
+		} else {
+			factor = 2.5; // Not worse than a 2.5x factor
+		}
+		assertDelta(facadeStats, rawStats, factor);
 	}
 
 	//
 	// Test framework
 	//
 
-	@Parameters(name = "{1}")
+	@Parameters(name = "{1}, {3}")
 	public static Iterable<Object[]> parameters() {
 		return Arrays.asList(new Object[][] { //
-				{Boolean.TRUE, "dynamic proxy" }, //
-				{Boolean.FALSE, "plain façade" }, //
+				{Boolean.TRUE, "dynamic proxy", Boolean.TRUE, "uml hooks" }, //
+				{Boolean.FALSE, "plain façade", Boolean.TRUE, "uml hooks" }, //
+				{Boolean.TRUE, "dynamic proxy", Boolean.FALSE, "no uml hooks" }, //
+				{Boolean.FALSE, "plain façade", Boolean.FALSE, "no uml hooks" }, //
 		});
 	}
 
@@ -175,6 +195,26 @@ public class FacadeComparisonPerformanceTest extends AbstractFacadeTest {
 	@AfterClass
 	public static void teardownClass() {
 		resetRegistries();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void registerPostProcessors(IPostProcessor.Descriptor.Registry<String> postProcessorRegistry) {
+		if (umlPost) {
+			super.registerPostProcessors(postProcessorRegistry);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void fillMergerRegistry(IMerger.Registry registry) {
+		if (umlPost) {
+			super.fillMergerRegistry(registry);
+		}
 	}
 
 	/**
@@ -273,7 +313,7 @@ public class FacadeComparisonPerformanceTest extends AbstractFacadeTest {
 				stats.average(MILLISECONDS), stats.stddev(MILLISECONDS));
 	}
 
-	void assertDelta(PerformanceStats a, PerformanceStats b, long factor) {
+	void assertDelta(PerformanceStats a, PerformanceStats b, double factor) {
 		long deltaPctTotal = (a.total(MILLISECONDS) - b.total(MILLISECONDS)) * 100 / b.total(MILLISECONDS);
 		long deltaPctAvg = (a.average(MILLISECONDS) - b.average(MILLISECONDS)) * 100
 				/ b.average(MILLISECONDS);
@@ -286,8 +326,8 @@ public class FacadeComparisonPerformanceTest extends AbstractFacadeTest {
 		}
 
 		// Make an allowance for the overhead of dynamic proxies
-		long acceptableFactor = useDynamicProxies.getAsBoolean() ? factor * 200L : factor * 100L;
-		long test = max(abs(deltaPctTotal), abs(deltaPctAvg));
+		double acceptableFactor = useDynamicProxies.getAsBoolean() ? factor * 200.0 : factor * 100.0;
+		double test = max(abs(deltaPctTotal), abs(deltaPctAvg));
 
 		assertThat("Performance impact of façades is too great", test, lessThanOrEqualTo(acceptableFactor));
 	}
