@@ -59,6 +59,7 @@ import org.eclipse.emf.compare.postprocessor.PostProcessorDescriptorRegistryImpl
 import org.eclipse.emf.compare.scope.DefaultComparisonScope;
 import org.eclipse.emf.compare.scope.IComparisonScope;
 import org.eclipse.emf.compare.tests.framework.junit.AnnotationRule;
+import org.eclipse.emf.compare.tests.framework.junit.AutoCloseRule;
 import org.eclipse.emf.compare.tests.postprocess.data.TestPostProcessor;
 import org.eclipse.emf.compare.uml2.internal.StereotypedElementChange;
 import org.eclipse.emf.compare.uml2.internal.UMLDiff;
@@ -92,6 +93,9 @@ import org.junit.Rule;
  * comparison. The <i>scope-type</i> should be {@link IComparisonScope} or some type conforming to it if only
  * specific a implementation of the scope should be verified</li>
  * </ul>
+ * <b>Note</b> that any fields of {@link AutoCloseable} type, or some kind of array/collection/map of that
+ * type, will be closed automatically after each test. This includes, of course, any
+ * {@link AbstractUMLInputData}.
  * 
  * @author <a href="mailto:cedric.notot@obeo.fr">Cedric Notot</a>
  */
@@ -101,6 +105,9 @@ public abstract class AbstractUMLTest {
 	@Rule
 	public final AnnotationRule<AdditionalResources, AdditionalResourcesKind> additionalResourcesKind = AnnotationRule
 			.create(AdditionalResources.class, AdditionalResourcesKind.NONE);
+
+	@Rule
+	public final AutoCloseRule autocloser = new AutoCloseRule();
 
 	protected EMFCompare emfCompare;
 
@@ -197,7 +204,7 @@ public abstract class AbstractUMLTest {
 
 	@After
 	public void cleanup() {
-		getInput().close();
+		// Let subclasses override this if necessary
 	}
 
 	protected EMFCompare getCompare() {

@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.eclipse.emf.common.notify.Notifier;
@@ -198,12 +199,18 @@ class FacadeComparisonScope implements IComparisonScope {
 	 *
 	 * @author Christian W. Damus
 	 */
-	protected class FacadeTreeIterator extends AbstractIterator<EObject> implements TreeIterator<EObject> {
+	protected class FacadeTreeIterator implements TreeIterator<EObject> {
 		/** The top sub-tree iterator in the prune stack. */
 		Iterator<? extends EObject> current;
 
 		/** A stack of iterators to resume after completion of a prune substitution. */
 		List<TreeIterator<? extends EObject>> pruneStack = Lists.newArrayListWithExpectedSize(3);
+
+		/** The current state of the iteration. */
+		private State state = State.INITIAL;
+
+		/** The prepared next object to return from the iteration. */
+		private EObject preparedNext;
 
 		/**
 		 * Initializes me with my delegate.
@@ -258,8 +265,57 @@ class FacadeComparisonScope implements IComparisonScope {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
-		protected EObject computeNext() {
+		public boolean hasNext() {
+			boolean result;
+
+			if (state.isDone()) {
+				result = false;
+			} else if (state.isPrepared()) {
+				result = true;
+			} else {
+				prepareNext();
+				result = hasNext();
+			}
+
+			return result;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public final EObject next() {
+			EObject result;
+
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+
+			result = preparedNext;
+			state = state.returned();
+			preparedNext = null;
+
+			return result;
+		}
+
+		/** Prepares the next value to return. */
+		private void prepareNext() {
+			preparedNext = computeNext();
+		}
+
+		/**
+		 * Signals that there is nothing left to iterate.
+		 * 
+		 * @return a dummy, useful as the return result from {@link #computeNext()}
+		 */
+		final EObject endOfData() {
+			state = State.DONE;
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		EObject computeNext() {
 			EObject result;
 
 			if (current == null) {
@@ -274,12 +330,16 @@ class FacadeComparisonScope implements IComparisonScope {
 					result = current.next();
 
 					EObject facade = facadeElse(result);
-					if (facade != result) {
+					if (facade == result) {
+						// Just a normal iteration step
+						state = state.prepared();
+					} else {
 						// Got a facade. Substitute it for the result and the sub-tree, too
 						result = facade;
 
 						if (push(current)) {
 							current = getChildren(facade);
+							state = state.substituted();
 						} else {
 							// Can't prune? Have to hope that the children of the original map
 							// one-for-one to façades, then
@@ -298,8 +358,20 @@ class FacadeComparisonScope implements IComparisonScope {
 		 * {@inheritDoc}
 		 */
 		public void prune() {
-			if (current instanceof TreeIterator<?>) {
-				((TreeIterator<?>)current).prune();
+			switch (state) {
+				case RETURNED:
+					if (current instanceof TreeIterator<?>) {
+						((TreeIterator<?>)current).prune();
+					}
+					break;
+				case RETURNED_SUBSTITUTE:
+					// The current iterator is that object's contents, so skip it entirely
+					current = null;
+					break;
+				default:
+					// Can only prune after a result was returned
+					break;
+
 			}
 		}
 	}
@@ -376,6 +448,98 @@ class FacadeComparisonScope implements IComparisonScope {
 			} else {
 				// Just prune off the entire current sub-tree
 				currentTree = null;
+			}
+		}
+	}
+
+	/**
+	 * Enumeration of the possible states of the {@link FacadeTreeIterator}.
+	 *
+	 * @author Christian W. Damus
+	 */
+	enum State {
+		/** We haven't yet computed anything. */
+		INITIAL,
+		/** We have prepared the next element to return. */
+		PREPARED,
+		/** We have returned an element and are ready to prepare another. */
+		RETURNED,
+		/** We have prepared the next element to return and it was a façade substitution. */
+		PREPARED_SUBSTITUTE,
+		/** We have returned a façade substitution and are ready to prepare the next element. */
+		RETURNED_SUBSTITUTE,
+		/** Iteration has finished; we have no more. */
+		DONE;
+
+		/**
+		 * Queries whether I am the <em>done</em> state.
+		 * 
+		 * @return whether I am the <em>done</em> state
+		 */
+		boolean isDone() {
+			return this == DONE;
+		}
+
+		/**
+		 * Queries whether I am a kind of <em>prepared</em> state.
+		 * 
+		 * @return whether I am a kind of <em>prepared</em> state
+		 */
+		boolean isPrepared() {
+			return (this == PREPARED) || (this == PREPARED_SUBSTITUTE);
+		}
+
+		/**
+		 * Transitions from a <em>prepared</em> state to the corresponding <em>returned</em> state.
+		 * 
+		 * @return the <em>returned</em> state
+		 * @throws IllegalStateException
+		 *             if we cannot transition to a <em>returned</em> state from this
+		 */
+		State returned() {
+			switch (this) {
+				case PREPARED:
+					return RETURNED;
+				case PREPARED_SUBSTITUTE:
+					return RETURNED_SUBSTITUTE;
+				default:
+					throw new IllegalStateException("return from " + this); //$NON-NLS-1$
+			}
+		}
+
+		/**
+		 * Transitions to the <em>prepared</em> state.
+		 * 
+		 * @return the <em>prepared</em> state
+		 * @throws IllegalStateException
+		 *             if we cannot transition to the <em>prepared</em> state from this
+		 */
+		State prepared() {
+			switch (this) {
+				case INITIAL:
+				case RETURNED:
+				case RETURNED_SUBSTITUTE:
+					return PREPARED;
+				default:
+					throw new IllegalStateException("prepare from " + this); //$NON-NLS-1$
+			}
+		}
+
+		/**
+		 * Transitions to the <em>prepared substitution</em> state.
+		 * 
+		 * @return the <em>prepared substitution</em> state
+		 * @throws IllegalStateException
+		 *             if we cannot transition to the <em>prepared substitution</em> state from this
+		 */
+		State substituted() {
+			switch (this) {
+				case INITIAL:
+				case RETURNED:
+				case RETURNED_SUBSTITUTE:
+					return PREPARED_SUBSTITUTE;
+				default:
+					throw new IllegalStateException("substitute from " + this); //$NON-NLS-1$
 			}
 		}
 	}
