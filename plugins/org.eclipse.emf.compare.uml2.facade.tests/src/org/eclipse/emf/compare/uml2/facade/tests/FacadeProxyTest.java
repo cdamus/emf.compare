@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.EList;
@@ -60,7 +61,7 @@ import org.junit.Test;
  *
  * @author Christian W. Damus
  */
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "boxing" })
 public class FacadeProxyTest extends AbstractFacadeTest {
 
 	private BasicFacadeInputData input = new BasicFacadeInputData();
@@ -521,6 +522,29 @@ public class FacadeProxyTest extends AbstractFacadeTest {
 		assertThat(oldValue.get(), notNullValue());
 		assertThat(oldValue.get(), hasItem(finder));
 		assertThat(oldValue.get(), hasItem(byID));
+	}
+
+	@Test
+	public void removeAdapter() {
+		Package package_ = requirePackage();
+		Bean thing = requireBean(package_, "Thing");
+
+		boolean[] removed = {false };
+
+		Adapter adapter = new AdapterImpl() {
+			@Override
+			public void notifyChanged(Notification msg) {
+				assertThat((EObject)msg.getNotifier(), isFacade());
+
+				if (msg.getEventType() == Notification.REMOVING_ADAPTER) {
+					removed[0] = msg.getOldValue() == this;
+				}
+			}
+		};
+		thing.eAdapters().add(adapter);
+		thing.eAdapters().remove(adapter);
+
+		assertThat("adapter not removed", removed[0], is(true));
 	}
 
 	//

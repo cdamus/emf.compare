@@ -75,6 +75,11 @@ final class ProxyNotification extends NotificationWrapper {
 		Object result = notification.getOldValue();
 		if (getFeature() instanceof EReference) {
 			result = impl.wrapEObjects(result);
+		} else if (getEventType() == REMOVING_ADAPTER) {
+			// Unwrap the adapter
+			if (result instanceof ProxyAdapter) {
+				result = ((ProxyAdapter)result).getDelegate();
+			}
 		}
 
 		return result;

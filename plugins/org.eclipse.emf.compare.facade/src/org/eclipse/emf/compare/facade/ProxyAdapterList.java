@@ -18,7 +18,6 @@ import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.util.DelegatingEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.compare.facade.FacadeProxy.Impl;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * A wrapper for the list of adapters attached to façade proxies that exposes details of incoming
@@ -64,9 +63,26 @@ final class ProxyAdapterList extends DelegatingEList<Adapter> {
 	 */
 	@Override
 	protected int delegateIndexOf(Object object) {
-		if (object instanceof EObject) {
-			return super.delegateIndexOf(FacadeProxy.unwrap((EObject)object));
+		if (object instanceof Adapter) {
+			List<Adapter> list = delegateList();
+
+			for (int i = 0; i < list.size(); i++) {
+				Adapter next = list.get(i);
+
+				if (next.equals(object)) {
+					return i;
+				}
+
+				// Maybe it's wrapped
+				if (next instanceof ProxyAdapter) {
+					next = ((ProxyAdapter)next).getDelegate();
+				}
+				if (next.equals(object)) {
+					return i;
+				}
+			}
 		}
+
 		return super.delegateIndexOf(object);
 	}
 
