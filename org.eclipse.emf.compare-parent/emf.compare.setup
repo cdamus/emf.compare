@@ -155,7 +155,7 @@
         name="Core">
       <predicate
           xsi:type="workingsets:ExclusionPredicate"
-          excludedWorkingSet="//@setupTasks.8/@workingSets.8 //@setupTasks.8/@workingSets.1 //@setupTasks.8/@workingSets.2 //@setupTasks.8/@workingSets.3 //@setupTasks.8/@workingSets.4 //@setupTasks.8/@workingSets.9 //@setupTasks.8/@workingSets.5 //@setupTasks.8/@workingSets.6"/>
+          excludedWorkingSet="//@setupTasks.8/@workingSets.9 //@setupTasks.8/@workingSets.1 //@setupTasks.8/@workingSets.2 //@setupTasks.8/@workingSets.3 //@setupTasks.8/@workingSets.4 //@setupTasks.8/@workingSets.10 //@setupTasks.8/@workingSets.5 //@setupTasks.8/@workingSets.6 //@setupTasks.8/@workingSets.7 //@setupTasks.8/@workingSets.8"/>
     </workingSet>
     <workingSet
         name="RCP">
@@ -163,10 +163,10 @@
           xsi:type="predicates:AndPredicate">
         <operand
             xsi:type="predicates:NamePredicate"
-            pattern=".*compare.rcp.*"/>
+            pattern="org\.eclipse\.emf\.compare\.rcp.*"/>
         <operand
             xsi:type="workingsets:ExclusionPredicate"
-            excludedWorkingSet="//@setupTasks.8/@workingSets.9"/>
+            excludedWorkingSet="//@setupTasks.8/@workingSets.10"/>
       </predicate>
     </workingSet>
     <workingSet
@@ -175,10 +175,10 @@
           xsi:type="predicates:AndPredicate">
         <operand
             xsi:type="predicates:NamePredicate"
-            pattern=".*compare.ide.*"/>
+            pattern="org\.eclipse\.emf\.compare\.ide.*"/>
         <operand
             xsi:type="workingsets:ExclusionPredicate"
-            excludedWorkingSet="//@setupTasks.8/@workingSets.9"/>
+            excludedWorkingSet="//@setupTasks.8/@workingSets.10"/>
       </predicate>
     </workingSet>
     <workingSet
@@ -187,10 +187,10 @@
           xsi:type="predicates:AndPredicate">
         <operand
             xsi:type="predicates:NamePredicate"
-            pattern=".*uml.*"/>
+            pattern="org\.eclipse\.emf\.compare\.uml.*"/>
         <operand
             xsi:type="workingsets:ExclusionPredicate"
-            excludedWorkingSet="//@setupTasks.8/@workingSets.9 //@setupTasks.8/@workingSets.6"/>
+            excludedWorkingSet="//@setupTasks.8/@workingSets.10 //@setupTasks.8/@workingSets.6 //@setupTasks.8/@workingSets.7"/>
       </predicate>
     </workingSet>
     <workingSet
@@ -199,10 +199,10 @@
           xsi:type="predicates:AndPredicate">
         <operand
             xsi:type="predicates:NamePredicate"
-            pattern=".*diagram.*"/>
+            pattern="org\.eclipse\.emf\.compare\..*diagram.*"/>
         <operand
             xsi:type="workingsets:ExclusionPredicate"
-            excludedWorkingSet="//@setupTasks.8/@workingSets.9"/>
+            excludedWorkingSet="//@setupTasks.8/@workingSets.10"/>
       </predicate>
     </workingSet>
     <workingSet
@@ -211,10 +211,10 @@
           xsi:type="predicates:AndPredicate">
         <operand
             xsi:type="predicates:NamePredicate"
-            pattern=".*\.e?git.*"/>
+            pattern="org\.eclipse\.emf\.compare\..*\.e?git.*"/>
         <operand
             xsi:type="workingsets:ExclusionPredicate"
-            excludedWorkingSet="//@setupTasks.8/@workingSets.9"/>
+            excludedWorkingSet="//@setupTasks.8/@workingSets.10"/>
       </predicate>
     </workingSet>
     <workingSet
@@ -223,10 +223,22 @@
           xsi:type="predicates:AndPredicate">
         <operand
             xsi:type="predicates:NamePredicate"
-            pattern=".*\.papyrus.*"/>
+            pattern="org\.eclipse\.emf\.compare\..*papyrus.*"/>
         <operand
             xsi:type="workingsets:ExclusionPredicate"
-            excludedWorkingSet="//@setupTasks.8/@workingSets.9"/>
+            excludedWorkingSet="//@setupTasks.8/@workingSets.10"/>
+      </predicate>
+    </workingSet>
+    <workingSet
+        name="Façades">
+      <predicate
+          xsi:type="predicates:AndPredicate">
+        <operand
+            xsi:type="predicates:NamePredicate"
+            pattern="org\.eclipse\.emf\.compare\..*facade.*"/>
+        <operand
+            xsi:type="workingsets:ExclusionPredicate"
+            excludedWorkingSet="//@setupTasks.8/@workingSets.10"/>
       </predicate>
     </workingSet>
     <workingSet
@@ -237,7 +249,7 @@
           contentPattern="org\.junit"/>
       <predicate
           xsi:type="predicates:NamePredicate"
-          pattern=".*tests.*"/>
+          pattern=".*tests?.*"/>
     </workingSet>
     <workingSet
         name="Packaging">
