@@ -25,11 +25,7 @@ public enum SyncDirectionKind {
 	/** Synchronize from the model to the façade. */
 	TO_FACADE,
 	/** Synchronize from the façade to the model. */
-	TO_MODEL,
-	/** Synchronize in both directions, to the façade first. */
-	BOTH_TO_FACADE_FIRST,
-	/** Synchronize in both directions, to the model first. */
-	BOTH_TO_MODEL_FIRST;
+	TO_MODEL;
 
 	/**
 	 * Performs synchronization between the {@code facade} and the {@code model}.
@@ -59,14 +55,6 @@ public enum SyncDirectionKind {
 				break;
 			case TO_MODEL:
 				toModelSupplier.get().synchronize(adapter, facade, model, null);
-				break;
-			case BOTH_TO_FACADE_FIRST:
-				toFacadeSupplier.get().synchronize(adapter, model, facade, null);
-				toModelSupplier.get().synchronize(adapter, facade, model, null);
-				break;
-			case BOTH_TO_MODEL_FIRST:
-				toModelSupplier.get().synchronize(adapter, facade, model, null);
-				toFacadeSupplier.get().synchronize(adapter, model, facade, null);
 				break;
 			default:
 				throw new IllegalArgumentException(this.name());

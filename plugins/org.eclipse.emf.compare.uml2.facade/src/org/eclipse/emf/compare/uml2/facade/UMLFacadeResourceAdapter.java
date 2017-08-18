@@ -12,6 +12,9 @@
  */
 package org.eclipse.emf.compare.uml2.facade;
 
+import java.util.Collection;
+import java.util.function.Predicate;
+
 import org.apache.log4j.Logger;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
@@ -145,24 +148,37 @@ public class UMLFacadeResourceAdapter extends AdapterImpl {
 			case Notification.SET:
 				EObject newObject = (EObject)msg.getNewValue();
 				if (!(newObject instanceof Element)) {
-					Stereotype stereo = UMLUtil.getStereotype(newObject);
-					if (stereo != null) {
-						Element base = UMLUtil.getBaseElement(newObject);
-						if (base != null) {
-							processStereotypeApplication(newObject, base);
-						} else {
-							// Process later
-							addAdapter(newObject);
-						}
-					}
+					discoverStereotypeApplication(newObject);
 				}
 				break;
 			case Notification.ADD_MANY:
-				// XXX
+				@SuppressWarnings("unchecked")
+				Collection<? extends EObject> newObjects = (Collection<? extends EObject>)msg.getNewValue();
+				Predicate<EObject> isElement = Element.class::isInstance;
+				newObjects.stream().filter(isElement.negate()).forEach(this::discoverStereotypeApplication);
 				break;
 			default:
 				// Pass
 				break;
+		}
+	}
+
+	/**
+	 * Attempts to discover a stereotype application, if the given new object is indeed that.
+	 * 
+	 * @param newObject
+	 *            a possible stereotype application
+	 */
+	private void discoverStereotypeApplication(EObject newObject) {
+		Stereotype stereo = UMLUtil.getStereotype(newObject);
+		if (stereo != null) {
+			Element base = UMLUtil.getBaseElement(newObject);
+			if (base != null) {
+				processStereotypeApplication(newObject, base);
+			} else {
+				// Process later
+				addAdapter(newObject);
+			}
 		}
 	}
 

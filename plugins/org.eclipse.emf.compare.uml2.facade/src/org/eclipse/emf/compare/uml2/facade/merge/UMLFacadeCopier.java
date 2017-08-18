@@ -425,8 +425,7 @@ public class UMLFacadeCopier extends FacadeCopier {
 			UMLFacadeCopier copier = copyContext.getXMIIDCopier();
 			Stream<Pair> related = copier.getRelatedElements(copyContext.original, originalUML,
 					copyContext.copy, copyUML);
-			related.filter(pair -> deferrals.remove(pair.original))
-					.forEach(pair -> copier.delegateCopyXMIIDs(pair.original, pair.copy));
+			related.filter(pair -> deferrals.remove(pair.original)).forEach(Pair::delegateCopy);
 		}
 
 		/**

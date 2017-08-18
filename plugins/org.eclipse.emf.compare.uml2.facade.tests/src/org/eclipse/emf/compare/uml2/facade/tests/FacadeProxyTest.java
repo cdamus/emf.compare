@@ -49,6 +49,7 @@ import org.eclipse.emf.compare.uml2.facade.tests.j2ee.J2EEPackage;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Package;
 import org.eclipse.emf.compare.uml2.tests.AbstractUMLInputData;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.hamcrest.Matcher;
@@ -545,6 +546,57 @@ public class FacadeProxyTest extends AbstractFacadeTest {
 		thing.eAdapters().remove(adapter);
 
 		assertThat("adapter not removed", removed[0], is(true));
+	}
+
+	@Test
+	public void eSetting_vector() {
+		Package package_ = requirePackage();
+		Bean thing = requireBean(package_, "Thing");
+
+		EStructuralFeature.Setting setting = ((InternalEObject)thing)
+				.eSetting(J2EEPackage.Literals.BEAN__FINDER);
+
+		assertThat(setting.getEObject(), sameInstance(thing));
+		assertThat(setting.getEStructuralFeature(), is(J2EEPackage.Literals.BEAN__FINDER));
+		assertThat(setting.get(true), instanceOf(EList.class));
+
+		EList<?> values = (EList<?>)setting.get(true);
+		assertThat(values, not(empty()));
+		assertThat(values, everyItem(instanceOf(Finder.class)));
+		assertThat(values, everyItem(instanceOf(FacadeObject.class)));
+	}
+
+	@Test
+	public void eSetting_scalar() {
+		Package package_ = requirePackage();
+		Bean thing = requireBean(package_, "Thing");
+
+		EStructuralFeature.Setting setting = ((InternalEObject)thing)
+				.eSetting(J2EEPackage.Literals.BEAN__HOME_INTERFACE);
+
+		assertThat(setting.getEObject(), sameInstance(thing));
+		assertThat(setting.getEStructuralFeature(), is(J2EEPackage.Literals.BEAN__HOME_INTERFACE));
+		assertThat(setting.get(true), instanceOf(HomeInterface.class));
+		assertThat(setting.get(true), instanceOf(FacadeObject.class));
+	}
+
+	@Test
+	public void eSetting_setScalar() {
+		Package package_ = requirePackage();
+		Bean thing = requireBean(package_, "Thing");
+		HomeInterface newHome = package_.createHomeInterface("NewHome");
+		assumeThat(newHome, instanceOf(FacadeObject.class));
+
+		EStructuralFeature.Setting setting = ((InternalEObject)thing)
+				.eSetting(J2EEPackage.Literals.BEAN__HOME_INTERFACE);
+
+		setting.set(newHome);
+
+		assertThat(setting.get(true), sameInstance(newHome));
+
+		Bean realThing = unproxy(thing);
+		HomeInterface realHome = realThing.getHomeInterface();
+		assertThat(realHome, sameInstance(unproxy(newHome)));
 	}
 
 	//

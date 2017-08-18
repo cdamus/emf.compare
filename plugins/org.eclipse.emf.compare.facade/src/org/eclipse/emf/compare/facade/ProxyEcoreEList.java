@@ -24,6 +24,7 @@ import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.DelegatingEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreEList;
 import org.eclipse.emf.ecore.util.InternalEList;
@@ -35,25 +36,35 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *            the list's element type
  * @author Christian W. Damus
  */
-final class ProxyEcoreEList<E extends EObject> //
+final class ProxyEcoreEList<E> //
 		extends DelegatingEList<E> //
 		implements InternalEList.Unsettable<E>, EStructuralFeature.Setting {
 
 	private static final long serialVersionUID = 1L;
 
+	/** My owner, as a proxy. */
+	private final FacadeObject owner;
+
 	/** The backing list. */
 	private final EcoreEList<E> delegate;
+
+	/** Am I the value of a reference feature? */
+	private final boolean isReference;
 
 	/**
 	 * Initializes me with my backing list.
 	 * 
+	 * @param owner
+	 *            my owner, as a proxy
 	 * @param delegate
 	 *            my backing list
 	 */
-	ProxyEcoreEList(EcoreEList<E> delegate) {
+	ProxyEcoreEList(FacadeObject owner, EcoreEList<E> delegate) {
 		super();
 
+		this.owner = owner;
 		this.delegate = delegate;
+		this.isReference = delegate.getEStructuralFeature() instanceof EReference;
 	}
 
 	/**
@@ -65,7 +76,11 @@ final class ProxyEcoreEList<E extends EObject> //
 	 */
 	@SuppressWarnings("unchecked")
 	E wrap(E object) {
-		return (E)FacadeProxy.createProxy(object);
+		if (!isReference || !FacadeAdapter.isFacade((EObject)object)) {
+			return object;
+		} else {
+			return (E)FacadeProxy.createProxy((EObject)object);
+		}
 	}
 
 	/**
@@ -98,9 +113,16 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	protected E validate(int index, E object) {
-		return FacadeProxy.unwrap(super.validate(index, object));
+		E result = super.validate(index, object);
+
+		if (isReference) {
+			result = (E)FacadeProxy.unwrap((EObject)result);
+		}
+
+		return result;
 	}
 
 	//
@@ -112,7 +134,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	 */
 	@Override
 	public EObject getEObject() {
-		return delegate.getEObject();
+		return owner;
 	}
 
 	/**
@@ -279,10 +301,17 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<E> basicList() {
-		// They need to be wrapped, but not by me
-		return new ProxyEList<E>((EList<E>)super.basicList());
+		List<E> result = super.basicList();
+
+		if (isReference) {
+			// They need to be wrapped, but not by me
+			result = (List<E>)new ProxyEList<>((EList<EObject>)result);
+		}
+
+		return result;
 	}
 
 	/**
@@ -318,8 +347,12 @@ final class ProxyEcoreEList<E extends EObject> //
 
 		if (collection.isEmpty()) {
 			return false;
+		} else if (!isReference) {
+			return super.addAllUnique(index, collection);
 		} else {
-			Collection<? extends E> unwrapped = FacadeProxy.unwrap(collection);
+			@SuppressWarnings("unchecked")
+			Collection<? extends E> unwrapped = (Collection<? extends E>)FacadeProxy
+					.unwrap((Collection<? extends EObject>)collection);
 			delegateList().addAll(unwrapped);
 
 			int i = index;

@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
@@ -40,6 +41,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.compare.utils.TreeIterators;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreEList;
@@ -318,101 +320,15 @@ public final class FacadeProxy {
 			Object result;
 
 			if (method.getDeclaringClass() == Object.class) {
-				switch (method.getName()) {
-					case "equals": //$NON-NLS-1$
-						result = Boolean.valueOf(proxy == args[0]);
-						break;
-					case "hashCode": //$NON-NLS-1$
-						result = Integer.valueOf(System.identityHashCode(proxy));
-						break;
-					case "toString": //$NON-NLS-1$
-						String toString = object.toString();
-						result = toString.replaceFirst("@[0-9a-f]+", "$0\\$Proxy"); //$NON-NLS-1$//$NON-NLS-2$
-						break;
-					default:
-						// Other Object methods are not proxied
-						throw new InternalError("Method unexpectedly proxied: " + method); //$NON-NLS-1$
-				}
+				result = invokeObject(proxy, method, args);
 			} else if (method.getDeclaringClass() == FacadeObject.class) {
-				switch (method.getName()) {
-					case "getUnderlyingElement": //$NON-NLS-1$
-						result = getUnderlyingObject(object);
-						break;
-					case "getFacadeAdapter": //$NON-NLS-1$
-						result = FacadeAdapter.get(object, FacadeAdapter.class);
-						break;
-					case "eResource": //$NON-NLS-1$
-						result = eResource(object);
-						break;
-					default:
-						throw new NoSuchMethodError(method.toString());
-				}
+				result = invokeFacadeObject(proxy, method, args);
 			} else if (method.getDeclaringClass() == InternalEObject.class) {
-				switch (method.getName()) {
-					case "eGet": //$NON-NLS-1$
-						result = method.invoke(object, args);
-						if (isReflectiveAPIReferenceArgument(args[0])) {
-							result = wrapEObjects(result);
-						}
-						break;
-					case "eSet": //$NON-NLS-1$
-						Object[] actualArgs = args;
-						if (isReflectiveAPIReferenceArgument(args[0])) {
-							actualArgs = unwrapEObjects(args);
-						}
-						result = method.invoke(object, actualArgs);
-						break;
-					case "eInternalContainer": //$NON-NLS-1$
-						result = wrapEObjects(((InternalEObject)object).eInternalContainer());
-						break;
-					case "eDirectResource": //$NON-NLS-1$
-						result = eDirectResource((InternalEObject)object);
-						break;
-					default:
-						result = method.invoke(object, args);
-						break;
-				}
+				result = invokeInternalEObject(proxy, method, args);
 			} else if (method.getDeclaringClass() == EObject.class) {
-				switch (method.getName()) {
-					case "eGet": //$NON-NLS-1$
-						result = method.invoke(object, args);
-						if (isReflectiveAPIReferenceArgument(args[0])) {
-							result = wrapEObjects(result);
-						}
-						break;
-					case "eSet": //$NON-NLS-1$
-						Object[] actualArgs = args;
-						if (isReflectiveAPIReferenceArgument(args[0])) {
-							actualArgs = unwrapEObjects(args);
-						}
-						result = method.invoke(object, actualArgs);
-						break;
-					case "eResource": //$NON-NLS-1$
-						result = eResource(object);
-						break;
-					case "eContainer": //$NON-NLS-1$
-						result = wrapEObjects(object.eContainer());
-						break;
-					case "eContents": //$NON-NLS-1$
-						// Needs the feature-iterator protocol?
-						result = wrapEObjects(object.eContents());
-						break;
-					case "eAllContents": //$NON-NLS-1$
-						result = TreeIterators.transform(object.eAllContents(), this::wrapEObjects);
-						break;
-					default:
-						result = method.invoke(object, args);
-						break;
-				}
+				result = invokeEObject(proxy, method, args);
 			} else if (method.getDeclaringClass() == Notifier.class) {
-				switch (method.getName()) {
-					case "eAdapters": //$NON-NLS-1$
-						result = new ProxyAdapterList(this, object.eAdapters());
-						break;
-					default:
-						result = method.invoke(object, args);
-						break;
-				}
+				result = invokeNotifier(proxy, method, args);
 			} else {
 				// Delegate the rest
 
@@ -429,6 +345,218 @@ public final class FacadeProxy {
 				}
 
 				return result;
+			}
+
+			return result;
+		}
+
+		/**
+		 * Invokes an {@link Object} method.
+		 * 
+		 * @param proxy
+		 *            the proxy that is delegating the {@code method}
+		 * @param method
+		 *            the method to invoke
+		 * @param args
+		 *            the arguments to the {@code method}
+		 * @return the {@code method}'s result, or {@code null} if none
+		 */
+		private Object invokeObject(Object proxy, Method method, Object[] args) {
+			Object result;
+
+			switch (method.getName()) {
+				case "equals": //$NON-NLS-1$
+					result = Boolean.valueOf(proxy == args[0]);
+					break;
+				case "hashCode": //$NON-NLS-1$
+					result = Integer.valueOf(System.identityHashCode(proxy));
+					break;
+				case "toString": //$NON-NLS-1$
+					String toString = object.toString();
+					result = toString.replaceFirst("@[0-9a-f]+", "$0\\$Proxy"); //$NON-NLS-1$//$NON-NLS-2$
+					break;
+				default:
+					// Other Object methods are not proxied
+					throw new InternalError("Method unexpectedly proxied: " + method); //$NON-NLS-1$
+			}
+
+			return result;
+		}
+
+		/**
+		 * Invokes a {@link FacadeObject} method.
+		 * 
+		 * @param proxy
+		 *            the proxy that is delegating the {@code method}
+		 * @param method
+		 *            the method to invoke
+		 * @param args
+		 *            the arguments to the {@code method}
+		 * @return the {@code method}'s result, or {@code null} if none
+		 */
+		private Object invokeFacadeObject(Object proxy, Method method, Object[] args) {
+			Object result;
+
+			switch (method.getName()) {
+				case "getUnderlyingElement": //$NON-NLS-1$
+					result = getUnderlyingObject(object);
+					break;
+				case "getFacadeAdapter": //$NON-NLS-1$
+					result = FacadeAdapter.get(object, FacadeAdapter.class);
+					break;
+				case "eResource": //$NON-NLS-1$
+					result = eResource(object);
+					break;
+				default:
+					throw new NoSuchMethodError(method.toString());
+			}
+
+			return result;
+		}
+
+		/**
+		 * Invokes an {@link EObject} method.
+		 * 
+		 * @param proxy
+		 *            the proxy that is delegating the {@code method}
+		 * @param method
+		 *            the method to invoke
+		 * @param args
+		 *            the arguments to the {@code method}
+		 * @return the {@code method}'s result, or {@code null} if none
+		 * @throws InvocationTargetException
+		 *             on failure of default delegation
+		 * @throws IllegalArgumentException
+		 *             on problems with arguments
+		 * @throws IllegalAccessException
+		 *             on failure to access the real method implementation
+		 */
+		private Object invokeEObject(Object proxy, Method method, Object[] args)
+				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			Object result;
+
+			switch (method.getName()) {
+				case "eGet": //$NON-NLS-1$
+					result = method.invoke(object, args);
+					if (isReflectiveAPIReferenceArgument(args[0])) {
+						result = wrapEObjects(result);
+					}
+					break;
+				case "eSet": //$NON-NLS-1$
+					Object[] actualArgs = args;
+					if (isReflectiveAPIReferenceArgument(args[0])) {
+						actualArgs = unwrapEObjects(args);
+					}
+					result = method.invoke(object, actualArgs);
+					break;
+				case "eResource": //$NON-NLS-1$
+					result = eResource(object);
+					break;
+				case "eContainer": //$NON-NLS-1$
+					result = wrapEObjects(object.eContainer());
+					break;
+				case "eContents": //$NON-NLS-1$
+					// Needs the feature-iterator protocol?
+					result = wrapEObjects(object.eContents());
+					break;
+				case "eAllContents": //$NON-NLS-1$
+					result = TreeIterators.transform(object.eAllContents(), this::wrapEObjects);
+					break;
+				default:
+					result = method.invoke(object, args);
+					break;
+			}
+
+			return result;
+		}
+
+		/**
+		 * Invokes an {@link InternalEObject} method.
+		 * 
+		 * @param proxy
+		 *            the proxy that is delegating the {@code method}
+		 * @param method
+		 *            the method to invoke
+		 * @param args
+		 *            the arguments to the {@code method}
+		 * @return the {@code method}'s result, or {@code null} if none
+		 * @throws InvocationTargetException
+		 *             on failure of default delegation
+		 * @throws IllegalArgumentException
+		 *             on problems with arguments
+		 * @throws IllegalAccessException
+		 *             on failure to access the real method implementation
+		 */
+		private Object invokeInternalEObject(Object proxy, Method method, Object[] args)
+				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			Object result;
+
+			switch (method.getName()) {
+				case "eGet": //$NON-NLS-1$
+					result = method.invoke(object, args);
+					if (isReflectiveAPIReferenceArgument(args[0])) {
+						result = wrapEObjects(result);
+					}
+					break;
+				case "eSet": //$NON-NLS-1$
+					Object[] actualArgs = args;
+					if (isReflectiveAPIReferenceArgument(args[0])) {
+						actualArgs = unwrapEObjects(args);
+					}
+					result = method.invoke(object, actualArgs);
+					break;
+				case "eInternalContainer": //$NON-NLS-1$
+					result = wrapEObjects(((InternalEObject)object).eInternalContainer());
+					break;
+				case "eDirectResource": //$NON-NLS-1$
+					result = eDirectResource((InternalEObject)object);
+					break;
+				case "eSetting": //$NON-NLS-1$
+					result = method.invoke(object, args);
+					if (result instanceof EList<?>) {
+						// It's a feature setting, so of course it's an EcoreEList
+						result = new ProxyEcoreEList<>(facadeProxy, (EcoreEList<?>)result);
+					} else {
+						// It's a single-valued setting
+						result = new ProxySetting(facadeProxy, (EStructuralFeature.Setting)result);
+					}
+					break;
+				default:
+					result = method.invoke(object, args);
+					break;
+			}
+
+			return result;
+		}
+
+		/**
+		 * Invokes a {@link Notifier} method.
+		 * 
+		 * @param proxy
+		 *            the proxy that is delegating the {@code method}
+		 * @param method
+		 *            the method to invoke
+		 * @param args
+		 *            the arguments to the {@code method}
+		 * @return the {@code method}'s result, or {@code null} if none
+		 * @throws InvocationTargetException
+		 *             on failure of default delegation
+		 * @throws IllegalArgumentException
+		 *             on problems with arguments
+		 * @throws IllegalAccessException
+		 *             on failure to access the real method implementation
+		 */
+		private Object invokeNotifier(Object proxy, Method method, Object[] args)
+				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			Object result;
+
+			switch (method.getName()) {
+				case "eAdapters": //$NON-NLS-1$
+					result = new ProxyAdapterList(this, object.eAdapters());
+					break;
+				default:
+					result = method.invoke(object, args);
+					break;
 			}
 
 			return result;
@@ -494,7 +622,7 @@ public final class FacadeProxy {
 				if (value instanceof EcoreEList<?>) {
 					@SuppressWarnings("unchecked")
 					EcoreEList<EObject> eList = (EcoreEList<EObject>)value;
-					result = new ProxyEcoreEList<>(eList);
+					result = new ProxyEcoreEList<>(facadeProxy, eList);
 				} else {
 					// It's not a feature but an operation result or parameter
 					@SuppressWarnings("unchecked")
