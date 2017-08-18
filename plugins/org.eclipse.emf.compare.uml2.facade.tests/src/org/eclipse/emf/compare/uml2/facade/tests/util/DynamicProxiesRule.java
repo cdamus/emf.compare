@@ -47,6 +47,7 @@ public final class DynamicProxiesRule extends TestWatcher implements BooleanSupp
 	 * 
 	 * @return whether we are using dynamic proxies
 	 */
+	@Override
 	public boolean getAsBoolean() {
 		return useDynamicProxies;
 	}

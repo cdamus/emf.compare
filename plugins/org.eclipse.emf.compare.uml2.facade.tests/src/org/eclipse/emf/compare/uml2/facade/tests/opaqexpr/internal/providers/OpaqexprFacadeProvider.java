@@ -42,6 +42,7 @@ public class OpaqexprFacadeProvider implements IFacadeProvider {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public EObject createFacade(EObject underlyingObject) {
 		EObject result = facadeFactory.doSwitch(underlyingObject);
 
@@ -79,6 +80,7 @@ public class OpaqexprFacadeProvider implements IFacadeProvider {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public boolean isFacadeProviderFactoryFor(Notifier notifier) {
 			return hasUMLPackage(notifier);
 		}

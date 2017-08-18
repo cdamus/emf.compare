@@ -49,6 +49,7 @@ final class ProxyAdapter implements Adapter {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Notifier getTarget() {
 		return impl.getProxy();
 	}
@@ -56,6 +57,7 @@ final class ProxyAdapter implements Adapter {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void setTarget(Notifier newTarget) {
 		delegate.setTarget(FacadeProxy.unwrap((EObject)newTarget));
 	}
@@ -63,6 +65,7 @@ final class ProxyAdapter implements Adapter {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isAdapterForType(Object type) {
 		return delegate.isAdapterForType(type);
 	}
@@ -70,6 +73,7 @@ final class ProxyAdapter implements Adapter {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void notifyChanged(Notification notification) {
 		delegate.notifyChanged(ProxyNotification.wrap(impl, notification));
 	}

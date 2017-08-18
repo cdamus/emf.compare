@@ -91,6 +91,7 @@ public class FacadeProviderPreferencePage extends PreferencePage implements IWor
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void init(IWorkbench workbench) {
 		ScopedPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE,
 				EMFCompareRCPPlugin.PLUGIN_ID);

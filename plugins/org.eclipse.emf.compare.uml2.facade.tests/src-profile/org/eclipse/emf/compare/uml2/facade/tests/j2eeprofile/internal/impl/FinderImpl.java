@@ -77,6 +77,7 @@ public class FinderImpl extends MinimalEObjectImpl.Container implements Finder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Interface getBase_Interface() {
 		if (base_Interface != null && base_Interface.eIsProxy()) {
 			InternalEObject oldBase_Interface = (InternalEObject)base_Interface;
@@ -103,6 +104,7 @@ public class FinderImpl extends MinimalEObjectImpl.Container implements Finder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setBase_Interface(Interface newBase_Interface) {
 		Interface oldBase_Interface = base_Interface;
 		base_Interface = newBase_Interface;

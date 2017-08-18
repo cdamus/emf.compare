@@ -103,6 +103,7 @@ public class DelegatingFacadeProviderFactory extends IFacadeProvider.Factory.Abs
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isFacadeProviderFactoryFor(IComparisonScope scope) {
 		return delegate.isFacadeProviderFactoryFor(scope);
 	}
@@ -110,6 +111,7 @@ public class DelegatingFacadeProviderFactory extends IFacadeProvider.Factory.Abs
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isFacadeProviderFactoryFor(Notifier notifier) {
 		return delegate.isFacadeProviderFactoryFor(notifier);
 	}

@@ -104,6 +104,7 @@ class DelegatingFacadeProvider implements IFacadeProvider {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public EObject createFacade(EObject underlyingObject) {
 		return delegateCreateFacade(underlyingObject);
 	}

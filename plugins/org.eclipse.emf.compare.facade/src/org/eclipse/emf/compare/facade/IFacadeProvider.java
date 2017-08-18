@@ -85,6 +85,7 @@ public interface IFacadeProvider {
 			/**
 			 * {@inheritDoc}
 			 */
+			@Override
 			public boolean isFacadeProviderFactoryFor(Notifier notifier) {
 				return true;
 			}
@@ -231,6 +232,7 @@ public interface IFacadeProvider {
 			/**
 			 * {@inheritDoc}
 			 */
+			@Override
 			public int getRanking() {
 				return ranking;
 			}
@@ -238,6 +240,7 @@ public interface IFacadeProvider {
 			/**
 			 * {@inheritDoc}
 			 */
+			@Override
 			public void setRanking(int ranking) {
 				this.ranking = ranking;
 			}
@@ -245,6 +248,7 @@ public interface IFacadeProvider {
 			/**
 			 * {@inheritDoc}
 			 */
+			@Override
 			public IFacadeProvider getFacadeProvider() {
 				if (provider == null) {
 					provider = createProvider();

@@ -65,6 +65,7 @@ public class UMLResourceSet extends ResourceSetImpl implements AutoCloseable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void close() {
 		copyOf(getResources()).forEach(this::close);
 		eAdapters().clear();

@@ -34,6 +34,7 @@ public class FacadeCopier implements ICopier {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public EObject copy(EObject originalObject) {
 		return new FacadeCopierImpl().copy(originalObject);
 	}
@@ -41,6 +42,7 @@ public class FacadeCopier implements ICopier {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public final void copyXMIIDs(EObject originalObject, EObject copy) {
 		FacadeAdapter originalAdapter = FacadeAdapter.getInstance(originalObject);
 		FacadeAdapter copyAdapter = FacadeAdapter.getInstance(copy);
@@ -85,6 +87,7 @@ public class FacadeCopier implements ICopier {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getIdentifier(EObject object) {
 		String result = DEFAULT.getIdentifier(object);
 

@@ -44,6 +44,7 @@ public class FacadeProviderRegistryImpl implements IFacadeProvider.Factory.Regis
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IFacadeProvider.Factory getHighestRankingFacadeProviderFactory(IComparisonScope scope) {
 		return factories.values().stream() //
 				.filter(f -> f.isFacadeProviderFactoryFor(scope))
@@ -54,6 +55,7 @@ public class FacadeProviderRegistryImpl implements IFacadeProvider.Factory.Regis
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public List<IFacadeProvider.Factory> getFacadeProviderFactories(IComparisonScope scope) {
 		return factories.values().stream() //
 				.filter(f -> f.isFacadeProviderFactoryFor(scope))
@@ -64,6 +66,7 @@ public class FacadeProviderRegistryImpl implements IFacadeProvider.Factory.Regis
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Factory add(IFacadeProvider.Factory facadeProviderFactory) {
 		return factories.put(facadeProviderFactory.getClass().getName(), facadeProviderFactory);
 	}
@@ -71,6 +74,7 @@ public class FacadeProviderRegistryImpl implements IFacadeProvider.Factory.Regis
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Factory remove(String className) {
 		return factories.remove(className);
 	}
@@ -78,6 +82,7 @@ public class FacadeProviderRegistryImpl implements IFacadeProvider.Factory.Regis
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void clear() {
 		factories.clear();
 	}

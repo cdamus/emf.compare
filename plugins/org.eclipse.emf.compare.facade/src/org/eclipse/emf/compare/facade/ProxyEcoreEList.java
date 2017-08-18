@@ -110,6 +110,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public EObject getEObject() {
 		return delegate.getEObject();
 	}
@@ -117,6 +118,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public EStructuralFeature getEStructuralFeature() {
 		return delegate.getEStructuralFeature();
 	}
@@ -124,6 +126,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Object get(boolean resolve) {
 		return this;
 	}
@@ -131,6 +134,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public void set(Object newValue) {
 		clear();
@@ -140,6 +144,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isSet() {
 		return delegate.isSet();
 	}
@@ -147,6 +152,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void unset() {
 		delegate.unset();
 	}
@@ -162,6 +168,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Object[] basicToArray() {
 		return super.toArray();
 	}
@@ -192,6 +199,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public <T> T[] basicToArray(T[] array) {
 		return super.toArray(array);
 	}
@@ -199,6 +207,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int basicIndexOf(Object object) {
 		return super.indexOf(object);
 	}
@@ -206,6 +215,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int basicLastIndexOf(Object object) {
 		return super.lastIndexOf(object);
 	}
@@ -213,6 +223,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean basicContains(Object object) {
 		return super.contains(object);
 	}
@@ -220,6 +231,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean basicContainsAll(Collection<?> collection) {
 		return super.containsAll(collection);
 	}
@@ -276,6 +288,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public NotificationChain basicAdd(E object, NotificationChain notifications) {
 		throw new UnsupportedOperationException();
 	}
@@ -283,6 +296,7 @@ final class ProxyEcoreEList<E extends EObject> //
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public NotificationChain basicRemove(Object object, NotificationChain notifications) {
 		throw new UnsupportedOperationException();
 	}

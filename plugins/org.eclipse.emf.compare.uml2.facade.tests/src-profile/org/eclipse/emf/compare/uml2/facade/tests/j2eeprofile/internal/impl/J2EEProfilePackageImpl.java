@@ -138,6 +138,7 @@ public class J2EEProfilePackageImpl extends EPackageImpl implements J2EEProfileP
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getBean() {
 		return beanEClass;
 	}
@@ -147,6 +148,7 @@ public class J2EEProfilePackageImpl extends EPackageImpl implements J2EEProfileP
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getBean_Base_Class() {
 		return (EReference)beanEClass.getEStructuralFeatures().get(0);
 	}
@@ -156,6 +158,7 @@ public class J2EEProfilePackageImpl extends EPackageImpl implements J2EEProfileP
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EAttribute getBean_Kind() {
 		return (EAttribute)beanEClass.getEStructuralFeatures().get(1);
 	}
@@ -165,6 +168,7 @@ public class J2EEProfilePackageImpl extends EPackageImpl implements J2EEProfileP
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getHomeInterface() {
 		return homeInterfaceEClass;
 	}
@@ -174,6 +178,7 @@ public class J2EEProfilePackageImpl extends EPackageImpl implements J2EEProfileP
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getHomeInterface_Base_Interface() {
 		return (EReference)homeInterfaceEClass.getEStructuralFeatures().get(0);
 	}
@@ -183,6 +188,7 @@ public class J2EEProfilePackageImpl extends EPackageImpl implements J2EEProfileP
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getFinder() {
 		return finderEClass;
 	}
@@ -192,6 +198,7 @@ public class J2EEProfilePackageImpl extends EPackageImpl implements J2EEProfileP
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EReference getFinder_Base_Interface() {
 		return (EReference)finderEClass.getEStructuralFeatures().get(0);
 	}
@@ -201,6 +208,7 @@ public class J2EEProfilePackageImpl extends EPackageImpl implements J2EEProfileP
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EEnum getBeanKind() {
 		return beanKindEEnum;
 	}
@@ -210,6 +218,7 @@ public class J2EEProfilePackageImpl extends EPackageImpl implements J2EEProfileP
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public J2EEProfileFactory getJ2EEProfileFactory() {
 		return (J2EEProfileFactory)getEFactoryInstance();
 	}

@@ -68,14 +68,17 @@ class FacadeComparisonScope implements IComparisonScope {
 		this.delegate = delegate;
 	}
 
+	@Override
 	public Notifier getLeft() {
 		return facadeElse(delegate.getLeft());
 	}
 
+	@Override
 	public Notifier getRight() {
 		return facadeElse(delegate.getRight());
 	}
 
+	@Override
 	public Notifier getOrigin() {
 		return facadeElse(delegate.getOrigin());
 	}
@@ -136,6 +139,7 @@ class FacadeComparisonScope implements IComparisonScope {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Set<String> getResourceURIs() {
 		return delegate.getResourceURIs();
 	}
@@ -143,6 +147,7 @@ class FacadeComparisonScope implements IComparisonScope {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Set<String> getNsURIs() {
 		return delegate.getNsURIs();
 	}
@@ -150,6 +155,7 @@ class FacadeComparisonScope implements IComparisonScope {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Iterator<? extends Resource> getCoveredResources(ResourceSet resourceSet) {
 		return delegate.getCoveredResources(resourceSet);
 	}
@@ -157,6 +163,7 @@ class FacadeComparisonScope implements IComparisonScope {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Iterator<? extends EObject> getCoveredEObjects(Resource resource) {
 		if (!facadeProviderFactory.isFacadeProviderFactoryFor(resource)) {
 			// No façades in here
@@ -174,6 +181,7 @@ class FacadeComparisonScope implements IComparisonScope {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Iterator<? extends EObject> getChildren(EObject eObject) {
 		Iterator<? extends EObject> result;
 		Iterator<? extends EObject> raw = delegate.getChildren(eObject);
@@ -265,6 +273,7 @@ class FacadeComparisonScope implements IComparisonScope {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public boolean hasNext() {
 			boolean result;
 
@@ -283,6 +292,7 @@ class FacadeComparisonScope implements IComparisonScope {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public final EObject next() {
 			EObject result;
 
@@ -357,6 +367,7 @@ class FacadeComparisonScope implements IComparisonScope {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public void prune() {
 			switch (state) {
 				case RETURNED:
@@ -442,6 +453,7 @@ class FacadeComparisonScope implements IComparisonScope {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public void prune() {
 			if (pruneIterator != null) {
 				pruneIterator.prune();

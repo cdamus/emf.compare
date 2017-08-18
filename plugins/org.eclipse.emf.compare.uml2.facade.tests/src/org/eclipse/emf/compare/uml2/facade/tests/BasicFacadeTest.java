@@ -409,6 +409,7 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 			/**
 			 * {@inheritDoc}
 			 */
+			@Override
 			public void describeTo(Description description) {
 				description.appendText("has Bean kind ").appendValue(kind);
 			}
@@ -449,6 +450,7 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 			/**
 			 * {@inheritDoc}
 			 */
+			@Override
 			public void describeTo(Description description) {
 				description.appendText(String.format("stereotyped as «%s»", name));
 			}
@@ -475,6 +477,7 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 			/**
 			 * {@inheritDoc}
 			 */
+			@Override
 			public void describeTo(Description description) {
 				description.appendText("supplied by element that ") //
 						.appendDescriptionOf(supplier);

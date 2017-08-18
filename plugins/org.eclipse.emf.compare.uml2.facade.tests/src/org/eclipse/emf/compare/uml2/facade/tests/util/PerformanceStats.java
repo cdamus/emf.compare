@@ -438,6 +438,7 @@ public class PerformanceStats {
 					/**
 					 * {@inheritDoc}
 					 */
+					@Override
 					public double applyAsDouble(Long value) {
 						double delta = value.doubleValue() - average;
 						return delta * delta;

@@ -126,6 +126,7 @@ public class FacadeAdapter implements Adapter.Internal {
 	 * @return the underlying model element
 	 * @see #getUnderlyingElement()
 	 */
+	@Override
 	public Notifier getTarget() {
 		return model;
 	}
@@ -155,6 +156,7 @@ public class FacadeAdapter implements Adapter.Internal {
 	 * @param newTarget
 	 *            a notifier to which I have been attached
 	 */
+	@Override
 	public void setTarget(Notifier newTarget) {
 		// Don't track any other targets
 	}
@@ -162,6 +164,7 @@ public class FacadeAdapter implements Adapter.Internal {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void unsetTarget(Notifier oldTarget) {
 		if ((oldTarget == model) || (oldTarget == facade)) {
 			dispose();
@@ -175,6 +178,7 @@ public class FacadeAdapter implements Adapter.Internal {
 	 *            description of a change in either the façade or the underlying element
 	 * @see #handleNotification(Notification)
 	 */
+	@Override
 	public void notifyChanged(Notification notification) {
 		if (notification.isTouch()) {
 			return;
@@ -397,6 +401,7 @@ public class FacadeAdapter implements Adapter.Internal {
 	 *            the adapter type to test for
 	 * @return whether I am an adapter of the given {@code type}
 	 */
+	@Override
 	public boolean isAdapterForType(Object type) {
 		return (type == FacadeObject.class) || (type == FacadeAdapter.class);
 	}

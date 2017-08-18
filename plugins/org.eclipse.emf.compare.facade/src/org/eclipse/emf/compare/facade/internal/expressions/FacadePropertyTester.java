@@ -36,6 +36,7 @@ public class FacadePropertyTester extends PropertyTester {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
 		boolean result = false;
 

@@ -98,6 +98,7 @@ public class BeanImpl extends MinimalEObjectImpl.Container implements Bean {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public org.eclipse.uml2.uml.Class getBase_Class() {
 		if (base_Class != null && base_Class.eIsProxy()) {
 			InternalEObject oldBase_Class = (InternalEObject)base_Class;
@@ -124,6 +125,7 @@ public class BeanImpl extends MinimalEObjectImpl.Container implements Bean {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setBase_Class(org.eclipse.uml2.uml.Class newBase_Class) {
 		org.eclipse.uml2.uml.Class oldBase_Class = base_Class;
 		base_Class = newBase_Class;
@@ -136,6 +138,7 @@ public class BeanImpl extends MinimalEObjectImpl.Container implements Bean {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public BeanKind getKind() {
 		return kind;
 	}
@@ -145,6 +148,7 @@ public class BeanImpl extends MinimalEObjectImpl.Container implements Bean {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public void setKind(BeanKind newKind) {
 		BeanKind oldKind = kind;
 		kind = newKind == null ? KIND_EDEFAULT : newKind;

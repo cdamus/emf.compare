@@ -32,6 +32,7 @@ public class FacadeObjectImpl extends Container implements FacadeObject {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public EObject getUnderlyingElement() {
 		EObject result = null;
 

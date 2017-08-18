@@ -110,6 +110,7 @@ public class J2EEProfileFactoryImpl extends EFactoryImpl implements J2EEProfileF
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Bean createBean() {
 		BeanImpl bean = new BeanImpl();
 		return bean;
@@ -120,6 +121,7 @@ public class J2EEProfileFactoryImpl extends EFactoryImpl implements J2EEProfileF
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public HomeInterface createHomeInterface() {
 		HomeInterfaceImpl homeInterface = new HomeInterfaceImpl();
 		return homeInterface;
@@ -130,6 +132,7 @@ public class J2EEProfileFactoryImpl extends EFactoryImpl implements J2EEProfileF
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public Finder createFinder() {
 		FinderImpl finder = new FinderImpl();
 		return finder;
@@ -160,6 +163,7 @@ public class J2EEProfileFactoryImpl extends EFactoryImpl implements J2EEProfileF
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public J2EEProfilePackage getJ2EEProfilePackage() {
 		return (J2EEProfilePackage)getEPackage();
 	}

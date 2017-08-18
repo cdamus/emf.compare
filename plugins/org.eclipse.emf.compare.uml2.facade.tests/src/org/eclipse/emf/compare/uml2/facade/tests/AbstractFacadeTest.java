@@ -261,6 +261,7 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public boolean isApplicableTo(EObject object) {
 			return object.eClass().getEPackage() == targetPackage;
 		}
@@ -268,6 +269,7 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public int getRank() {
 			return 50;
 		}
@@ -275,6 +277,7 @@ public abstract class AbstractFacadeTest extends AbstractUMLTest {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public ICopier getCopier() {
 			return copier;
 		}

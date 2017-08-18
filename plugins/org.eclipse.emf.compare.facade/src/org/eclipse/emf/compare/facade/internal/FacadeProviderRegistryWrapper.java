@@ -68,6 +68,7 @@ public class FacadeProviderRegistryWrapper implements IFacadeProvider.Factory.Re
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IFacadeProvider.Factory getHighestRankingFacadeProviderFactory(IComparisonScope scope) {
 		IItemDescriptor<IFacadeProvider.Factory> highest = null;
 		IFacadeProvider.Factory result = null;
@@ -92,6 +93,7 @@ public class FacadeProviderRegistryWrapper implements IFacadeProvider.Factory.Re
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public List<IFacadeProvider.Factory> getFacadeProviderFactories(IComparisonScope scope) {
 		Iterable<IFacadeProvider.Factory> result = filter(
 				transform(getEnabledFactories(), IItemDescriptor::getItem),
@@ -102,6 +104,7 @@ public class FacadeProviderRegistryWrapper implements IFacadeProvider.Factory.Re
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IFacadeProvider.Factory add(IFacadeProvider.Factory factory) {
 		Preconditions.checkNotNull(factory);
 
@@ -119,6 +122,7 @@ public class FacadeProviderRegistryWrapper implements IFacadeProvider.Factory.Re
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public IFacadeProvider.Factory remove(String className) {
 		Preconditions.checkNotNull(className);
 
@@ -133,6 +137,7 @@ public class FacadeProviderRegistryWrapper implements IFacadeProvider.Factory.Re
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void clear() {
 		registry.clear();
 	}

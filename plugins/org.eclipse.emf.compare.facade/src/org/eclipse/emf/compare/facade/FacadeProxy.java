@@ -313,6 +313,7 @@ public final class FacadeProxy {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Exception {
 			Object result;
 

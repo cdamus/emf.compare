@@ -74,5 +74,6 @@ public interface FacadeObject extends EObject {
 	 *         {@linkplain #getUnderlyingElement() underlying element}
 	 * @see #getUnderlyingElement()
 	 */
+	@Override
 	Resource eResource();
 }
