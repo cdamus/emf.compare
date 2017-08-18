@@ -14,6 +14,7 @@ package org.eclipse.emf.compare.tests.framework;
 
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.hasDirectOrIndirectConflict;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
 import org.eclipse.emf.compare.Conflict;
@@ -23,6 +24,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.uml2.common.util.UML2Util;
 import org.eclipse.uml2.uml.NamedElement;
 import org.hamcrest.BaseMatcher;
+import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
@@ -178,7 +180,7 @@ public final class CompareMatchers {
 	/**
 	 * Matcher for unresolved proxies.
 	 * 
-	 * @return th proxy matcher
+	 * @return the proxy matcher
 	 */
 	public static Matcher<EObject> isProxy() {
 		return new TypeSafeMatcher<EObject>() {
@@ -199,4 +201,20 @@ public final class CompareMatchers {
 		};
 	}
 
+	/**
+	 * Matcher for present {@link Optional}s.
+	 * 
+	 * @return a present optional matcher
+	 */
+	public static <T> Matcher<Optional<T>> isPresent() {
+		return new CustomTypeSafeMatcher<Optional<T>>("optional is present") {
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected boolean matchesSafely(Optional<T> item) {
+				return item.isPresent();
+			}
+		};
+	}
 }

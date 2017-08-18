@@ -51,4 +51,17 @@ Contributors:
          </enablement>
       </copier>
    </extension>
+   
+   <extension
+         point="org.eclipse.emf.compare.rcp.postProcessor">
+      <processor
+            class="org.eclipse.emf.compare.facade.internal.post.FacadePostProcessor"
+            description="Post-processor for generic façade model dependencies (nothing domain-specific)."
+            label="Generic Façade Post-processor"
+            ordinal="20">
+         <nsURI
+               value=".+"> <!-- This is applicable to any model. -->
+         </nsURI>
+      </processor>
+   </extension>
 </plugin>

@@ -1,11 +1,15 @@
-/*******************************************************************************
- * Copyright (C) 2016 Obeo and others
+/*
+ * Copyright (c) 2017 Christian W. Damus and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *******************************************************************************/
+ * 
+ * Contributors:
+ *     Christian W. Damus - initial API and implementation
+ *
+ */
 package org.eclipse.emf.compare.uml2.facade.ui.tests.merge;
 
 import static com.google.common.base.Predicates.and;
@@ -53,6 +57,11 @@ import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.UMLPackage;
 import org.junit.runner.RunWith;
 
+/**
+ * Tests of basic merge scenarios in façades, of single- and mixed-mode varieties.
+ *
+ * @author Christian W. Damus
+ */
 @RunWith(GitTestRunner.class)
 @GitMergeStrategy(GitMergeStrategyID.MODEL_ADDITIVE)
 @SuppressWarnings({"nls", "unused", "boxing" })

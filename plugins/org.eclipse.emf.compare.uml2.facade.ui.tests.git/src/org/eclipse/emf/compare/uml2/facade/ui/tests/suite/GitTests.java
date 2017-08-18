@@ -12,13 +12,21 @@
  */
 package org.eclipse.emf.compare.uml2.facade.ui.tests.suite;
 
+import org.eclipse.emf.compare.uml2.facade.ui.tests.merge.BasicDependencyTests;
 import org.eclipse.emf.compare.uml2.facade.ui.tests.merge.BasicMergeTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+/**
+ * The Git fragment's test suite.
+ *
+ * @author Christian W. Damus
+ */
 @RunWith(Suite.class)
-@SuiteClasses({BasicMergeTests.class, //
+@SuiteClasses({//
+		BasicMergeTests.class, //
+		BasicDependencyTests.class, //
 })
 public class GitTests {
 	// Specification is all in the annotations

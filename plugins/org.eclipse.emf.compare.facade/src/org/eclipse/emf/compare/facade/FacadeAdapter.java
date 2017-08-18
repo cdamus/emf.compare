@@ -1001,6 +1001,26 @@ public class FacadeAdapter implements Adapter.Internal {
 	}
 
 	/**
+	 * Obtains the façade representing the given object assumed not to be a {@code underlying} a façade.
+	 * 
+	 * @param underlying
+	 *            an object presumed to be underlying a façade
+	 * @return the corresponding façade, or {@code null} if the input is not an object underlying some façade
+	 *         with a {@link FacadeAdapter} attached to it
+	 */
+	public static EObject getFacade(EObject underlying) {
+		EObject result = null;
+
+		FacadeAdapter adapter = get(underlying, FacadeAdapter.class);
+		if (adapter != null) {
+			// It could be dybnamically proxied, to boot
+			result = FacadeProxy.wrap(adapter.getFacade());
+		}
+
+		return result;
+	}
+
+	/**
 	 * A no-op.
 	 * 
 	 * @param adapter

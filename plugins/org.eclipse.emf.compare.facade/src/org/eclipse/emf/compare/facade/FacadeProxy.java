@@ -240,6 +240,30 @@ public final class FacadeProxy {
 	}
 
 	/**
+	 * Obtains the dynamic proxy, if any, that wraps a given {@code façade}.
+	 * 
+	 * @param facade
+	 *            a façade implementation
+	 * @return the dynamic proxy, or itself if none
+	 * @param <T>
+	 *            the model interface to wrap
+	 */
+	@SuppressWarnings("unchecked")
+	static <T extends EObject> T wrap(T facade) {
+		T result = facade;
+
+		if (!(result instanceof FacadeObject)) {
+			// Wrap it
+			Impl impl = (Impl)EcoreUtil.getExistingAdapter(result, Impl.class);
+			if (impl != null) {
+				result = (T)impl.facadeProxy;
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * Unwraps a collection of dynamic façade proxy to get at the core objects.
 	 * 
 	 * @param possibleProxies
