@@ -311,15 +311,6 @@ public interface IFacadeProvider {
 			}
 
 			/**
-			 * Obtains the highest-ranked façade provider for the given {@code scope}.
-			 * 
-			 * @param scope
-			 *            a comparison scope
-			 * @return the highest-ranked façade provider, or {@code null} if none
-			 */
-			IFacadeProvider.Factory getHighestRankingFacadeProviderFactory(IComparisonScope scope);
-
-			/**
 			 * Obtains the façade providers applicable to the given {@code scope}, in rank order from highest
 			 * to lowest rank.
 			 * 

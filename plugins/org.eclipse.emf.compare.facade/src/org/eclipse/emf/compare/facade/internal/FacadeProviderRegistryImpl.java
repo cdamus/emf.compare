@@ -45,17 +45,6 @@ public class FacadeProviderRegistryImpl implements IFacadeProvider.Factory.Regis
 	 * {@inheritDoc}
 	 */
 	@Override
-	public IFacadeProvider.Factory getHighestRankingFacadeProviderFactory(IComparisonScope scope) {
-		return factories.values().stream() //
-				.filter(f -> f.isFacadeProviderFactoryFor(scope))
-				.max(comparing(IFacadeProvider.Factory::getRanking))
-				.orElse(IFacadeProvider.Factory.NULL_FACTORY);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public List<IFacadeProvider.Factory> getFacadeProviderFactories(IComparisonScope scope) {
 		return factories.values().stream() //
 				.filter(f -> f.isFacadeProviderFactoryFor(scope))

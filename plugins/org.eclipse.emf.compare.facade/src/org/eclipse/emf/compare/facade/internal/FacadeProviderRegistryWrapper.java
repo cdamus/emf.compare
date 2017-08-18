@@ -69,31 +69,6 @@ public class FacadeProviderRegistryWrapper implements IFacadeProvider.Factory.Re
 	 * {@inheritDoc}
 	 */
 	@Override
-	public IFacadeProvider.Factory getHighestRankingFacadeProviderFactory(IComparisonScope scope) {
-		IItemDescriptor<IFacadeProvider.Factory> highest = null;
-		IFacadeProvider.Factory result = null;
-
-		for (IItemDescriptor<IFacadeProvider.Factory> next : getEnabledFactories()) {
-			if ((highest == null) || (highest.getRank() > highest.getRank())) {
-				IFacadeProvider.Factory factory = next.getItem();
-				if (factory.isFacadeProviderFactoryFor(scope)) {
-					highest = next;
-					result = factory;
-				}
-			}
-		}
-
-		if (result == null) {
-			result = IFacadeProvider.Factory.NULL_FACTORY;
-		}
-
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public List<IFacadeProvider.Factory> getFacadeProviderFactories(IComparisonScope scope) {
 		Iterable<IFacadeProvider.Factory> result = filter(
 				transform(getEnabledFactories(), IItemDescriptor::getItem),
