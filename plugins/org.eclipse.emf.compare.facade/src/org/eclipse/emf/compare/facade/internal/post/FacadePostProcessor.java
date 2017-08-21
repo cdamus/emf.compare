@@ -13,6 +13,8 @@
 package org.eclipse.emf.compare.facade.internal.post;
 
 import static com.google.common.base.Predicates.and;
+import static com.google.common.base.Predicates.instanceOf;
+import static com.google.common.collect.Iterables.addAll;
 import static com.google.common.collect.Iterables.filter;
 import static org.eclipse.emf.compare.DifferenceSource.LEFT;
 import static org.eclipse.emf.compare.DifferenceSource.RIGHT;
@@ -22,10 +24,9 @@ import static org.eclipse.emf.compare.utils.EMFComparePredicates.valueIs;
 import static org.eclipse.emf.compare.utils.MatchUtil.findAddOrDeleteContainmentDiffs;
 import static org.eclipse.emf.compare.utils.MatchUtil.getMatchedObject;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.eclipse.emf.common.util.Monitor;
 import org.eclipse.emf.compare.Comparison;
@@ -34,6 +35,7 @@ import org.eclipse.emf.compare.DifferenceKind;
 import org.eclipse.emf.compare.DifferenceSource;
 import org.eclipse.emf.compare.Match;
 import org.eclipse.emf.compare.ReferenceChange;
+import org.eclipse.emf.compare.ResourceAttachmentChange;
 import org.eclipse.emf.compare.facade.FacadeAdapter;
 import org.eclipse.emf.compare.internal.utils.ComparisonUtil;
 import org.eclipse.emf.compare.postprocessor.IPostProcessor;
@@ -107,10 +109,8 @@ public class FacadePostProcessor implements IPostProcessor {
 					referenced = FacadeAdapter.getUnderlyingObject(referenced);
 				}
 
-				List<Diff> dependencies = getRequiredFacadeAdds(comparison, referenced);
-				refChange.getRequires().addAll(dependencies);
-
-				result = !dependencies.isEmpty();
+				Iterable<Diff> dependencies = getRequiredFacadeAdds(comparison, referenced);
+				result = addAll(refChange.getRequires(), dependencies);
 				break;
 			default:
 				// Pass
@@ -163,11 +163,9 @@ public class FacadePostProcessor implements IPostProcessor {
 					referenced = FacadeAdapter.getUnderlyingObject(referenced);
 				}
 
-				List<Diff> dependents = getRequiringFacadeDeletes(comparison, referenced,
+				Iterable<Diff> dependents = getRequiringFacadeDeletes(comparison, referenced,
 						refChange.getSource());
-				refChange.getRequiredBy().addAll(dependents);
-
-				result = !dependents.isEmpty();
+				result = addAll(refChange.getRequiredBy(), dependents);
 				break;
 			default:
 				// Pass
@@ -187,8 +185,8 @@ public class FacadePostProcessor implements IPostProcessor {
 	 *            an object that is added to a reference in some diff
 	 * @return diffs pertaining to the addition of the object
 	 */
-	private List<Diff> getRequiredFacadeAdds(Comparison comparison, EObject referenced) {
-		List<Diff> result;
+	private Iterable<Diff> getRequiredFacadeAdds(Comparison comparison, EObject referenced) {
+		Iterable<Diff> result;
 
 		EObject facade = FacadeAdapter.getFacade(referenced);
 		if (facade == null) {
@@ -254,9 +252,31 @@ public class FacadePostProcessor implements IPostProcessor {
 	 * @return the diffs, if any, that are its addition diffs
 	 */
 	@SuppressWarnings("unchecked")
-	List<Diff> getAddDiff(Match match, EObject added, DifferenceSource onSide) {
-		return ImmutableList.copyOf(filter(findAddOrDeleteContainmentDiffs(match),
-				and(ofKind(DifferenceKind.ADD), valueIs(added), fromSide(onSide))));
+	Iterable<Diff> getAddDiff(Match match, EObject added, DifferenceSource onSide) {
+		Iterable<Diff> addToContainment = filter(orEmpty(findAddOrDeleteContainmentDiffs(match)),
+				and(ofKind(DifferenceKind.ADD), valueIs(added), fromSide(onSide)));
+
+		Iterable<Diff> addToResource = filter(match.getDifferences(), and(
+				instanceOf(ResourceAttachmentChange.class), ofKind(DifferenceKind.ADD), fromSide(onSide)));
+
+		return Iterables.concat(addToContainment, addToResource);
+	}
+
+	/**
+	 * Cases a {@code null} iterable as an empty iterable.
+	 * 
+	 * @param maybeNull
+	 *            an iterable or {@code null}
+	 * @return the iterable or an empty iterable if it was {@code null}
+	 * @param <T>
+	 *            the element type of the iterable
+	 */
+	static <T> Iterable<T> orEmpty(Iterable<T> maybeNull) {
+		if (maybeNull == null) {
+			return Collections.emptyList();
+		} else {
+			return maybeNull;
+		}
 	}
 
 	/**
@@ -271,9 +291,10 @@ public class FacadePostProcessor implements IPostProcessor {
 	 *            the side of the comparison in which to look for deletions of the {@code reference} object
 	 * @return diffs pertaining to the deletion of the object
 	 */
-	private List<Diff> getRequiringFacadeDeletes(Comparison comparison, EObject referenced,
+	private Iterable<Diff> getRequiringFacadeDeletes(Comparison comparison, EObject referenced,
 			DifferenceSource onSide) {
-		List<Diff> result;
+
+		Iterable<Diff> result;
 
 		EObject facade = FacadeAdapter.getFacade(referenced);
 		if (facade == null) {
@@ -312,9 +333,14 @@ public class FacadePostProcessor implements IPostProcessor {
 	 * @return the diffs, if any, that are its deletion diffs
 	 */
 	@SuppressWarnings("unchecked")
-	List<Diff> getDeleteDiff(Match match, EObject removed, DifferenceSource onSide) {
-		return ImmutableList.copyOf(filter(findAddOrDeleteContainmentDiffs(match),
-				and(ofKind(DifferenceKind.DELETE), valueIs(removed), fromSide(onSide))));
+	Iterable<Diff> getDeleteDiff(Match match, EObject removed, DifferenceSource onSide) {
+		Iterable<Diff> removeFromContainment = filter(orEmpty(findAddOrDeleteContainmentDiffs(match)),
+				and(ofKind(DifferenceKind.DELETE), valueIs(removed), fromSide(onSide)));
+
+		Iterable<Diff> removeFromResource = filter(match.getDifferences(), and(
+				instanceOf(ResourceAttachmentChange.class), ofKind(DifferenceKind.DELETE), fromSide(onSide)));
+
+		return Iterables.concat(removeFromContainment, removeFromResource);
 	}
 
 	/**

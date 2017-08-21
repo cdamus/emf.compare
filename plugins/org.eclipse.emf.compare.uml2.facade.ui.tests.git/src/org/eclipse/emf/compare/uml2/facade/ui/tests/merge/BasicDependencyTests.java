@@ -12,19 +12,27 @@
  */
 package org.eclipse.emf.compare.uml2.facade.ui.tests.merge;
 
+import static com.google.common.base.Predicates.and;
 import static com.google.common.collect.Iterables.tryFind;
+import static org.eclipse.emf.compare.DifferenceKind.ADD;
+import static org.eclipse.emf.compare.DifferenceKind.DELETE;
 import static org.eclipse.emf.compare.tests.framework.CompareMatchers.isPresent;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.added;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.changedReference;
+import static org.eclipse.emf.compare.utils.EMFComparePredicates.ofKind;
+import static org.eclipse.emf.compare.utils.EMFComparePredicates.onEObject;
+import static org.eclipse.emf.compare.utils.EMFComparePredicates.referenceValueMatch;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.removed;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.junit.Assume.assumeThat;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
 
 import org.eclipse.emf.compare.Comparison;
 import org.eclipse.emf.compare.Diff;
+import org.eclipse.emf.compare.ResourceAttachmentChange;
 import org.eclipse.emf.compare.ide.ui.tests.git.framework.GitMergeStrategyID;
 import org.eclipse.emf.compare.ide.ui.tests.git.framework.GitTestRunner;
 import org.eclipse.emf.compare.ide.ui.tests.git.framework.annotations.GitCompare;
@@ -73,5 +81,41 @@ public class BasicDependencyTests {
 
 		assertThat("Deletion of finder does not require unset of collaboration role type",
 				unsetCollaborationRoleType, isPresent());
+	}
+
+	@GitCompare(local = "master", remote = "ref-to-new-root", file = "app.uml")
+	@GitInput("data/add-root-facade-object.zip")
+	public void umlRefToAddedRootFacadeObject(Comparison comparison) throws Exception {
+		assumeThat("There were unexpected conflicts", comparison.getConflicts(), empty());
+
+		Optional<Diff> setImportedPackageOpt = tryFind(comparison.getDifferences(),
+				referenceValueMatch("importedPackage", "beans", false));
+		assertThat("Set of imported package not found", setImportedPackageOpt, isPresent());
+
+		Diff setImportedPackage = setImportedPackageOpt.get();
+		@SuppressWarnings("unchecked")
+		Optional<Diff> addPackage = tryFind(setImportedPackage.getRequires(),
+				and(onEObject("beans"), Predicates.instanceOf(ResourceAttachmentChange.class), ofKind(ADD)));
+
+		assertThat("Imported package reference does not require addition of façade package", addPackage,
+				isPresent());
+	}
+
+	@GitCompare(local = "ref-to-new-root", remote = "delete-root-again", file = "app.uml")
+	@GitInput("data/add-root-facade-object.zip")
+	public void umlRefToDeletedRootFacadeObject(Comparison comparison) throws Exception {
+		assumeThat("There were unexpected conflicts", comparison.getConflicts(), empty());
+
+		Optional<Diff> unsetImportedPackageOpt = tryFind(comparison.getDifferences(),
+				referenceValueMatch("importedPackage", "beans", false));
+		assertThat("Unset of imported package not found", unsetImportedPackageOpt, isPresent());
+
+		Diff unsetImportedPackage = unsetImportedPackageOpt.get();
+		@SuppressWarnings("unchecked")
+		Optional<Diff> deletePackage = tryFind(unsetImportedPackage.getRequiredBy(), and(onEObject("beans"),
+				Predicates.instanceOf(ResourceAttachmentChange.class), ofKind(DELETE)));
+
+		assertThat("Imported package reference not required by deletion of façade package", deletePackage,
+				isPresent());
 	}
 }
