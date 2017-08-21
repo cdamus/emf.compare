@@ -21,7 +21,7 @@ import org.eclipse.uml2.uml.UMLPackage;
  *
  * @author Christian W. Damus
  */
-@Input({"a1", "m1", "m2", "o1", "u1" }) // Generate resource accessors
+@Input({"a1", "m1", "m2", "o1", "o2", "o3", "o4", "u1" }) // Generate resource accessors
 public class UMLInputData extends UMLInputDataGen {
 
 	/**

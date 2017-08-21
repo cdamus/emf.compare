@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, 2014 Obeo.
+ * Copyright (c) 2011, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,11 @@
  * 
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Christian W. Damus - support for EMap entry distance calculation
  */
 package org.eclipse.emf.compare.tests.nodes.util;
 
+import java.util.Map;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
 
@@ -33,7 +35,7 @@ public class NodesAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final String copyright = "Copyright (c) 2011, 2012 Obeo.\r\nAll rights reserved. This program and the accompanying materials\r\nare made available under the terms of the Eclipse Public License v1.0\r\nwhich accompanies this distribution, and is available at\r\nhttp://www.eclipse.org/legal/epl-v10.html\r\n\r\nContributors:\r\n    Obeo - initial API and implementation"; //$NON-NLS-1$
+	public static final String copyright = "Copyright (c) 2011, 2017 Obeo and others.\r\nAll rights reserved. This program and the accompanying materials\r\nare made available under the terms of the Eclipse Public License v1.0\r\nwhich accompanies this distribution, and is available at\r\nhttp://www.eclipse.org/legal/epl-v10.html\r\n\r\nContributors:\r\n    Obeo - initial API and implementation"; //$NON-NLS-1$
 
 	/**
 	 * The cached model package.
@@ -141,6 +143,14 @@ public class NodesAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseNodeMultiValueEEnumAttribute(NodeMultiValueEEnumAttribute object) {
 				return createNodeMultiValueEEnumAttributeAdapter();
+			}
+			@Override
+			public Adapter caseStringToNodeMapEntry(Map.Entry<String, Node> object) {
+				return createStringToNodeMapEntryAdapter();
+			}
+			@Override
+			public Adapter caseNodeEMap(NodeEMap object) {
+				return createNodeEMapAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -369,6 +379,34 @@ public class NodesAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createNodeMultiValueEEnumAttributeAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>String To Node Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createStringToNodeMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link org.eclipse.emf.compare.tests.nodes.NodeEMap <em>Node EMap</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.eclipse.emf.compare.tests.nodes.NodeEMap
+	 * @generated
+	 */
+	public Adapter createNodeEMapAdapter() {
 		return null;
 	}
 

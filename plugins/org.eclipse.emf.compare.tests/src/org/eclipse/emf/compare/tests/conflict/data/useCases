@@ -51,6 +51,15 @@ k3 - Real Add Conflict, containing pseudo conflict, containing pseudo conflict (
 k4 - Real Conflict (not add), containing pseudo conflict (must not be detected as real conflict).
 	(see https://bugs.eclipse.org/bugs/show_bug.cgi?id=442897)
 
+Specialized use cases
+
+m - Conflict detection in EMap-type features.  These tests use XML resources to ensure
+    structural matching, not using XMI IDs or other extrinsic identifiers.
+    
+	m1 - Add-add conflict at different indices in the containment list
+	m2 - Add-add conflict at same index in the containment list
+	m3 - No conflict (adding different keys)
+
 Ecore specific?
 
 - Setting two different attributes as "idAttribute" in left and right.

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, 2014 Obeo.
+ * Copyright (c) 2011, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Christian W. Damus - support for EMap entry distance calculation
  */
 package org.eclipse.emf.compare.tests.nodes;
 
@@ -26,7 +27,7 @@ public interface NodesFactory extends EFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	String copyright = "Copyright (c) 2011, 2012 Obeo.\r\nAll rights reserved. This program and the accompanying materials\r\nare made available under the terms of the Eclipse Public License v1.0\r\nwhich accompanies this distribution, and is available at\r\nhttp://www.eclipse.org/legal/epl-v10.html\r\n\r\nContributors:\r\n    Obeo - initial API and implementation"; //$NON-NLS-1$
+	String copyright = "Copyright (c) 2011, 2017 Obeo and others.\r\nAll rights reserved. This program and the accompanying materials\r\nare made available under the terms of the Eclipse Public License v1.0\r\nwhich accompanies this distribution, and is available at\r\nhttp://www.eclipse.org/legal/epl-v10.html\r\n\r\nContributors:\r\n    Obeo - initial API and implementation"; //$NON-NLS-1$
 
 	/**
 	 * The singleton instance of the factory.
@@ -170,6 +171,15 @@ public interface NodesFactory extends EFactory {
 	 * @generated
 	 */
 	NodeMultiValueEEnumAttribute createNodeMultiValueEEnumAttribute();
+
+	/**
+	 * Returns a new object of class '<em>Node EMap</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Node EMap</em>'.
+	 * @generated
+	 */
+	NodeEMap createNodeEMap();
 
 	/**
 	 * Returns the package supported by this factory.

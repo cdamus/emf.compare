@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2016 Obeo and others.
+ * Copyright (c) 2012, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *     Philip Langer - bug 479449
+ *     Christian W. Damus - support for EMap entry distance calculation
  *******************************************************************************/
 package org.eclipse.emf.compare.tests.conflict.data;
 
@@ -674,6 +675,42 @@ public class ConflictInputData extends AbstractInputData {
 
 	public Resource getK4Right() throws IOException {
 		return loadFromClassLoader("k4/conflict_k4_right.nodes");
+	}
+
+	public Resource getM1Left() throws IOException {
+		return loadFromClassLoader("m1/conflict_m1_left.xml");
+	}
+
+	public Resource getM1Origin() throws IOException {
+		return loadFromClassLoader("m1/conflict_m1_origin.xml");
+	}
+
+	public Resource getM1Right() throws IOException {
+		return loadFromClassLoader("m1/conflict_m1_right.xml");
+	}
+
+	public Resource getM2Left() throws IOException {
+		return loadFromClassLoader("m2/conflict_m2_left.xml");
+	}
+
+	public Resource getM2Origin() throws IOException {
+		return loadFromClassLoader("m2/conflict_m2_origin.xml");
+	}
+
+	public Resource getM2Right() throws IOException {
+		return loadFromClassLoader("m2/conflict_m2_right.xml");
+	}
+
+	public Resource getM3Left() throws IOException {
+		return loadFromClassLoader("m3/conflict_m3_left.xml");
+	}
+
+	public Resource getM3Origin() throws IOException {
+		return loadFromClassLoader("m3/conflict_m3_origin.xml");
+	}
+
+	public Resource getM3Right() throws IOException {
+		return loadFromClassLoader("m3/conflict_m3_right.xml");
 	}
 
 	public Resource getComplexLeft() throws IOException {

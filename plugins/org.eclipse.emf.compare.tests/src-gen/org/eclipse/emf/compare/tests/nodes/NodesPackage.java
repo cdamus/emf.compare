@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, 2014 Obeo.
+ * Copyright (c) 2011, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Christian W. Damus - support for EMap entry distance calculation
  */
 package org.eclipse.emf.compare.tests.nodes;
 
@@ -37,7 +38,7 @@ public interface NodesPackage extends EPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	String copyright = "Copyright (c) 2011, 2012 Obeo.\r\nAll rights reserved. This program and the accompanying materials\r\nare made available under the terms of the Eclipse Public License v1.0\r\nwhich accompanies this distribution, and is available at\r\nhttp://www.eclipse.org/legal/epl-v10.html\r\n\r\nContributors:\r\n    Obeo - initial API and implementation"; //$NON-NLS-1$
+	String copyright = "Copyright (c) 2011, 2017 Obeo and others.\r\nAll rights reserved. This program and the accompanying materials\r\nare made available under the terms of the Eclipse Public License v1.0\r\nwhich accompanies this distribution, and is available at\r\nhttp://www.eclipse.org/legal/epl-v10.html\r\n\r\nContributors:\r\n    Obeo - initial API and implementation"; //$NON-NLS-1$
 
 	/**
 	 * The package name.
@@ -852,6 +853,89 @@ public interface NodesPackage extends EPackage {
 	int NODE_MULTI_VALUE_EENUM_ATTRIBUTE_FEATURE_COUNT = NODE_FEATURE_COUNT + 1;
 
 	/**
+	 * The meta object id for the '{@link org.eclipse.emf.compare.tests.nodes.impl.StringToNodeMapEntryImpl <em>String To Node Map Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.emf.compare.tests.nodes.impl.StringToNodeMapEntryImpl
+	 * @see org.eclipse.emf.compare.tests.nodes.impl.NodesPackageImpl#getStringToNodeMapEntry()
+	 * @generated
+	 */
+	int STRING_TO_NODE_MAP_ENTRY = 15;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STRING_TO_NODE_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STRING_TO_NODE_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>String To Node Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STRING_TO_NODE_MAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.emf.compare.tests.nodes.impl.NodeEMapImpl <em>Node EMap</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.emf.compare.tests.nodes.impl.NodeEMapImpl
+	 * @see org.eclipse.emf.compare.tests.nodes.impl.NodesPackageImpl#getNodeEMap()
+	 * @generated
+	 */
+	int NODE_EMAP = 16;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_EMAP__NAME = NODE__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Containment Ref1</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_EMAP__CONTAINMENT_REF1 = NODE__CONTAINMENT_REF1;
+
+	/**
+	 * The feature id for the '<em><b>Name Table</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_EMAP__NAME_TABLE = NODE_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Node EMap</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_EMAP_FEATURE_COUNT = NODE_FEATURE_COUNT + 1;
+
+	/**
 	 * The meta object id for the '{@link org.eclipse.emf.compare.tests.nodes.NodeEnum <em>Node Enum</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -859,7 +943,7 @@ public interface NodesPackage extends EPackage {
 	 * @see org.eclipse.emf.compare.tests.nodes.impl.NodesPackageImpl#getNodeEnum()
 	 * @generated
 	 */
-	int NODE_ENUM = 15;
+	int NODE_ENUM = 17;
 
 
 	/**
@@ -1299,6 +1383,61 @@ public interface NodesPackage extends EPackage {
 	EAttribute getNodeMultiValueEEnumAttribute_MultiValueEEnumAttribute();
 
 	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>String To Node Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>String To Node Map Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyDataType="org.eclipse.emf.ecore.EString" keyRequired="true"
+	 *        valueType="org.eclipse.emf.compare.tests.nodes.Node" valueRequired="true"
+	 * @generated
+	 */
+	EClass getStringToNodeMapEntry();
+
+	/**
+	 * Returns the meta object for the attribute '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getStringToNodeMapEntry()
+	 * @generated
+	 */
+	EAttribute getStringToNodeMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getStringToNodeMapEntry()
+	 * @generated
+	 */
+	EReference getStringToNodeMapEntry_Value();
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.emf.compare.tests.nodes.NodeEMap <em>Node EMap</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Node EMap</em>'.
+	 * @see org.eclipse.emf.compare.tests.nodes.NodeEMap
+	 * @generated
+	 */
+	EClass getNodeEMap();
+
+	/**
+	 * Returns the meta object for the map '{@link org.eclipse.emf.compare.tests.nodes.NodeEMap#getNameTable <em>Name Table</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the map '<em>Name Table</em>'.
+	 * @see org.eclipse.emf.compare.tests.nodes.NodeEMap#getNameTable()
+	 * @see #getNodeEMap()
+	 * @generated
+	 */
+	EReference getNodeEMap_NameTable();
+
+	/**
 	 * Returns the meta object for enum '{@link org.eclipse.emf.compare.tests.nodes.NodeEnum <em>Node Enum</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1687,6 +1826,50 @@ public interface NodesPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute NODE_MULTI_VALUE_EENUM_ATTRIBUTE__MULTI_VALUE_EENUM_ATTRIBUTE = eINSTANCE.getNodeMultiValueEEnumAttribute_MultiValueEEnumAttribute();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.emf.compare.tests.nodes.impl.StringToNodeMapEntryImpl <em>String To Node Map Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.emf.compare.tests.nodes.impl.StringToNodeMapEntryImpl
+		 * @see org.eclipse.emf.compare.tests.nodes.impl.NodesPackageImpl#getStringToNodeMapEntry()
+		 * @generated
+		 */
+		EClass STRING_TO_NODE_MAP_ENTRY = eINSTANCE.getStringToNodeMapEntry();
+
+		/**
+		 * The meta object literal for the '<em><b>Key</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute STRING_TO_NODE_MAP_ENTRY__KEY = eINSTANCE.getStringToNodeMapEntry_Key();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference STRING_TO_NODE_MAP_ENTRY__VALUE = eINSTANCE.getStringToNodeMapEntry_Value();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.emf.compare.tests.nodes.impl.NodeEMapImpl <em>Node EMap</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.emf.compare.tests.nodes.impl.NodeEMapImpl
+		 * @see org.eclipse.emf.compare.tests.nodes.impl.NodesPackageImpl#getNodeEMap()
+		 * @generated
+		 */
+		EClass NODE_EMAP = eINSTANCE.getNodeEMap();
+
+		/**
+		 * The meta object literal for the '<em><b>Name Table</b></em>' map feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference NODE_EMAP__NAME_TABLE = eINSTANCE.getNodeEMap_NameTable();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.emf.compare.tests.nodes.NodeEnum <em>Node Enum</em>}' enum.

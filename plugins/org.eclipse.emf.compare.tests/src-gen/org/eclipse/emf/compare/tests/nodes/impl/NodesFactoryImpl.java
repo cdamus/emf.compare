@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, 2014 Obeo.
+ * Copyright (c) 2011, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,11 @@
  * 
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Christian W. Damus - support for EMap entry distance calculation
  */
 package org.eclipse.emf.compare.tests.nodes.impl;
 
+import java.util.Map;
 import org.eclipse.emf.compare.tests.nodes.*;
 
 import org.eclipse.emf.ecore.EClass;
@@ -33,7 +35,7 @@ public class NodesFactoryImpl extends EFactoryImpl implements NodesFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final String copyright = "Copyright (c) 2011, 2012 Obeo.\r\nAll rights reserved. This program and the accompanying materials\r\nare made available under the terms of the Eclipse Public License v1.0\r\nwhich accompanies this distribution, and is available at\r\nhttp://www.eclipse.org/legal/epl-v10.html\r\n\r\nContributors:\r\n    Obeo - initial API and implementation"; //$NON-NLS-1$
+	public static final String copyright = "Copyright (c) 2011, 2017 Obeo and others.\r\nAll rights reserved. This program and the accompanying materials\r\nare made available under the terms of the Eclipse Public License v1.0\r\nwhich accompanies this distribution, and is available at\r\nhttp://www.eclipse.org/legal/epl-v10.html\r\n\r\nContributors:\r\n    Obeo - initial API and implementation"; //$NON-NLS-1$
 
 	/**
 	 * Creates the default factory implementation.
@@ -87,6 +89,8 @@ public class NodesFactoryImpl extends EFactoryImpl implements NodesFactory {
 			case NodesPackage.NODE_FEATURE_MAP_CONTAINMENT2: return createNodeFeatureMapContainment2();
 			case NodesPackage.NODE_SINGLE_VALUE_EENUM_ATTRIBUTE: return createNodeSingleValueEEnumAttribute();
 			case NodesPackage.NODE_MULTI_VALUE_EENUM_ATTRIBUTE: return createNodeMultiValueEEnumAttribute();
+			case NodesPackage.STRING_TO_NODE_MAP_ENTRY: return (EObject)createStringToNodeMapEntry();
+			case NodesPackage.NODE_EMAP: return createNodeEMap();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -270,6 +274,26 @@ public class NodesFactoryImpl extends EFactoryImpl implements NodesFactory {
 	public NodeMultiValueEEnumAttribute createNodeMultiValueEEnumAttribute() {
 		NodeMultiValueEEnumAttributeImpl nodeMultiValueEEnumAttribute = new NodeMultiValueEEnumAttributeImpl();
 		return nodeMultiValueEEnumAttribute;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<String, Node> createStringToNodeMapEntry() {
+		StringToNodeMapEntryImpl stringToNodeMapEntry = new StringToNodeMapEntryImpl();
+		return stringToNodeMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NodeEMap createNodeEMap() {
+		NodeEMapImpl nodeEMap = new NodeEMapImpl();
+		return nodeEMap;
 	}
 
 	/**

@@ -89,3 +89,34 @@ of the UML metamodel.
 Two-way comparison of a very simple model containing an opaque expression:
 
 * the left side adds a matched (language, body) pair to the opaque expression from the right side
+
+### Use case o2
+
+Three-way comparison of a very simple model containing an opaque expression with a
+conflict in the value of the expression body of an opaque-expression:
+
+* the left side changes the body of the expression for some language
+* the right side changes the body of the expression for the same language as the
+  left, but to a different value.  Conflict
+
+### Use case o3
+
+Three-way comparison of a very simple model containing an opaque expression with an
+add-add conflict in the bodies of an opaque-expression:
+
+* the left side adds a body for some language, in some position in the list
+* the right side adds a different body for the same language, in a different position
+  in the list.  Conflict
+
+### Use case o4
+
+Three-way comparison of a very simple model containing an opaque expression with an
+add-add conflict in the bodies of an opaque-expression:
+
+* the left side adds a body for some language, in some position in the list
+* the right side adds a different body for the same language, in the same position
+  in the list.  Conflict
+
+This use case exists despite its apparent redundance with **o3** because, at the time
+of its definition, this use case actually resulted only in a pseudo-conflict, despite
+that left and right values for the same language are different

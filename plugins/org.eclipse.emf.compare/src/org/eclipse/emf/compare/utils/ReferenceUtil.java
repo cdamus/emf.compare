@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2017 Obeo and others.
+ * Copyright (c) 2012, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *     Philip Langer - bug 516524
+ *     Christian W. Damus - support for EMap entry distance calculation
  *******************************************************************************/
 package org.eclipse.emf.compare.utils;
 
@@ -15,7 +16,9 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
@@ -176,5 +179,25 @@ public final class ReferenceUtil {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Queries whether a {@code reference} is an {@link EMap}.
+	 * 
+	 * @param reference
+	 *            a reference, which if it is an {@code EMap} would have to be a containment
+	 * @return {@code true} if the {@code reference} is a {@link EReference#isContainment() containment} of an
+	 *         {@link Map.Entry} type
+	 * @since 3.6
+	 */
+	public static boolean isEMap(EReference reference) {
+		boolean result = false;
+
+		if (reference.isContainment()) {
+			EClass type = reference.getEReferenceType();
+			result = (type != null) && (type.getInstanceClass() == Map.Entry.class);
+		}
+
+		return result;
 	}
 }

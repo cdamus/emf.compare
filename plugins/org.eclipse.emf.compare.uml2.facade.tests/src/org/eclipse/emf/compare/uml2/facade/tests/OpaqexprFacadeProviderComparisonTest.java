@@ -12,10 +12,17 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests;
 
+import static com.google.common.base.Predicates.and;
+import static org.eclipse.emf.compare.tests.framework.CompareMatchers.isRealConflict;
+import static org.eclipse.emf.compare.tests.framework.CompareMatchers.matches;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.addedToReference;
+import static org.eclipse.emf.compare.utils.EMFComparePredicates.attributeValueMatch;
+import static org.eclipse.emf.compare.utils.EMFComparePredicates.onEObject;
+import static org.eclipse.emf.compare.utils.EMFComparePredicates.onFeature;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.removedFromReference;
 import static org.hamcrest.CoreMatchers.anything;
 import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -25,6 +32,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.fail;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 
 import java.util.Arrays;
@@ -32,6 +40,7 @@ import java.util.List;
 
 import org.eclipse.emf.common.EMFPlugin;
 import org.eclipse.emf.compare.Comparison;
+import org.eclipse.emf.compare.Conflict;
 import org.eclipse.emf.compare.Diff;
 import org.eclipse.emf.compare.facade.FacadeObject;
 import org.eclipse.emf.compare.facade.IFacadeProvider;
@@ -163,6 +172,73 @@ public class OpaqexprFacadeProviderComparisonTest extends AbstractFacadeTest {
 		testMergeLeftToRight(left, right, null);
 	}
 
+	@Test
+	public void bodyValueConflict_o2() {
+		Resource base = input.getO2Base();
+		Resource left = input.getO2Left();
+		Resource right = input.getO2Right();
+		Comparison comparison = compare(left, right, base);
+
+		List<Conflict> conflicts = comparison.getConflicts();
+
+		assertThat(conflicts.size(), is(1));
+
+		Conflict conflict = conflicts.get(0);
+		assertThat(conflict, isRealConflict());
+
+		Diff setBodyEntry1 = Iterables.find(conflict.getDifferences(),
+				changedBodyValue("o2.expr.Smalltalk", "self things notEmpty"));
+		Diff setBodyEntry2 = Iterables.find(conflict.getDifferences(),
+				changedBodyValue("o2.expr.Smalltalk", "things notEmpty"));
+
+		assertThat(setBodyEntry1, notNullValue());
+		assertThat(setBodyEntry2, notNullValue());
+	}
+
+	@Test
+	public void bodyAddAddConflictDifferentIndex_o3() {
+		Resource base = input.getO3Base();
+		Resource left = input.getO3Left();
+		Resource right = input.getO3Right();
+		Comparison comparison = compare(left, right, base);
+		EAttribute keyFeature = OpaqexprPackage.Literals.BODY_ENTRY__KEY;
+
+		List<Conflict> conflicts = comparison.getConflicts();
+
+		assertThat(conflicts.size(), is(1));
+
+		Conflict conflict = conflicts.get(0);
+		assertThat(conflict, isRealConflict());
+
+		Predicate<? super Diff> addBodyDescription = addedToReference("o3.expr", "body", "o3.expr.Smalltalk",
+				keyFeature);
+
+		assertThat(conflict.getDifferences(),
+				everyItem(matches(Diff.class, "is add Smalltalk body", addBodyDescription)));
+	}
+
+	@Test
+	public void bodyAddAddConflictSameIndex_o4() {
+		Resource base = input.getO4Base();
+		Resource left = input.getO4Left();
+		Resource right = input.getO4Right();
+		Comparison comparison = compare(left, right, base);
+		EAttribute keyFeature = OpaqexprPackage.Literals.BODY_ENTRY__KEY;
+
+		List<Conflict> conflicts = comparison.getConflicts();
+
+		assertThat(conflicts.size(), is(1));
+
+		Conflict conflict = conflicts.get(0);
+		assertThat(conflict, isRealConflict());
+
+		Predicate<? super Diff> addBodyDescription = addedToReference("o4.expr", "body", "o4.expr.Smalltalk",
+				keyFeature);
+
+		assertThat(conflict.getDifferences(),
+				everyItem(matches(Diff.class, "is add Smalltalk body", addBodyDescription)));
+	}
+
 	//
 	// Test framework
 	//
@@ -225,4 +301,11 @@ public class OpaqexprFacadeProviderComparisonTest extends AbstractFacadeTest {
 				uri -> assertThat("Not an UML URI", uri, endsWith("." + UMLResource.FILE_EXTENSION)));
 	}
 
+	@SuppressWarnings("unchecked")
+	Predicate<Diff> changedBodyValue(String qualifiedName, String value) {
+		return and(onEObject(qualifiedName, OpaqexprPackage.Literals.BODY_ENTRY__KEY),
+				onFeature(OpaqexprPackage.Literals.BODY_ENTRY__VALUE),
+				attributeValueMatch("value", value, false));
+
+	}
 }

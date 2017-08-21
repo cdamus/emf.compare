@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Obeo.
+ * Copyright (c) 2014, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Christian W. Damus - support for EMap entry distance calculation
  *******************************************************************************/
 package org.eclipse.emf.compare.match.eobject;
 
@@ -14,7 +15,9 @@ import com.google.common.collect.Maps;
 
 import java.util.Map;
 
+import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EAttribute;
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -27,6 +30,9 @@ import org.eclipse.emf.ecore.EStructuralFeature;
  * @author <a href="mailto:axel.richard@obeo.fr">Axel Richard</a>
  */
 public class DefaultWeightProvider extends AbstractWeightProvider {
+
+	/** The name that the value feature of a map-entry {@link EClass} must have. */
+	private static final String VALUE_FEATURE_NAME = "value"; //$NON-NLS-1$
 
 	/**
 	 * The list of specific weight to apply on specific Features.
@@ -103,10 +109,32 @@ public class DefaultWeightProvider extends AbstractWeightProvider {
 	 */
 	protected boolean irrelevant(EStructuralFeature feat) {
 		if (feat instanceof EAttribute) {
-			return feat.isDerived() || feat.isTransient();
+			return feat.isDerived() || feat.isTransient() || isEMapEntryValue(feat);
 		} else {
 			EReference ref = (EReference)feat;
-			return ref.isDerived() || ref.isTransient() || ref.isContainment() || ref.isContainer();
+			return ref.isDerived() || ref.isTransient() || ref.isContainment() || ref.isContainer()
+					|| isEMapEntryValue(feat);
 		}
+	}
+
+	/**
+	 * The value feature of an {@link EMap} entry is irrelevant because the keys in an {@code EMap} must be
+	 * unique, so map entries always match by key only.
+	 * 
+	 * @param feature
+	 *            a feature
+	 * @return whether it is the value feature of an {@link EMap} entry
+	 * @since 3.6
+	 */
+	protected boolean isEMapEntryValue(EStructuralFeature feature) {
+		boolean result = false;
+
+		EClass eClass = feature.getEContainingClass();
+		if ((eClass != null) && (eClass.getInstanceClass() == Map.Entry.class)) {
+			// Which feature is it?
+			result = VALUE_FEATURE_NAME.equals(feature.getName());
+		}
+
+		return result;
 	}
 }

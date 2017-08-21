@@ -125,4 +125,12 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="multiValueEEnumAttribute"
         upperBound="-1" eType="#//NodeEnum"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="StringToNodeMapEntry" instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" lowerBound="1" eType="#//Node"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NodeEMap" eSuperTypes="#//Node">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="nameTable" upperBound="-1"
+        eType="#//StringToNodeMapEntry" containment="true"/>
+  </eClassifiers>
 </ecore:EPackage>

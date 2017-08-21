@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Obeo and others.
+ * Copyright (c) 2012, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Obeo - initial API and implementation
  *     Philip Langer - bug 479449
+ *     Christian W. Damus - support for EMap entry distance calculation
  *******************************************************************************/
 package org.eclipse.emf.compare.tests.conflict;
 
@@ -17,6 +18,7 @@ import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.size;
 import static org.eclipse.emf.compare.ConflictKind.PSEUDO;
 import static org.eclipse.emf.compare.ConflictKind.REAL;
+import static org.eclipse.emf.compare.tests.framework.CompareMatchers.isRealConflict;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.added;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.addedToAttribute;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.addedToReference;
@@ -34,6 +36,13 @@ import static org.eclipse.emf.compare.utils.EMFComparePredicates.referenceValueM
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.removed;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.removedFromAttribute;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.removedFromReference;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -57,11 +66,12 @@ import org.eclipse.emf.compare.ResourceAttachmentChange;
 import org.eclipse.emf.compare.scope.DefaultComparisonScope;
 import org.eclipse.emf.compare.scope.IComparisonScope;
 import org.eclipse.emf.compare.tests.conflict.data.ConflictInputData;
+import org.eclipse.emf.compare.tests.nodes.NodesPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.junit.Test;
 
-@SuppressWarnings("nls")
+@SuppressWarnings({"nls", "boxing" })
 public class ConflictDetectionTest {
 
 	/**
@@ -2372,5 +2382,111 @@ public class ConflictDetectionTest {
 		assertEquals(DifferenceSource.RIGHT, nonConflictingDiff.getSource());
 		assertTrue(
 				((ResourceAttachmentChange)nonConflictingDiff).getResourceURI().endsWith("fragment.nodes"));
+	}
+
+	@Test
+	public void testM1UseCase() throws IOException {
+		Resource left = input.getM1Left();
+		Resource origin = input.getM1Origin();
+		Resource right = input.getM1Right();
+
+		IComparisonScope scope = new DefaultComparisonScope(left, right, origin);
+		Comparison comparison = EMFCompare.builder().build().compare(scope);
+
+		List<Diff> differences = comparison.getDifferences();
+		List<Conflict> conflicts = comparison.getConflicts();
+
+		assertThat(differences.size(), greaterThanOrEqualTo(2));
+		assertThat(conflicts.size(), greaterThanOrEqualTo(1));
+
+		Predicate<? super Diff> leftDiffDescription = addedToReference("root.table", "nameTable",
+				"root.table.Brian", NodesPackage.Literals.STRING_TO_NODE_MAP_ENTRY__KEY);
+		Predicate<? super Diff> rightDiffDescription = addedToReference("root.table", "nameTable",
+				"root.table.Brian", NodesPackage.Literals.STRING_TO_NODE_MAP_ENTRY__KEY);
+
+		Diff leftDiff = Iterators.find(differences.iterator(),
+				and(fromSide(DifferenceSource.LEFT), leftDiffDescription), null);
+		Diff rightDiff = Iterators.find(differences.iterator(),
+				and(fromSide(DifferenceSource.RIGHT), rightDiffDescription), null);
+
+		assertThat("Left add not found", leftDiff, notNullValue());
+		assertThat("Right add not found", rightDiff, notNullValue());
+
+		Conflict conflict = leftDiff.getConflict();
+		assertThat("Left diff not in conflict", conflict, notNullValue());
+
+		List<Diff> conflictDiffs = conflict.getDifferences();
+		assertThat(conflictDiffs.size(), is(2));
+		assertThat(conflictDiffs, hasItem(rightDiff)); // The other is the left already
+		assertThat(conflict, isRealConflict());
+	}
+
+	@Test
+	public void testM2UseCase() throws IOException {
+		Resource left = input.getM2Left();
+		Resource origin = input.getM2Origin();
+		Resource right = input.getM2Right();
+
+		IComparisonScope scope = new DefaultComparisonScope(left, right, origin);
+		Comparison comparison = EMFCompare.builder().build().compare(scope);
+
+		List<Diff> differences = comparison.getDifferences();
+		List<Conflict> conflicts = comparison.getConflicts();
+
+		assertThat(differences.size(), greaterThanOrEqualTo(2));
+		assertThat(conflicts.size(), greaterThanOrEqualTo(1));
+
+		Predicate<? super Diff> leftDiffDescription = addedToReference("root.table", "nameTable",
+				"root.table.Brian", NodesPackage.Literals.STRING_TO_NODE_MAP_ENTRY__KEY);
+		Predicate<? super Diff> rightDiffDescription = addedToReference("root.table", "nameTable",
+				"root.table.Brian", NodesPackage.Literals.STRING_TO_NODE_MAP_ENTRY__KEY);
+
+		Diff leftDiff = Iterators.find(differences.iterator(),
+				and(fromSide(DifferenceSource.LEFT), leftDiffDescription), null);
+		Diff rightDiff = Iterators.find(differences.iterator(),
+				and(fromSide(DifferenceSource.RIGHT), rightDiffDescription), null);
+
+		assertThat("Left add not found", leftDiff, notNullValue());
+		assertThat("Right add not found", rightDiff, notNullValue());
+
+		Conflict conflict = leftDiff.getConflict();
+		assertThat("Left diff not in conflict", conflict, notNullValue());
+
+		List<Diff> conflictDiffs = conflict.getDifferences();
+		assertThat(conflictDiffs.size(), is(2));
+		assertThat(conflictDiffs, hasItem(rightDiff)); // The other is the left already
+		assertThat(conflict, isRealConflict());
+	}
+
+	@Test
+	public void testM3UseCase() throws IOException {
+		Resource left = input.getM3Left();
+		Resource origin = input.getM3Origin();
+		Resource right = input.getM3Right();
+
+		IComparisonScope scope = new DefaultComparisonScope(left, right, origin);
+		Comparison comparison = EMFCompare.builder().build().compare(scope);
+
+		List<Diff> differences = comparison.getDifferences();
+		List<Conflict> conflicts = comparison.getConflicts();
+
+		assertThat(differences.size(), greaterThanOrEqualTo(2));
+		assertThat(conflicts, empty());
+
+		Predicate<? super Diff> leftDiffDescription = addedToReference("root.table", "nameTable",
+				"root.table.Dwayne", NodesPackage.Literals.STRING_TO_NODE_MAP_ENTRY__KEY);
+		Predicate<? super Diff> rightDiffDescription = addedToReference("root.table", "nameTable",
+				"root.table.Brian", NodesPackage.Literals.STRING_TO_NODE_MAP_ENTRY__KEY);
+
+		Diff leftDiff = Iterators.find(differences.iterator(),
+				and(fromSide(DifferenceSource.LEFT), leftDiffDescription), null);
+		Diff rightDiff = Iterators.find(differences.iterator(),
+				and(fromSide(DifferenceSource.RIGHT), rightDiffDescription), null);
+
+		assertThat("Left add not found", leftDiff, notNullValue());
+		assertThat("Right add not found", rightDiff, notNullValue());
+
+		assertThat("Left diff is in conflict", leftDiff.getConflict(), nullValue());
+		assertThat("Right diff is in conflict", rightDiff.getConflict(), nullValue());
 	}
 }

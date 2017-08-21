@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nodes:Node
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:nodes="http://www.eclipse.org/emf/compare/tests/nodes"
+    name="root">
+  <containmentRef1
+      xsi:type="nodes:NodeEMap"
+      name="table">
+    <nameTable
+        key="Alice"
+        value="#Alice"/>
+    <nameTable
+        key="Catherine"
+        value="#Catherine"/>
+    <nameTable
+        key="Brian"
+        value="#Dwayne"/>
+  </containmentRef1>
+  <containmentRef1
+      name="Alice"/>
+  <containmentRef1
+      name="Brian"/>
+  <containmentRef1
+      name="Catherine"/>
+  <containmentRef1
+      name="Dwayne"/>
+</nodes:Node>

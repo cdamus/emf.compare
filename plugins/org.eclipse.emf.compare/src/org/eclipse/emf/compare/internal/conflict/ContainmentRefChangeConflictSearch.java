@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Obeo.
+ * Copyright (c) 2016, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Christian W. Damus - support for EMap entry distance calculation
  *******************************************************************************/
 package org.eclipse.emf.compare.internal.conflict;
 
@@ -24,6 +25,7 @@ import static org.eclipse.emf.compare.utils.EMFComparePredicates.onFeature;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.possiblyConflictingWith;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.valueMatches;
 import static org.eclipse.emf.compare.utils.MatchUtil.matchingIndices;
+import static org.eclipse.emf.compare.utils.ReferenceUtil.isEMap;
 
 import com.google.common.collect.Iterables;
 
@@ -77,6 +79,7 @@ public class ContainmentRefChangeConflictSearch {
 					and(possiblyConflictingWith(diff), ofKind(ADD, CHANGE)))) {
 				if (candidate.getReference().isContainment()) {
 					if (candidate.getReference() == feature && candidate.getMatch() == diff.getMatch()
+							&& !isEMap(feature) // Indices don't matter in EMaps because keys must be unique
 							&& matchingIndices(diff.getMatch(), feature, value, candidate.getValue())) {
 						conflict(candidate, PSEUDO);
 					} else {

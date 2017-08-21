@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, 2014 Obeo.
+ * Copyright (c) 2011, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,13 @@
  * 
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Christian W. Damus - support for EMap entry distance calculation
  */
 package org.eclipse.emf.compare.tests.nodes.util;
 
 import java.util.List;
 
+import java.util.Map;
 import org.eclipse.emf.compare.tests.nodes.*;
 
 import org.eclipse.emf.ecore.EClass;
@@ -36,7 +38,7 @@ public class NodesSwitch<T> {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final String copyright = "Copyright (c) 2011, 2012 Obeo.\r\nAll rights reserved. This program and the accompanying materials\r\nare made available under the terms of the Eclipse Public License v1.0\r\nwhich accompanies this distribution, and is available at\r\nhttp://www.eclipse.org/legal/epl-v10.html\r\n\r\nContributors:\r\n    Obeo - initial API and implementation"; //$NON-NLS-1$
+	public static final String copyright = "Copyright (c) 2011, 2017 Obeo and others.\r\nAll rights reserved. This program and the accompanying materials\r\nare made available under the terms of the Eclipse Public License v1.0\r\nwhich accompanies this distribution, and is available at\r\nhttp://www.eclipse.org/legal/epl-v10.html\r\n\r\nContributors:\r\n    Obeo - initial API and implementation"; //$NON-NLS-1$
 
 	/**
 	 * The cached model package
@@ -199,6 +201,19 @@ public class NodesSwitch<T> {
 				NodeMultiValueEEnumAttribute nodeMultiValueEEnumAttribute = (NodeMultiValueEEnumAttribute)theEObject;
 				T result = caseNodeMultiValueEEnumAttribute(nodeMultiValueEEnumAttribute);
 				if (result == null) result = caseNode(nodeMultiValueEEnumAttribute);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case NodesPackage.STRING_TO_NODE_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<String, Node> stringToNodeMapEntry = (Map.Entry<String, Node>)theEObject;
+				T result = caseStringToNodeMapEntry(stringToNodeMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case NodesPackage.NODE_EMAP: {
+				NodeEMap nodeEMap = (NodeEMap)theEObject;
+				T result = caseNodeEMap(nodeEMap);
+				if (result == null) result = caseNode(nodeEMap);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -428,6 +443,36 @@ public class NodesSwitch<T> {
 	 * @generated
 	 */
 	public T caseNodeMultiValueEEnumAttribute(NodeMultiValueEEnumAttribute object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>String To Node Map Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>String To Node Map Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseStringToNodeMapEntry(Map.Entry<String, Node> object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Node EMap</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Node EMap</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseNodeEMap(NodeEMap object) {
 		return null;
 	}
 

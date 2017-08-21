@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, 2014 Obeo.
+ * Copyright (c) 2011, 2017 Obeo, Christian W. Damus, and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,13 @@
  * 
  * Contributors:
  *     Obeo - initial API and implementation
+ *     Christian W. Damus - support for EMap entry distance calculation
  */
 package org.eclipse.emf.compare.tests.nodes.impl;
 
+import java.util.Map;
 import org.eclipse.emf.compare.tests.nodes.Node;
+import org.eclipse.emf.compare.tests.nodes.NodeEMap;
 import org.eclipse.emf.compare.tests.nodes.NodeEnum;
 import org.eclipse.emf.compare.tests.nodes.NodeFeatureMapContainment;
 import org.eclipse.emf.compare.tests.nodes.NodeFeatureMapContainment2;
@@ -49,7 +52,7 @@ public class NodesPackageImpl extends EPackageImpl implements NodesPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final String copyright = "Copyright (c) 2011, 2012 Obeo.\r\nAll rights reserved. This program and the accompanying materials\r\nare made available under the terms of the Eclipse Public License v1.0\r\nwhich accompanies this distribution, and is available at\r\nhttp://www.eclipse.org/legal/epl-v10.html\r\n\r\nContributors:\r\n    Obeo - initial API and implementation"; //$NON-NLS-1$
+	public static final String copyright = "Copyright (c) 2011, 2017 Obeo and others.\r\nAll rights reserved. This program and the accompanying materials\r\nare made available under the terms of the Eclipse Public License v1.0\r\nwhich accompanies this distribution, and is available at\r\nhttp://www.eclipse.org/legal/epl-v10.html\r\n\r\nContributors:\r\n    Obeo - initial API and implementation"; //$NON-NLS-1$
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -155,6 +158,20 @@ public class NodesPackageImpl extends EPackageImpl implements NodesPackage {
 	 * @generated
 	 */
 	private EClass nodeMultiValueEEnumAttributeEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass stringToNodeMapEntryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass nodeEMapEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -598,6 +615,51 @@ public class NodesPackageImpl extends EPackageImpl implements NodesPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getStringToNodeMapEntry() {
+		return stringToNodeMapEntryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getStringToNodeMapEntry_Key() {
+		return (EAttribute)stringToNodeMapEntryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getStringToNodeMapEntry_Value() {
+		return (EReference)stringToNodeMapEntryEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getNodeEMap() {
+		return nodeEMapEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getNodeEMap_NameTable() {
+		return (EReference)nodeEMapEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EEnum getNodeEnum() {
 		return nodeEnumEEnum;
 	}
@@ -686,6 +748,13 @@ public class NodesPackageImpl extends EPackageImpl implements NodesPackage {
 		nodeMultiValueEEnumAttributeEClass = createEClass(NODE_MULTI_VALUE_EENUM_ATTRIBUTE);
 		createEAttribute(nodeMultiValueEEnumAttributeEClass, NODE_MULTI_VALUE_EENUM_ATTRIBUTE__MULTI_VALUE_EENUM_ATTRIBUTE);
 
+		stringToNodeMapEntryEClass = createEClass(STRING_TO_NODE_MAP_ENTRY);
+		createEAttribute(stringToNodeMapEntryEClass, STRING_TO_NODE_MAP_ENTRY__KEY);
+		createEReference(stringToNodeMapEntryEClass, STRING_TO_NODE_MAP_ENTRY__VALUE);
+
+		nodeEMapEClass = createEClass(NODE_EMAP);
+		createEReference(nodeEMapEClass, NODE_EMAP__NAME_TABLE);
+
 		// Create enums
 		nodeEnumEEnum = createEEnum(NODE_ENUM);
 	}
@@ -732,6 +801,7 @@ public class NodesPackageImpl extends EPackageImpl implements NodesPackage {
 		nodeFeatureMapContainment2EClass.getESuperTypes().add(this.getNode());
 		nodeSingleValueEEnumAttributeEClass.getESuperTypes().add(this.getNode());
 		nodeMultiValueEEnumAttributeEClass.getESuperTypes().add(this.getNode());
+		nodeEMapEClass.getESuperTypes().add(this.getNode());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(nodeEClass, Node.class, "Node", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
@@ -789,6 +859,13 @@ public class NodesPackageImpl extends EPackageImpl implements NodesPackage {
 
 		initEClass(nodeMultiValueEEnumAttributeEClass, NodeMultiValueEEnumAttribute.class, "NodeMultiValueEEnumAttribute", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEAttribute(getNodeMultiValueEEnumAttribute_MultiValueEEnumAttribute(), this.getNodeEnum(), "multiValueEEnumAttribute", null, 0, -1, NodeMultiValueEEnumAttribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+
+		initEClass(stringToNodeMapEntryEClass, Map.Entry.class, "StringToNodeMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEAttribute(getStringToNodeMapEntry_Key(), ecorePackage.getEString(), "key", null, 1, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+		initEReference(getStringToNodeMapEntry_Value(), this.getNode(), null, "value", null, 1, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+
+		initEClass(nodeEMapEClass, NodeEMap.class, "NodeEMap", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEReference(getNodeEMap_NameTable(), this.getStringToNodeMapEntry(), null, "nameTable", null, 0, -1, NodeEMap.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		// Initialize enums and add enum literals
 		initEEnum(nodeEnumEEnum, NodeEnum.class, "NodeEnum"); //$NON-NLS-1$
