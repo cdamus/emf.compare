@@ -272,6 +272,23 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 	}
 
 	@Test
+	public void traceSecondaryUnderlyingElementsOfHomeInterface() {
+		Package package_ = requirePackage(input.getA2Left(), "a2");
+		Bean whatsit = requireBean(package_, "Whatsit");
+
+		HomeInterface newHome = package_.createHomeInterface("WhatsitHome");
+		newHome.setBean(whatsit);
+
+		Interface interface_ = (Interface)getUnderlyingObject(newHome);
+		assumeThat("No UML interface", interface_, notNullValue());
+
+		assumeThat("Home interface should have exactly one dependency",
+				interface_.getClientDependencies().size(), is(1));
+		assertThat(interface_.getClientDependencies().stream().map(FacadeAdapter::getFacade)
+				.collect(Collectors.toList()), everyItem(is(newHome)));
+	}
+
+	@Test
 	public void addHomeInterfaceInUML() {
 		Package package_ = requirePackage(input.getA2Left(), "a2");
 
@@ -302,6 +319,23 @@ public class BasicFacadeTest extends AbstractFacadeTest {
 				interface_.getClientDependencies().size(), is(1));
 		assertThat(interface_.getClientDependencies(), everyItem(hasStereotype("Create")));
 		assertThat(interface_.getClientDependencies(), everyItem(suppliedBy(is(getUnderlyingObject(thing)))));
+	}
+
+	@Test
+	public void traceSecondaryUnderlyingElementsOfFinder() {
+		Package package_ = requirePackage(input.getA3Left(), "a3");
+		Bean thing = requireBean(package_, "Thing");
+
+		Finder newFinder = package_.createFinder("ThingByRandom");
+		newFinder.setBean(thing);
+
+		Interface interface_ = (Interface)getUnderlyingObject(newFinder);
+		assumeThat("No UML interface", interface_, notNullValue());
+
+		assumeThat("Finder interface should have exactly one dependency",
+				interface_.getClientDependencies().size(), is(1));
+		assertThat(interface_.getClientDependencies().stream().map(FacadeAdapter::getFacade)
+				.collect(Collectors.toList()), everyItem(is(newFinder)));
 	}
 
 	@Test

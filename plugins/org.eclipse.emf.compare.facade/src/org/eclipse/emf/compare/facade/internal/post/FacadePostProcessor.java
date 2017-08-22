@@ -30,6 +30,7 @@ import java.util.Collections;
 
 import org.eclipse.emf.common.util.Monitor;
 import org.eclipse.emf.compare.Comparison;
+import org.eclipse.emf.compare.ComparisonCanceledException;
 import org.eclipse.emf.compare.Diff;
 import org.eclipse.emf.compare.DifferenceKind;
 import org.eclipse.emf.compare.DifferenceSource;
@@ -67,7 +68,7 @@ public class FacadePostProcessor implements IPostProcessor {
 		for (Diff next : comparison.getDifferences()) {
 			if (next instanceof ReferenceChange) {
 				if (monitor.isCanceled()) {
-					return;
+					throw new ComparisonCanceledException();
 				}
 
 				if (tryAddReferenceToFacade(comparison, next)) {

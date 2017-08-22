@@ -21,10 +21,15 @@ import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Queue;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -148,6 +153,58 @@ public class FacadeAdapter implements Adapter.Internal {
 	 */
 	public EObject getUnderlyingElement() {
 		return model;
+	}
+
+	/**
+	 * Obtains elements from the underlying model that are related to the given {@code underlying} element of
+	 * this façade, that are also claimed by this façade as part of its realization. This notion is applied
+	 * recursively to related elements of related underlying elements. <strong>Note</strong> that a façade
+	 * <ul>
+	 * <li>may report as its related underlying elements any elements that are also underlying some other
+	 * façade. This mapping is, in general, many-to-many</li>
+	 * <li>needs not be concerned with cycles in transitive relationships in the underlying model. Clients of
+	 * this API are required to account for cycles, or just use the {@link #getAllRelatedUnderlyingElements()}
+	 * API
+	 * </ul>
+	 * 
+	 * @param underlying
+	 *            an element underlying my façade
+	 * @return elements related to it that are integral to my façade, or an empty iterable if none (not
+	 *         {@code null})
+	 * @see #getAllRelatedUnderlyingElements()
+	 */
+	public Iterable<? extends EObject> getRelatedUnderlyingElements(EObject underlying) {
+		return Collections.emptyList();
+	}
+
+	/**
+	 * Computes the transitive closure of all elements in the underlying model that realize my façade.
+	 * 
+	 * @return all of my façades underlying elements, starting with and perhaps limited to the
+	 *         {@linkplain #getUnderlyingElement() principal underlying element}
+	 * @see #getRelatedUnderlyingElements(EObject)
+	 * @see #getUnderlyingElement()
+	 */
+	public Set<? extends EObject> getAllRelatedUnderlyingElements() {
+		Set<EObject> result = Sets.newLinkedHashSet();
+		Queue<Iterable<? extends EObject>> fifoRelations = Queues.newArrayDeque();
+
+		// Seed the result
+		EObject under = getUnderlyingElement();
+		result.add(under);
+		fifoRelations.offer(getRelatedUnderlyingElements(under));
+
+		// Breadth-first discovery of related elements with accounting for cycles
+		for (Iterable<? extends EObject> relations = fifoRelations
+				.poll(); relations != null; relations = fifoRelations.poll()) {
+			for (EObject next : relations) {
+				if (result.add(next)) {
+					fifoRelations.offer(getRelatedUnderlyingElements(next));
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -929,6 +986,7 @@ public class FacadeAdapter implements Adapter.Internal {
 					// if the 'notifier' is a dynamic proxy façade for the real notifier,
 					// which is then what the adapter references
 					if ((result.getFacade() == notifier) || (result.getUnderlyingElement() == notifier)
+							|| result.getAllRelatedUnderlyingElements().contains(notifier)
 							|| (getRealNotifier(notifier) == result.getFacade())) {
 
 						break; // Got it
@@ -958,7 +1016,7 @@ public class FacadeAdapter implements Adapter.Internal {
 				// Look for a façade adapter that has this object as the façade (not
 				// the underlying element)
 				FacadeAdapter adapter = getInstance(next);
-				result = (adapter != null) && (adapter.getUnderlyingElement() != next);
+				result = (adapter != null) && (adapter.getFacade() == next);
 			}
 		}
 
@@ -1001,7 +1059,7 @@ public class FacadeAdapter implements Adapter.Internal {
 	}
 
 	/**
-	 * Obtains the façade representing the given object assumed not to be a {@code underlying} a façade.
+	 * Obtains the façade representing the given object assumed to be {@code underlying} a façade.
 	 * 
 	 * @param underlying
 	 *            an object presumed to be underlying a façade
@@ -1013,7 +1071,7 @@ public class FacadeAdapter implements Adapter.Internal {
 
 		FacadeAdapter adapter = get(underlying, FacadeAdapter.class);
 		if (adapter != null) {
-			// It could be dybnamically proxied, to boot
+			// It could be dynamically proxied, to boot
 			result = FacadeProxy.wrap(adapter.getFacade());
 		}
 

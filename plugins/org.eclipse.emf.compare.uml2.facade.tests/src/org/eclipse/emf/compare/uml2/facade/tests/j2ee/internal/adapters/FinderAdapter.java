@@ -12,6 +12,9 @@
  */
 package org.eclipse.emf.compare.uml2.facade.tests.j2ee.internal.adapters;
 
+import com.google.common.collect.ImmutableList;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +23,7 @@ import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Bean;
 import org.eclipse.emf.compare.uml2.facade.tests.j2ee.Finder;
 import org.eclipse.emf.compare.utils.Optionals;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.uml2.uml.Element;
 import org.eclipse.uml2.uml.Interface;
 import org.eclipse.uml2.uml.NamedElement;
@@ -87,6 +91,29 @@ public class FinderAdapter extends NamedElementAdapter {
 	@Override
 	public org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.Finder getStereotype() {
 		return (org.eclipse.emf.compare.uml2.facade.tests.j2eeprofile.Finder)super.getStereotype();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Iterable<? extends EObject> getRelatedUnderlyingElements(EObject underlying) {
+		Iterable<? extends EObject> result;
+
+		if (underlying == create) {
+			result = Collections.unmodifiableList(create.getStereotypeApplications());
+		} else if (underlying == getUnderlyingElement()) {
+			ImmutableList.Builder<EObject> resultBuilder = ImmutableList.builder();
+			resultBuilder.add(getStereotype());
+			if (create != null) {
+				resultBuilder.add(create);
+			}
+			result = resultBuilder.build();
+		} else {
+			result = super.getRelatedUnderlyingElements(underlying);
+		}
+
+		return result;
 	}
 
 	/**

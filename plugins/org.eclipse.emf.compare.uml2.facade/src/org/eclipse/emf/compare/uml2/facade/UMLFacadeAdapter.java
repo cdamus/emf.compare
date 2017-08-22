@@ -12,6 +12,8 @@
  */
 package org.eclipse.emf.compare.uml2.facade;
 
+import com.google.common.base.Optional;
+
 import java.util.function.BiFunction;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -99,6 +101,22 @@ public class UMLFacadeAdapter extends FacadeAdapter {
 	 */
 	public EObject getStereotype() {
 		return stereotype;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Iterable<? extends EObject> getRelatedUnderlyingElements(EObject underlying) {
+		Iterable<? extends EObject> result;
+
+		if (underlying != getUnderlyingElement()) {
+			result = super.getRelatedUnderlyingElements(underlying);
+		} else {
+			result = Optional.fromNullable(getStereotype()).asSet();
+		}
+
+		return result;
 	}
 
 	/**

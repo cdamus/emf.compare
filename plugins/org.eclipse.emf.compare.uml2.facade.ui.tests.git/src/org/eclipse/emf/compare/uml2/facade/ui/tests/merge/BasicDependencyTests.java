@@ -21,6 +21,7 @@ import static org.eclipse.emf.compare.utils.EMFComparePredicates.added;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.changedReference;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.ofKind;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.onEObject;
+import static org.eclipse.emf.compare.utils.EMFComparePredicates.onFeature;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.referenceValueMatch;
 import static org.eclipse.emf.compare.utils.EMFComparePredicates.removed;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -117,5 +118,21 @@ public class BasicDependencyTests {
 
 		assertThat("Imported package reference not required by deletion of façade package", deletePackage,
 				isPresent());
+	}
+
+	@GitCompare(local = "master", remote = "add-finder", file = "design.uml")
+	@GitInput("data/add-finder-ref-usage.zip")
+	public void umlRefToSecondaryUnderlyingObject(Comparison comparison) throws Exception {
+		assumeThat("There were unexpected conflicts", comparison.getConflicts(), empty());
+
+		Optional<Diff> addAnnotatedElementOpt = tryFind(comparison.getDifferences(),
+				and(ofKind(ADD), onFeature("annotatedElement")));
+		assertThat("Add annotated element not found", addAnnotatedElementOpt, isPresent());
+
+		Diff addAnnotatedElement = addAnnotatedElementOpt.get();
+		Optional<Diff> addFinder = tryFind(addAnnotatedElement.getRequires(),
+				added("j2ee-app.WhatsItByChance"));
+
+		assertThat("Annotated element reference does not require addition of finder", addFinder, isPresent());
 	}
 }
