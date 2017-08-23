@@ -23,4 +23,12 @@ Contributors:
             name="Facade Model Providers">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.emf.compare.rcp.ui.contentMergeViewerCustomization">
+      <treeContentCustomization
+            contentProvider="org.eclipse.emf.compare.facade.ui.internal.content.FacadeMergeViewerItemContentProvider"
+            context="org.eclipse.emf.compare.facade.ui.internal.content.FacadeContextTester"
+            ranking="50">
+      </treeContentCustomization>
+   </extension>
 </plugin>

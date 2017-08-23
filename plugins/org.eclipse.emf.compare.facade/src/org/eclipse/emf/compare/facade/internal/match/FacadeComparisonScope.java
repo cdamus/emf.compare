@@ -16,23 +16,34 @@ import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Iterators.filter;
 import static com.google.common.collect.Iterators.transform;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.collect.MapMaker;
 
+import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.function.Supplier;
 
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.emf.common.EMFPlugin;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.compare.facade.FacadeObject;
 import org.eclipse.emf.compare.facade.IFacadeProvider;
+import org.eclipse.emf.compare.scope.AbstractComparisonScope;
 import org.eclipse.emf.compare.scope.IComparisonScope;
+import org.eclipse.emf.compare.utils.TreeIterators;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * A decorating scope that extracts façade model elements from the underlying model elements in the base
@@ -42,15 +53,28 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
  *
  * @author Christian W. Damus
  */
-class FacadeComparisonScope implements IComparisonScope {
+public final class FacadeComparisonScope implements IComparisonScope, IAdaptable {
+
+	/**
+	 * Mapping of comparison scopes to façade wrappers. Depends on the values using weak references to the
+	 * keys to avoid memory leaks. <b>Note</b> that weak values cannot be used, otherwise we would get
+	 * premature collection of the façade scope wrappers from the map as they are quickly forgotten by the
+	 * comparison algorithm.
+	 */
+	private static final Map<IComparisonScope, IComparisonScope> INSTANCES = new MapMaker().weakKeys()
+			.makeMap();
+
 	/** The façade provider factory that I use to get façade providers for each resource. */
 	private final IFacadeProvider.Factory facadeProviderFactory;
 
 	/** The façade provider that I use on resources that have façades. */
 	private final IFacadeProvider facadeProvider;
 
-	/** The comparison scope that provides the underlying model elements to be compared via the façade. */
-	private final IComparisonScope delegate;
+	/**
+	 * The comparison scope that provides the underlying model elements to be compared via the façade. Use a
+	 * weak reference to avoid leaking the wrapping scope in the static map of instances.
+	 */
+	private final Supplier<IComparisonScope> delegate;
 
 	/**
 	 * Initializes me with my façade provider factory and underlying comparison scope.
@@ -65,22 +89,66 @@ class FacadeComparisonScope implements IComparisonScope {
 
 		this.facadeProviderFactory = facadeProviderFactory;
 		this.facadeProvider = facadeProviderFactory.getFacadeProvider();
-		this.delegate = delegate;
+
+		Supplier<IComparisonScope> backup = Suppliers.memoize(EmptyScope::new);
+		this.delegate = Suppliers.compose(d -> {
+			if (d == null) {
+				return backup.get();
+			} else {
+				return d;
+			}
+		}, new WeakReference<>(delegate)::get);
+
+		INSTANCES.put(delegate, this);
+	}
+
+	/**
+	 * Obtains the most appropriate view of a scope for inclusion of façades in the given {@code scope}.
+	 * 
+	 * @param scope
+	 *            a comparison scope
+	 * @return a façade-providing view of the {@code scope}, or else the {@code scope} if façades are not
+	 *         applicable
+	 */
+	public static IComparisonScope getFacadeScope(IComparisonScope scope) {
+		return INSTANCES.getOrDefault(scope, scope);
 	}
 
 	@Override
 	public Notifier getLeft() {
-		return facadeElse(delegate.getLeft());
+		return facadeElse(delegate.get().getLeft());
 	}
 
 	@Override
 	public Notifier getRight() {
-		return facadeElse(delegate.getRight());
+		return facadeElse(delegate.get().getRight());
 	}
 
 	@Override
 	public Notifier getOrigin() {
-		return facadeElse(delegate.getOrigin());
+		return facadeElse(delegate.get().getOrigin());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public <T> T getAdapter(Class<T> adapter) {
+		T result;
+
+		if (adapter.isInstance(this)) {
+			result = adapter.cast(this);
+		} else if (adapter == IFacadeProvider.class) {
+			result = adapter.cast(facadeProvider);
+		} else if (adapter == IFacadeProvider.Factory.class) {
+			result = adapter.cast(facadeProviderFactory);
+		} else if (EMFPlugin.IS_ECLIPSE_RUNNING) {
+			result = Platform.getAdapterManager().getAdapter(this, adapter);
+		} else {
+			result = null;
+		}
+
+		return result;
 	}
 
 	/**
@@ -141,7 +209,7 @@ class FacadeComparisonScope implements IComparisonScope {
 	 */
 	@Override
 	public Set<String> getResourceURIs() {
-		return delegate.getResourceURIs();
+		return delegate.get().getResourceURIs();
 	}
 
 	/**
@@ -149,7 +217,7 @@ class FacadeComparisonScope implements IComparisonScope {
 	 */
 	@Override
 	public Set<String> getNsURIs() {
-		return delegate.getNsURIs();
+		return delegate.get().getNsURIs();
 	}
 
 	/**
@@ -157,7 +225,7 @@ class FacadeComparisonScope implements IComparisonScope {
 	 */
 	@Override
 	public Iterator<? extends Resource> getCoveredResources(ResourceSet resourceSet) {
-		return delegate.getCoveredResources(resourceSet);
+		return delegate.get().getCoveredResources(resourceSet);
 	}
 
 	/**
@@ -167,7 +235,7 @@ class FacadeComparisonScope implements IComparisonScope {
 	public Iterator<? extends EObject> getCoveredEObjects(Resource resource) {
 		if (!facadeProviderFactory.isFacadeProviderFactoryFor(resource)) {
 			// No façades in here
-			return delegate.getCoveredEObjects(resource);
+			return delegate.get().getCoveredEObjects(resource);
 		}
 
 		// Ignore root elements that are not façades
@@ -184,7 +252,7 @@ class FacadeComparisonScope implements IComparisonScope {
 	@Override
 	public Iterator<? extends EObject> getChildren(EObject eObject) {
 		Iterator<? extends EObject> result;
-		Iterator<? extends EObject> raw = delegate.getChildren(eObject);
+		Iterator<? extends EObject> raw = delegate.get().getChildren(eObject);
 
 		if (raw instanceof TreeIterator<?>) {
 			result = new FacadeTreeIterator(raw);
@@ -556,4 +624,42 @@ class FacadeComparisonScope implements IComparisonScope {
 		}
 	}
 
+	/**
+	 * An empty comparison scope.
+	 *
+	 * @author Christian W. Damus
+	 */
+	private static final class EmptyScope extends AbstractComparisonScope {
+		/**
+		 * Initializes me.
+		 */
+		EmptyScope() {
+			super(new ResourceSetImpl(), new ResourceSetImpl(), new ResourceSetImpl());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<? extends EObject> getChildren(EObject eObject) {
+			return TreeIterators.emptyIterator();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<? extends EObject> getCoveredEObjects(Resource resource) {
+			return TreeIterators.emptyIterator();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Iterator<? extends Resource> getCoveredResources(ResourceSet resourceSet) {
+			return TreeIterators.emptyIterator();
+		}
+
+	}
 }

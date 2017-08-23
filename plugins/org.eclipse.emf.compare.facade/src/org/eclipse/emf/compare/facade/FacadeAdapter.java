@@ -1051,7 +1051,9 @@ public class FacadeAdapter implements Adapter.Internal {
 		EObject result = null;
 
 		FacadeAdapter adapter = get(facade, FacadeAdapter.class);
-		if (adapter != null) {
+		if ((adapter != null)
+				&& ((adapter.getFacade() == facade) || (adapter.getFacade() == getRealNotifier(facade)))) {
+
 			result = adapter.getUnderlyingElement();
 		}
 

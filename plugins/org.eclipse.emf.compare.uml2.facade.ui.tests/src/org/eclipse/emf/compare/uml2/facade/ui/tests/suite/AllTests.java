@@ -1,4 +1,4 @@
-/*****************************************************************************
+/*
  * Copyright (c) 2017 Christian W. Damus and others.
  * 
  * All rights reserved. This program and the accompanying materials
@@ -9,11 +9,12 @@
  * Contributors:
  *   Christian W. Damus - Initial API and implementation
  *   
- *****************************************************************************/
+ */
 package org.eclipse.emf.compare.uml2.facade.ui.tests.suite;
 
 import org.eclipse.emf.compare.uml2.facade.ui.tests.BasicConflictMergeJustUMLControlTest;
 import org.eclipse.emf.compare.uml2.facade.ui.tests.BasicConflictMergeWithFacadeTest;
+import org.eclipse.emf.compare.uml2.facade.ui.tests.FacadeItemProviderTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -24,7 +25,9 @@ import org.junit.runners.Suite.SuiteClasses;
  * @author Christian W. Damus
  */
 @RunWith(Suite.class)
-@SuiteClasses({BasicConflictMergeWithFacadeTest.class, BasicConflictMergeJustUMLControlTest.class //
+@SuiteClasses({//
+		BasicConflictMergeWithFacadeTest.class, BasicConflictMergeJustUMLControlTest.class, //
+		FacadeItemProviderTest.class, //
 })
 public class AllTests {
 	// Specification is all in the annotations

@@ -146,6 +146,7 @@ public class FacadeMatchEngine extends DefaultMatchEngine {
 	 */
 	protected IComparisonScope wrap(IComparisonScope delegate,
 			IFacadeProvider.Factory facadeProviderFactory) {
+
 		return new FacadeComparisonScope(facadeProviderFactory, delegate);
 	}
 
