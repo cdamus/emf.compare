@@ -17,6 +17,8 @@ import static org.eclipse.emf.compare.utils.EMFComparePredicates.hasDirectOrIndi
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.emf.compare.Conflict;
 import org.eclipse.emf.compare.ConflictKind;
 import org.eclipse.emf.compare.Diff;
@@ -214,6 +216,29 @@ public final class CompareMatchers {
 			@Override
 			protected boolean matchesSafely(Optional<T> item) {
 				return item.isPresent();
+			}
+		};
+	}
+
+	/**
+	 * Matcher for a regular expression {@code pattern}. This matches a string that has a region matching the
+	 * given {@code pattern}. If a complete match is required, then use the {@code ^} and {@code $} anchors.
+	 * 
+	 * @param pattern
+	 *            the regular expression to match
+	 * @return matcher
+	 */
+	public static Matcher<String> regexMatches(String pattern) {
+		final java.util.regex.Matcher matcher = Pattern.compile(pattern).matcher("");
+
+		return new CustomTypeSafeMatcher<String>(String.format("matches regex /%s/", pattern)) {
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			protected boolean matchesSafely(String item) {
+				matcher.reset(item);
+				return matcher.find();
 			}
 		};
 	}

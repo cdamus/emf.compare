@@ -15,6 +15,7 @@ package org.eclipse.emf.compare.uml2.facade.ui.tests.suite;
 import org.eclipse.emf.compare.uml2.facade.ui.tests.BasicConflictMergeJustUMLControlTest;
 import org.eclipse.emf.compare.uml2.facade.ui.tests.BasicConflictMergeWithFacadeTest;
 import org.eclipse.emf.compare.uml2.facade.ui.tests.FacadeItemProviderTest;
+import org.eclipse.emf.compare.uml2.facade.ui.tests.MergeViewerTreeTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -26,8 +27,10 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({//
-		BasicConflictMergeWithFacadeTest.class, BasicConflictMergeJustUMLControlTest.class, //
+		BasicConflictMergeWithFacadeTest.class, //
+		BasicConflictMergeJustUMLControlTest.class, //
 		FacadeItemProviderTest.class, //
+		MergeViewerTreeTest.class, //
 })
 public class AllTests {
 	// Specification is all in the annotations
