@@ -128,9 +128,9 @@ public class FacadeComparisonPerformanceTest extends AbstractFacadeTest {
 
 		double factor;
 		if (umlPost) {
-			factor = 2.0; // Not worse than a 2x factor
+			factor = 3.0; // Not worse than a 3x factor
 		} else {
-			factor = 2.5; // Not worse than a 2.5x factor
+			factor = 3.5; // Not worse than a 3.5x factor
 		}
 		assertDelta(facadeStats, rawStats, factor);
 	}
@@ -166,9 +166,9 @@ public class FacadeComparisonPerformanceTest extends AbstractFacadeTest {
 
 		double factor;
 		if (umlPost) {
-			factor = 2.0; // Not worse than a 2x factor
+			factor = 3.0; // Not worse than a 3x factor
 		} else {
-			factor = 2.5; // Not worse than a 2.5x factor
+			factor = 3.5; // Not worse than a 3.5x factor
 		}
 		assertDelta(facadeStats, rawStats, factor);
 	}
