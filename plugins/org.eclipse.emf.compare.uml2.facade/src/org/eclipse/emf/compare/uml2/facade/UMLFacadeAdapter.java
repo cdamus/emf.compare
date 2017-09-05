@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright (c) 2017 Christian W. Damus and others.
  *
  * All rights reserved. This program and the accompanying materials
@@ -8,8 +8,7 @@
  * 
  * Contributors:
  *     Christian W. Damus - initial API and implementation
- *
- */
+ *******************************************************************************/
 package org.eclipse.emf.compare.uml2.facade;
 
 import com.google.common.base.Optional;
