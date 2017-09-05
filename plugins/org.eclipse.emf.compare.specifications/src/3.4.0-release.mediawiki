@@ -1,0 +1,82 @@
+<!-- 
+ Copyright (c) 2017 Christian W. Damus and others.
+ 
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Eclipse Public License v1.0
+ which accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+   Christian W. Damus - Initial API and implementation
+
+ -->
+= Specifications of the EMF Compare 3.4.0 release (Eclipse Photon) =
+
+==  US_340_001 - Façade Models ==
+
+=== Description ===
+
+The EMF Compare framework provides numerous extension points to customize the calculation
+and presentation of diffs and to tailor the merge process according to specific application
+semantics.  Façade Models allow an extender to replace a subset of the input of a comparison
+with an alternative representation that better encodes these domain-specific concerns within
+the EMF model implementation, thus simplifying or even obviating other extensions to
+customize the calculation of diffs, UI presentation, and merge dependencies.
+
+==== Categories ====
+[[./index.html#Core-related Specifications|Core]], [[./index.html#UML-related Specifications|UML]]
+
+=== Related Bugs And Reviews ====
+
+This user story is linked with these bugs and reviews:
+* https://bugs.eclipse.org/bugs/show_bug.cgi?id=000000
+* https://git.eclipse.org/r/#/c/00000/
+
+=== Related Tests ===
+
+This user story is linked with these tests, for UML-based use cases (DSML façades for
+profiles and partial façades for complex structures in UML):
+* http://git.eclipse.org/c/emfcompare/org.eclipse.emf.compare.git/tree/plugins/org.eclipse.emf.compare.facade.uml2.tests
+* http://git.eclipse.org/c/emfcompare/org.eclipse.emf.compare.git/tree/plugins/org.eclipse.emf.compare.facade.uml2.ui.tests
+* http://git.eclipse.org/c/emfcompare/org.eclipse.emf.compare.git/tree/plugins/org.eclipse.emf.compare.facade.uml2.ui.tests.git
+
+=== Content ===
+
+Façade models are injected into the compare/merge process by the
+'''FacadeMatchEngine''', which if it detects that any façades are available for the
+given input by registered '''IFacadeProvider'''s, substitutes the standard
+'''IComparisonScope''' with one that replaces model elements in the match process with façade
+objects supplied by the applicable providers.  These façades are '''EObject'''s of distinct
+Ecore models that have entirely their own structure and EMF.Edit providers for a domain-specific
+computation of diffs and presentation of labels and content trees.
+
+Façades are linked to the
+underlying model elements actually stored in the compared resources by a '''FacadeAdapter'''.
+This association allows the '''FacadeMatchEngine''' to match façade objects according to the
+matching of the primary object in the underlying model that represents them when matching
+by ID; façades can match by structure in their own right.
+
+The '''FacadeAdapter''' is also responsible for bidirectional synchronization of changes
+in the underlying model with the façade model.  The merge process relies on this to push
+changes from the logical merge in the façades into the underlying model implementation.
+But in that underlying model, changes could be triggered consequently that need to update
+the façade in turn, so the synchronization is bi-directional.  It is expected to be common,
+but is not required, that a façade provider will define an adapter for each façade '''EClass'''
+to perform this synchronization.
+
+The façade integration feature also introduces into the core EMFCompare framework the
+concept of a pluggable '''ICopier'''.  This addresses the need of façade-based merge to
+create copies of façade objects from the left/right sides of the comparison into the merge
+result.  In the case of an underlying model that uses XMI IDs, this copier then must ensure
+that the XMI IDs of the objects underlying a copied façade are aligned with the XMI IDs of
+the objects underlying the left/right-side originals.
+
+Finally, the enablement of façade providers is user selectable in the preferences as is the
+case for matchers, post processors, and other extensions.  This is not the case for copiers,
+which are required by the framework to handle whatever objects are compared and merge.
+A copiers specific to a façade would of course not be involved if that façade provider is
+disabled, so user control of copiers is not required and would be dangerous.
+
+The org.eclipse.emf.compare.facade.uml2 bundle implements UML-specific specializations of
+the core façade APIs to capture common concerns in UML-based DSLs, such as awareness of
+stereotypes and the XMI IDs used by the Eclipse UML2 implementation for object identity.

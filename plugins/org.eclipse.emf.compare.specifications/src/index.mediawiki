@@ -1,5 +1,8 @@
 = Specifications =
 
+== [[./3.4.0-release.html|3.4.0 release (Eclipse Photon)]] ==
+
+
 == [[./3.3.0-release.html|3.3.0 release (Simultaneous but not included in Eclipse Neon.1)]] ==
 
 
@@ -9,11 +12,12 @@
 == [[./3.1.0-release.html|3.1.0 release (Eclipse Mars)]] ==
 
 
-== [older-releases.html|Older releases] ==
+== [[./older-releases.html|Older releases]] ==
 
 
 == Core-related Specifications ==
 
+* [[./3.4.0-release.html#US_340_001 - Façade Models|US_340_001 - Compare/merge based on Façade Models]]
 * [[./3.2.0-release.html#US_320_001 - UML Dangling stereotypes|US_320_001 - UML Dangling stereotypes]]
 
 == UI-related Specifications ==
@@ -26,6 +30,7 @@
 
 == UML-related Specifications ==
 
+* [[./3.4.0-release.html#US_340_001 - Façade Models|US_340_001 - Compare/merge based on Façade Models]]
 * [[./3.3.0-release.html#US_330_003 - Automatic Profile Migration on Papyrus UML models|US_330_003 - Automatic Profile Migration on Papyrus UML models]]
 * [[./3.2.0-release.html#US_320_001 - UML Dangling stereotypes|US_320_001 - UML Dangling stereotypes]]
 * [[./3.2.0-release.html#US_320_008 - Ignore changes in Papyrus di-files|US_320_008 - Ignore changes in Papyrus di-files]]

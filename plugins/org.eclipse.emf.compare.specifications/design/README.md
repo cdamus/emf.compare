@@ -16,7 +16,7 @@ Copyright: Copyright © 2017 Christian W. Damus and others.
 
 This folder contains design documentation that is not intended for end users.
 Accordingly, it is not included in the `build.properties` neither for binary
-distribution not for the source bundle.  It is expected that developers that
+distribution nor for the source bundle.  It is expected that developers that
 wish to make reference to this documentation will have checked out the source
 from git anyways and can use it in the workspace.
 
