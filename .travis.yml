@@ -9,7 +9,7 @@ before_script:
 - export DISPLAY=:99.0
 - sh -e /etc/init.d/xvfb start
 - sleep 3
-script: org.eclipse.emf.compare-parent/releng/travisbuild.sh -P oxygen verify
+script: org.eclipse.emf.compare-parent/releng/travisbuild.sh -Pfacade-modules -Poxygen verify
 notifications:
   pushover:
     api_key:

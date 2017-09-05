@@ -123,16 +123,6 @@
     <module>../plugins/org.eclipse.emf.compare.diagram</module>
     <module>../plugins/org.eclipse.emf.compare.diagram.edit</module>
     <module>../plugins/org.eclipse.emf.compare.diagram.ide.ui</module>
-        
-    <module>../plugins/org.eclipse.emf.compare.facade</module>
-    <module>../plugins/org.eclipse.emf.compare.facade.ui</module>
-    <module>../plugins/org.eclipse.emf.compare.uml2.facade</module>
-    <module>../plugins/org.eclipse.emf.compare.uml2.facade.tests.annotations</module>
-    <module>../plugins/org.eclipse.emf.compare.uml2.facade.tests</module>
-    <module>../plugins/org.eclipse.emf.compare.uml2.facade.tests.edit</module>
-    <module>../plugins/org.eclipse.emf.compare.uml2.facade.ui.tests</module>
-    <module>../plugins/org.eclipse.emf.compare.uml2.facade.ui.tests.git</module>
-    <module>../packaging/org.eclipse.emf.compare.facade-feature</module>
   </modules>
 
   <build>
@@ -479,6 +469,27 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <!--
+        The "facade-modules" profile builds additionally the façade integration features,
+        supported on Oxygen or later platform only.  So you will need to activate also the
+        "oxygen" or "oxygen-extras" profile, or equivalent for a newer platform than Oxygen.
+    -->
+    <profile>
+      <id>facade-modules</id>
+      <modules>
+        <module>../packaging/org.eclipse.emf.compare.update.facade</module>
+        
+        <module>../plugins/org.eclipse.emf.compare.facade</module>
+        <module>../plugins/org.eclipse.emf.compare.facade.ui</module>
+        <module>../plugins/org.eclipse.emf.compare.uml2.facade</module>
+        <module>../plugins/org.eclipse.emf.compare.uml2.facade.tests.annotations</module>
+        <module>../plugins/org.eclipse.emf.compare.uml2.facade.tests</module>
+        <module>../plugins/org.eclipse.emf.compare.uml2.facade.tests.edit</module>
+        <module>../plugins/org.eclipse.emf.compare.uml2.facade.ui.tests</module>
+        <module>../plugins/org.eclipse.emf.compare.uml2.facade.ui.tests.git</module>
+        <module>../packaging/org.eclipse.emf.compare.facade-feature</module>
+      </modules>
     </profile>
     <!--
         The "extras" profiles can be used to build the supports for external tools such as Sirius and Papyrus.
