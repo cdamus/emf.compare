@@ -13,7 +13,7 @@ package org.eclipse.emf.compare.uml2.facade.merge;
 
 import static java.util.Objects.requireNonNull;
 import static org.eclipse.emf.compare.facade.FacadeAdapter.getUnderlyingObject;
-import static org.eclipse.emf.compare.utils.Optionals.ifAbsent;
+import static org.eclipse.emf.compare.facade.internal.util.Optionals.ifAbsent;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;

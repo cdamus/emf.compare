@@ -186,7 +186,8 @@ public final class ReflectiveDispatch {
 		};
 		Predicate<Method> byParameterCount = new Predicate<Method>() {
 			public boolean apply(Method input) {
-				return input.getParameterCount() == argType.length;
+				// TODO(Java 8): For efficiency, use Method::getParameterCount()
+				return input.getParameterTypes().length == argType.length;
 			}
 		};
 		Predicate<Method> bySignature = new Predicate<Method>() {

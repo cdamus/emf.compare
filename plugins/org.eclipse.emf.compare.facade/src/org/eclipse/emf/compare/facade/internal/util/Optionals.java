@@ -9,7 +9,7 @@
  * Contributors:
  *     Christian W. Damus - initial API and implementation
  *******************************************************************************/
-package org.eclipse.emf.compare.utils;
+package org.eclipse.emf.compare.facade.internal.util;
 
 import com.google.common.base.Function;
 
@@ -20,8 +20,8 @@ import java.util.function.Consumer;
  * Utility operations on {@link Optional}s that should have been provided by that API.
  *
  * @author Christian W. Damus
- * @since 3.5
  */
+// TODO(Java 8): Move this to org.eclipse.emf.compare.utils package
 public final class Optionals {
 
 	/**
