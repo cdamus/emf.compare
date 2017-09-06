@@ -125,7 +125,11 @@ public class EMFCompareRCPPlugin extends Plugin {
 	/** The id of the adapter factory extension point. */
 	public static final String FACTORY_PPID = "adapterFactory"; //$NON-NLS-1$
 
-	/** The ID of the copier extension point. */
+	/**
+	 * The ID of the copier extension point.
+	 * 
+	 * @since 2.6
+	 */
 	public static final String COPIERS_PPID = "copier"; //$NON-NLS-1$
 
 	/**

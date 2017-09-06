@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.emf.compare.ide.ui.tests.framework;
 
+import static org.eclipse.emf.compare.ide.ui.tests.framework.AbstractCompareTestRunner.DEFAULT_DISABLED_FACADE_PROVIDERS;
+
 /**
  * This class is a wrapper for EMFCompare configurations.
  * 
@@ -54,8 +56,32 @@ public class EMFCompareTestConfiguration {
 	 *            The conflict detector used for the test
 	 * @param disabledPostProcessors
 	 *            The post processors disabled for the test
+	 */
+	public EMFCompareTestConfiguration(Class<?>[] disabledMatchEngineFactory, Class<?> diffEngine,
+			Class<?> eqEngine, Class<?> reqEngine, Class<?> conflictDetector,
+			Class<?>[] disabledPostProcessors) {
+		this(disabledMatchEngineFactory, diffEngine, eqEngine, reqEngine, conflictDetector,
+				disabledPostProcessors, DEFAULT_DISABLED_FACADE_PROVIDERS);
+	}
+
+	/**
+	 * The constructor.
+	 * 
+	 * @param disabledMatchEngineFactory
+	 *            The match engines disabled for the test
+	 * @param diffEngine
+	 *            The diff engine used for the test
+	 * @param eqEngine
+	 *            The eq engine used for the test
+	 * @param reqEngine
+	 *            The req engine used for the test
+	 * @param conflictDetector
+	 *            The conflict detector used for the test
+	 * @param disabledPostProcessors
+	 *            The post processors disabled for the test
 	 * @param disabledFacadeProviders
 	 *            The façade providers disabled for the test
+	 * @since 1.1
 	 */
 	public EMFCompareTestConfiguration(Class<?>[] disabledMatchEngineFactory, Class<?> diffEngine,
 			Class<?> eqEngine, Class<?> reqEngine, Class<?> conflictDetector,
@@ -93,6 +119,12 @@ public class EMFCompareTestConfiguration {
 		return disabledPostProcessors;
 	}
 
+	/**
+	 * Obtains the façade provider classes to disable for the test scope.
+	 * 
+	 * @return the disabled façade provider classes
+	 * @since 1.1
+	 */
 	public Class<?>[] getDisabledFacadeProviders() {
 		return disabledFacadeProviders;
 	}

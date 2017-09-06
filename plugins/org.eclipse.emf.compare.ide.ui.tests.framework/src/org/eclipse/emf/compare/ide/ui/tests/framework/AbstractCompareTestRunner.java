@@ -44,6 +44,9 @@ import org.junit.runners.model.InitializationError;
  */
 public abstract class AbstractCompareTestRunner extends ParentRunner<Runner> {
 
+	/** The default disabled façade provider classes. */
+	static final Class<?>[] DEFAULT_DISABLED_FACADE_PROVIDERS = new Class<?>[0];
+
 	/** The list of all runners. */
 	protected final List<Runner> runners;
 
@@ -74,7 +77,7 @@ public abstract class AbstractCompareTestRunner extends ParentRunner<Runner> {
 	 * Default list of façade providers disabled if the
 	 * {@link DisabledFacadeProviders @DisabledFacadeProviders} annotation is not used.
 	 */
-	private final Class<?>[] defaultDisabledFacadeProviders = new Class<?>[] {};
+	private final Class<?>[] defaultDisabledFacadeProviders = DEFAULT_DISABLED_FACADE_PROVIDERS;
 
 	/**
 	 * The constructor.

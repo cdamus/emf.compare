@@ -49,6 +49,8 @@ public final class EMFComparePreferences {
 
 	/**
 	 * Disabled façade providers preference. (Key to use in the registry to retrieve the provider descriptor).
+	 * 
+	 * @since 2.6
 	 */
 	public static final String DISABLED_FACADE_PROVIDER = "org.eclipse.emf.compare.preference.facade.provider"; //$NON-NLS-1$
 

@@ -331,7 +331,7 @@ public final class MatchUtil {
 	// public for testing
 	public static boolean featureContains(EObject eObject, EStructuralFeature feature, Object value) {
 		boolean contains = false;
-
+		
 		if (eObject != null && feature != null) {
 			final Object featureValue = safeEGet(eObject, feature);
 			if (feature.isMany()) {

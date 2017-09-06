@@ -32,6 +32,7 @@ import org.eclipse.emf.ecore.EObject;
  * Listener for changes on the <em>Copiers</em> extension point.
  * 
  * @author Christian W. Damus
+ * @since 2.6
  */
 public class CopierExtensionRegistryListener extends AbstractRegistryEventListener {
 

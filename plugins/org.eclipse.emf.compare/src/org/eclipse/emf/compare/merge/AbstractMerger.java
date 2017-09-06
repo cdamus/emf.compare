@@ -1167,6 +1167,7 @@ public abstract class AbstractMerger implements IMerger2, IMergeOptionAware, IMe
 	 * @param originalObject
 	 *            a merged object
 	 * @return the most appropriate copier for it (never {@code null})
+	 * @since 3.6
 	 */
 	protected ICopier getCopier(EObject originalObject) {
 		ICopier.Registry copierRegistry = (ICopier.Registry)getMergeOptions()
